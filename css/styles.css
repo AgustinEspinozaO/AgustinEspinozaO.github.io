@@ -1,0 +1,216 @@
+body{
+    background-color: #333;
+    color: white;
+}
+#redes-sociales{
+    margin-top: 20px;
+    padding: 10px 0px 10px;    
+}
+a:any-link{
+    color:white;
+}
+a:-webkit-any-link{
+    color:white;
+}
+a:-moz-any-link{
+    color:white;
+}
+li{
+    float: left;
+    margin-right: 10px;
+}
+.seccion{
+    padding-left: 50px;
+    padding-right: 50px;
+}
+section{
+    padding: 10px 50px 10px 50px 
+}
+.agustin{
+    margin-top: 0px;
+}
+#inicio{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    background-image: url("../imagenes/Inicio.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 250px;
+    border-bottom: 2px solid #ffc900;
+    padding-top: 75px;
+}
+.hashtag{
+    font-family: 'Nunito', sans-serif;
+    font-size: smaller;
+    font-weight: 200;
+    color: #ffc900;
+}
+#experiencia{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-align: left;
+}
+#sobre-mi{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-align: left;
+}
+.parrafo-about-me{
+    font-family: 'Nunito', sans-serif;
+    text-align: left;
+}
+#portfolio{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    border-top: 2px solid #ffc900;
+    border-bottom: 2px solid #ffc900;
+    text-align: center;
+}
+.filaportfolio{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 30px 30px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+.card{
+    width: 250px;
+    background-color: #191919;
+    border-radius: 15px;
+}
+.card img{
+    border-radius: 15px 15px 0 0;
+}
+.card h3{
+    color: #ffc900;
+}
+.card h4{
+    margin:0 5px 5px 0;
+}
+.card h3,.card h4,.card p,.card .masinfo{
+    padding: 0 15px;
+}
+.card .masinfo {
+    margin: 15px 0px 15px 0 px;
+    height: 26px;
+}
+.masinfo button{
+    background-color: #ffc900;
+    font-weight: 600;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 10px;
+    padding: 4px;
+}
+.card .sep{
+    margin: 0 5px 5px 0;
+    border: 1px solid #ffc900;
+}
+.card button{
+    padding: 4px;
+}
+.Im-still-learning{
+    font-family: 'Nunito', sans-serif;
+    font-size: smaller;
+    font-weight: 200;
+}
+.h3-experiencia{
+    font-family: 'Nunito', sans-serif;
+    font-size: smaller;
+}
+.parrafo-experiencia{
+    font-family: 'Nunito', sans-serif;
+    font-size: medium;
+}
+span{
+    color: #ffc900;
+}
+i{
+    font-size: 24px;
+}
+i:hover{
+    color: #ffc900;
+}
+ul{
+    list-style: none;
+}
+nav{ 
+    width: 100%;
+    height: 55px;
+    text-align: center;
+    background-color: #333;
+    border-bottom: 1px solid white;
+    
+}
+nav ul{
+    display: inline-block;
+}
+a{
+    text-decoration: none;
+}
+a:hover{
+    color: #ffc900;
+}
+#sobre-mi{
+    display: grid;
+    grid-template-columns: 250px 1fr;
+}
+.card .masinfo button{
+    float: right;
+}
+.gridexp{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap:10px;
+    justify-content: space-between;
+    align-content: space-around;
+}
+.cardexp{
+    background-color: #222;
+    border-radius: 15px;
+    color: white;
+    padding: 10px 15px;
+}
+.cardexp h2{
+    margin-bottom: 5px;
+}
+.cardexp h3{
+    margin-bottom: 20px;
+}
+.cardexp p{
+    margin-bottom: 20px;
+}
+.cardexp ul{
+    display: flex;
+    justify-content: flex-end;
+}
+.cardexp li{
+    height: 30px;
+}
+#contacto h2{
+    color: #222;
+}
+#contacto h3{
+    color: #222;
+}
+#contacto{
+    background-color: #ffc900;
+}
+.item-formulario{
+    display: grid;
+    grid-template-columns: 150px 350px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.item-formulario label{
+    color: #222;
+}
+.item-formulario input,.item-formulario textarea{
+    border-radius: 5px;
+    border: 1px solid white;
+}
+input[type="submit"]{
+    background-color: #222;
+    color: white;
+    padding: 5px;
+    grid-column: 2/3;
+    justify-self: end;
+}
