@@ -214,3 +214,14 @@ input[type="submit"]{
     grid-column: 2/3;
     justify-self: end;
 }
+footer{
+    height: 55px;
+    padding-top: 10px;
+    text-align: center;
+}
+footer ul{
+    display: inline-block;
+}
+footer ul li{
+    float:left;
+}
