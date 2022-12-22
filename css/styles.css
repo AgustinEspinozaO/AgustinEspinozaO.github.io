@@ -1,10 +1,49 @@
+*{
+margin: 0px;
+padding: 0px;
+}
 body{
     background-color: #333;
     color: white;
+    font: 200 14px Georgia, 'Times New Roman', Times, serif;
 }
-#redes-sociales{
-    margin-top: 20px;
-    padding: 10px 0px 10px;    
+h2{
+    font-size: 36px;
+    line-height: 36px;
+}
+h3{
+    color: #999;
+    font-size: 18px;
+    font-weight: 300;
+}
+nav{ 
+    position: fixed;
+    width: 100%;
+    height: 55px;
+    text-align: center;
+    background-color: #333;
+    border-bottom: 1px solid white;   
+}
+nav ul{
+    display: inline-block;
+}
+nav ul li{
+    padding-top: 16px;
+}
+section{
+    padding: 10px 50px 10px 50px 
+}
+p{
+    text-align: justify;
+}
+i{
+    font-size: 24px;
+}
+i:hover{
+    color: #ffc900;
+}
+a{
+    text-decoration: none;
 }
 a:any-link{
     color:white;
@@ -15,53 +54,109 @@ a:-webkit-any-link{
 a:-moz-any-link{
     color:white;
 }
+a:hover{
+    color: #ffc900;
+}
+ul{
+    list-style: none;
+}
 li{
     float: left;
     margin-right: 10px;
 }
-.seccion{
-    padding-left: 50px;
-    padding-right: 50px;
+button{
+    border-radius: 10px;
 }
-section{
-    padding: 10px 50px 10px 50px 
+footer{
+    height: 55px;
+    padding-top: 10px;
+    text-align: center;
 }
-.agustin{
-    margin-top: 0px;
+footer ul{
+    display: inline-block;
 }
-#inicio{
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    background-image: url("../imagenes/Inicio.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
-    min-height: 250px;
-    border-bottom: 2px solid #ffc900;
-    padding-top: 75px;
+footer ul li{
+    float:left;
 }
+/*id y clases*/
 .hashtag{
     font-family: 'Nunito', sans-serif;
     font-size: smaller;
     font-weight: 200;
     color: #ffc900;
 }
-#experiencia{
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    text-align: left;
+.seccion{
+    padding: 10px 100px 10px 100px;
 }
-#sobre-mi{
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    text-align: left;
+#redes-sociales{
+    margin-top: 20px;   
 }
-.parrafo-about-me{
-    font-family: 'Nunito', sans-serif;
-    text-align: left;
-}
-#portfolio{
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    border-top: 2px solid #ffc900;
+#inicio{
+    background-image: url("../imagenes/Inicio.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 280px;
     border-bottom: 2px solid #ffc900;
+    padding-top: 95px;
+}
+#inicio h2{
+    margin-bottom: 10px;
+}
+#experiencia{
+    text-align: left;
+}
+#experiencia h2,#portfolio h2{
     text-align: center;
 }
+#experiencia h3,#portfolio h3{
+    text-align: center;
+    margin-bottom: 30px;
+}
+#portfolio{
+    border-top: 2px solid #ffc900;
+    border-bottom: 2px solid #ffc900;
+}
+.masinfo button{
+    background-color: #ffc900;
+    font-weight: 600;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 5px;
+    padding: 5px;
+}
+video{
+    border-radius: 10px;
+}
+.video h4{
+    margin-bottom: 10px; 
+}
+#contacto{
+    background-color: #ffc900;
+    color: #222;
+}
+#contacto h3{
+    color: #222;
+}
+#sobre-mi{
+    display: grid;
+    grid-template-columns: 250px 1fr;
+}
+#sobre-mi h2{
+    margin-bottom: 15px;
+}
+#sobre-mi .masinfo{
+    margin-top: 10px;
+}
+#sobre-mi .masinfo button{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+#sobre-mi h3{
+    margin-bottom: 10px;
+}
+
 .filaportfolio{
     display: flex;
     flex-direction: row;
@@ -71,6 +166,7 @@ section{
     margin-bottom: 15px;
     margin-top: 15px;
 }
+
 .card{
     width: 250px;
     background-color: #191919;
@@ -92,74 +188,23 @@ section{
     margin: 15px 0px 15px 0 px;
     height: 26px;
 }
-.masinfo button{
-    background-color: #ffc900;
-    font-weight: 600;
-    padding-left: 15px;
-    padding-right: 15px;
-    border-radius: 10px;
-    padding: 4px;
-}
 .card .sep{
     margin: 0 5px 5px 0;
     border: 1px solid #ffc900;
 }
+.card .masinfo button{
+    float: right;
+}
 .card button{
     padding: 4px;
-}
-.Im-still-learning{
-    font-family: 'Nunito', sans-serif;
-    font-size: smaller;
-    font-weight: 200;
-}
-.h3-experiencia{
-    font-family: 'Nunito', sans-serif;
-    font-size: smaller;
-}
-.parrafo-experiencia{
-    font-family: 'Nunito', sans-serif;
-    font-size: medium;
 }
 span{
     color: #ffc900;
 }
-i{
-    font-size: 24px;
-}
-i:hover{
-    color: #ffc900;
-}
-ul{
-    list-style: none;
-}
-nav{ 
-    width: 100%;
-    height: 55px;
-    text-align: center;
-    background-color: #333;
-    border-bottom: 1px solid white;
-    
-}
-nav ul{
-    display: inline-block;
-}
-a{
-    text-decoration: none;
-}
-a:hover{
-    color: #ffc900;
-}
-#sobre-mi{
-    display: grid;
-    grid-template-columns: 250px 1fr;
-}
-.card .masinfo button{
-    float: right;
-}
 .gridexp{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap:10px;
+    grid-template-columns: repeat(3,350px);
+    grid-gap: 10px;
     justify-content: space-between;
     align-content: space-around;
 }
@@ -185,15 +230,7 @@ a:hover{
 .cardexp li{
     height: 30px;
 }
-#contacto h2{
-    color: #222;
-}
-#contacto h3{
-    color: #222;
-}
-#contacto{
-    background-color: #ffc900;
-}
+/*form*/
 .item-formulario{
     display: grid;
     grid-template-columns: 150px 350px;
@@ -214,15 +251,6 @@ input[type="submit"]{
     grid-column: 2/3;
     justify-self: end;
 }
-footer{
-    height: 55px;
-    padding-top: 10px;
-    text-align: center;
-}
-footer ul{
-    display: inline-block;
-}
-footer ul li{
-    float:left;
-}
+
+
 
