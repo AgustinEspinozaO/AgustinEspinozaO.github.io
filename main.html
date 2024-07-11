@@ -220,12 +220,7 @@
             const plazo = document.getElementById('plazo').value;
             const condiciones = document.getElementById('condiciones').value;
             
-            let total = precio;
-            if (financiamiento === 'credito') {
-                total *= 1.1;
-            } else if (financiamiento === 'leasing') {
-                total *= 1.15;
-            }
+        
             
             const htmlContent = `
             <!DOCTYPE html>
@@ -307,12 +302,11 @@
                     <p><strong>Financiamiento:</strong> ${financiamiento}</p>
                     <p><strong>Plazo:</strong> ${plazo} meses</p>
                     <p><strong>Condiciones Adicionales:</strong> ${condiciones}</p>
-                    <p><strong>Total Estimado:</strong> $${total.toLocaleString('es-CL')} CLP</p>
                 </div>
                 
                 <div class="footer">
                     <p>Esta cotizacion es valida por 30 dias a partir de la fecha de emision.</p>
-                    <p>Para mas informacion, por favor contacte a nuestro equipo de ventas.</p>
+                    <p>Para mas informacion, por favor contacte a nuestro equipo de ventas. Creado por AdeoSuite.com</p>
                 </div>
             </body>
             </html>
