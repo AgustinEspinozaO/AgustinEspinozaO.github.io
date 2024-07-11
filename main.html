@@ -277,3 +277,71 @@ ${resultadoHTML}
 
 </body>
 </html>
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 20px;
+                    background-color: #f4f4f4;
+                }
+                .container {
+                    max-width: 800px;
+                    margin: auto;
+                    background: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                }
+                h1, h2 {
+                    color: #333;
+                }
+                p {
+                    font-size: 16px;
+                    color: #555;
+                }
+                img {
+                    max-width: 100%;
+                    margin-top: 10px;
+                    display: block;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Cotización para ${nombre}</h1>
+                <h2>Información del Cliente</h2>
+                <p><strong>Nombre:</strong> ${nombre}</p>
+                <p><strong>Correo electrónico:</strong> ${email}</p>
+                <p><strong>Teléfono:</strong> ${telefono}</p>
+                <h2>Información del Vehículo</h2>
+                <p><strong>Marca:</strong> ${marca}</p>
+                <p><strong>Modelo:</strong> ${modelo}</p>
+                <p><strong>Año:</strong> ${anio}</p>
+                <p><strong>Tipo:</strong> ${tipo}</p>
+                <p><strong>Características:</strong> ${caracteristicas}</p>
+                ${imagenBase64 ? `<img src="${imagenBase64}" alt="Imagen del Vehículo">` : ''}
+                <h2>Condiciones Comerciales</h2>
+                <p><strong>Precio base:</strong> $${precio.toLocaleString('es-CL')} CLP</p>
+                <p><strong>Financiamiento:</strong> ${financiamiento}</p>
+                <p><strong>Plazo:</strong> ${plazo} meses</p>
+                <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
+            </div>
+        </body>
+        </html>
+        `;
+        
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cotizacion_${nombre}.html`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+    
+    document.getElementById('whatsappBtn').addEventListener('click', function() {
+        const nombre = document.getElementById('nombre').value;
+        const telefono = document.getElementById('telefono').value;
+        const mensaje = `Hola ${nombre}, aquí tienes tu cotización.`;
+        const whatsappUrl = `https://wa.me/569${telefono}?text=${encodeURIComponent(mensaje)}`;
+        window.open(whatsappUrl, '_blank');
+    });
+</script>
