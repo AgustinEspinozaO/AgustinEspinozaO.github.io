@@ -324,9 +324,6 @@ ${resultadoHTML}
                 <p><strong>Plazo:</strong> ${plazo} meses</p>
                 <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
             </div>
-        </body>
-        </html>
-        `;
         
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
