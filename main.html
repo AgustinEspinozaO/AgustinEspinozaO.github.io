@@ -182,12 +182,7 @@
             const condiciones = document.getElementById('condiciones').value;
             
             // Calculo simple (esto debe ser ajustado segun las necesidades especificas)
-            let total = precio;
-            if (financiamiento === 'credito') {
-                total *= 1.1; // 10% de interes simple
-            } else if (financiamiento === 'leasing') {
-                total *= 1.15; // 15% de interes simple
-            }
+            
             
             // Generar resultado
             const resultadoHTML = `
