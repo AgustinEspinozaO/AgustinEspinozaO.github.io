@@ -5,114 +5,267 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador Automotora</title>
     <style>
-        /* ... (mantener los estilos existentes) ... */
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: grid;
+            gap: 20px;
+        }
+        label {
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 120px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-left: 6px solid #3498db;
+            border-radius: 4px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        #whatsappBtn {
+            background-color: #25D366;
+        }
+        #whatsappBtn:hover {
+            background-color: #128C7E;
+        }
+        #imagenPreview {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <img src="/api/placeholder/150/100" alt="Logo Automotora" class="logo">
-            <h1>Cotizador Automotora</h1>
-        </div>
-
+        <h1>Cotizador Automotora</h1>
         <form id="cotizadorForm">
-            <!-- ... (mantener el contenido del formulario existente) ... -->
-
-            <button type="button" id="descargarBtn">Descargar Cotización</button>
-            <button type="button" id="mostrarBtn">Mostrar Cotización</button>
+            <!-- ... (el resto del formulario se mantiene igual) ... -->
         </form>
+        
+        <div id="resultado"></div>
+        
+        <div class="action-buttons" style="display: none;">
+            <button id="descargarBtn">Descargar Cotización</button>
+            <button id="whatsappBtn">Enviar por WhatsApp</button>
+        </div>
     </div>
 
-    <div id="cotizacionImprimible" style="display:none;"></div>
-
     <script>
+        let imagenBase64 = '';
+
+        // ... (el resto del código JavaScript se mantiene igual hasta la función de descarga) ...
+
         document.getElementById('descargarBtn').addEventListener('click', function() {
-            generarCotizacion(true);
-        });
-
-        document.getElementById('mostrarBtn').addEventListener('click', function() {
-            generarCotizacion(false);
-        });
-
-        function generarCotizacion(descargar) {
-            const nombre = document.getElementById('nombre').value;
-            const email = document.getElementById('email').value;
-            const telefono = document.getElementById('telefono').value;
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const anio = document.getElementById('anio').value;
-            const tipo = document.getElementById('tipo').value;
-            const caracteristicas = document.getElementById('caracteristicas').value;
-            const precio = parseFloat(document.getElementById('precio').value);
-            const financiamiento = document.getElementById('financiamiento').value;
-            const plazo = document.getElementById('plazo').value;
-            const condiciones = document.getElementById('condiciones').value;
+            // ... (recopilación de datos del formulario) ...
             
-            let total = precio;
-            if (financiamiento === 'credito') {
-                total *= 1.1;
-            } else if (financiamiento === 'leasing') {
-                total *= 1.15;
-            }
-
-            const cotizacionHTML = `
-            <div class="container">
-                <div class="header">
-                    <img src="/api/placeholder/150/100" alt="Logo Automotora" class="logo">
-                    <h1>Cotización Automotora para ${nombre}</h1>
-                </div>
-                
-                <div class="section">
-                    <h2>Información del Cliente</h2>
-                    <div class="info-grid">
-                        <div class="info-item"><strong>Nombre:</strong> ${nombre}</div>
-                        <div class="info-item"><strong>Email:</strong> ${email}</div>
-                        <div class="info-item"><strong>Teléfono:</strong> ${telefono}</div>
+            const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Cotización Automotora</title>
+                <style>
+                    body {
+                        font-family: 'Arial', sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 40px;
+                        background-color: #f9f9f9;
+                    }
+                    .container {
+                        background-color: #ffffff;
+                        padding: 40px;
+                        border-radius: 8px;
+                        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                    }
+                    .logo {
+                        max-width: 200px;
+                        height: auto;
+                        margin-bottom: 20px;
+                    }
+                    h1 {
+                        color: #2c3e50;
+                        font-size: 28px;
+                        margin-bottom: 10px;
+                    }
+                    .section {
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background-color: #f4f9fd;
+                        border-radius: 6px;
+                    }
+                    .section h2 {
+                        color: #3498db;
+                        border-bottom: 2px solid #3498db;
+                        padding-bottom: 10px;
+                        margin-top: 0;
+                    }
+                    .footer {
+                        margin-top: 40px;
+                        text-align: center;
+                        font-size: 0.9em;
+                        color: #7f8c8d;
+                    }
+                    .vehiculo-imagen {
+                        max-width: 100%;
+                        height: auto;
+                        margin-top: 20px;
+                        border-radius: 6px;
+                        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                    }
+                    th, td {
+                        padding: 12px;
+                        text-align: left;
+                        border-bottom: 1px solid #e0e0e0;
+                    }
+                    th {
+                        background-color: #3498db;
+                        color: white;
+                    }
+                    .total {
+                        font-weight: bold;
+                        font-size: 1.2em;
+                        color: #2c3e50;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <img src="/api/placeholder/200/100" alt="Logo Automotora" class="logo">
+                        <h1>Cotización Automotora</h1>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Información del Cliente</h2>
+                        <p><strong>Nombre:</strong> ${nombre}</p>
+                        <p><strong>Email:</strong> ${email}</p>
+                        <p><strong>Teléfono:</strong> ${telefono}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Detalles del Vehículo</h2>
+                        <p><strong>Marca:</strong> ${marca}</p>
+                        <p><strong>Modelo:</strong> ${modelo}</p>
+                        <p><strong>Año:</strong> ${anio}</p>
+                        <p><strong>Tipo:</strong> ${tipo}</p>
+                        <p><strong>Características:</strong> ${caracteristicas}</p>
+                        ${imagenBase64 ? `<img src="${imagenBase64}" alt="Imagen del vehículo" class="vehiculo-imagen">` : ''}
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Condiciones Comerciales</h2>
+                        <table>
+                            <tr>
+                                <th>Concepto</th>
+                                <th>Detalle</th>
+                            </tr>
+                            <tr>
+                                <td>Precio Base</td>
+                                <td>$${precio.toLocaleString('es-CL')} CLP</td>
+                            </tr>
+                            <tr>
+                                <td>Financiamiento</td>
+                                <td>${financiamiento}</td>
+                            </tr>
+                            <tr>
+                                <td>Plazo</td>
+                                <td>${plazo} meses</td>
+                            </tr>
+                            <tr>
+                                <td>Condiciones Adicionales</td>
+                                <td>${condiciones}</td>
+                            </tr>
+                            <tr class="total">
+                                <td>Total Estimado</td>
+                                <td>$${total.toLocaleString('es-CL')} CLP</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Esta cotización es válida por 30 días a partir de la fecha de emisión.</p>
+                        <p>Para más información, por favor contacte a nuestro equipo de ventas.</p>
                     </div>
                 </div>
-                
-                <div class="section">
-                    <h2>Detalles del Vehículo</h2>
-                    <div class="info-grid">
-                        <div class="info-item"><strong>Marca:</strong> ${marca}</div>
-                        <div class="info-item"><strong>Modelo:</strong> ${modelo}</div>
-                        <div class="info-item"><strong>Año:</strong> ${anio}</div>
-                        <div class="info-item"><strong>Tipo:</strong> ${tipo}</div>
-                    </div>
-                    <div class="info-item"><strong>Características:</strong> ${caracteristicas}</div>
-                </div>
-                
-                <div class="section">
-                    <h2>Condiciones Comerciales</h2>
-                    <div class="info-grid">
-                        <div class="info-item"><strong>Precio Base:</strong> $${precio.toLocaleString('es-CL')} CLP</div>
-                        <div class="info-item"><strong>Financiamiento:</strong> ${financiamiento}</div>
-                        <div class="info-item"><strong>Plazo:</strong> ${plazo} meses</div>
-                    </div>
-                    <div class="info-item"><strong>Condiciones Adicionales:</strong> ${condiciones}</div>
-                </div>
-                
-                <div class="total">
-                    <strong>Total Estimado:</strong> $${total.toLocaleString('es-CL')} CLP
-                </div>
-                
-                <div class="footer">
-                    <p>Esta cotización es válida por 30 días. Para más información, contáctenos.</p>
-                </div>
-            </div>`;
-
-            if (descargar) {
-                const blob = new Blob([cotizacionHTML], { type: 'text/html' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'cotizacion_' + nombre.replace(/\s+/g, '_') + '.html';
-                a.click();
-            } else {
-                const cotizacionImprimible = document.getElementById('cotizacionImprimible');
-                cotizacionImprimible.innerHTML = cotizacionHTML;
-                cotizacionImprimible.style.display = 'block';
-            }
-        }
+            </body>
+            </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Cotizacion_Automotora.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // ... (el resto del código JavaScript se mantiene igual) ...
     </script>
 </body>
 </html>
