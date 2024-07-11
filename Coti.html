@@ -181,7 +181,7 @@
             const financiamiento = document.getElementById('financiamiento').value;
             const plazo = document.getElementById('plazo').value;
             const condiciones = document.getElementById('condiciones').value;
-
+            
             let total = precio;
             if (financiamiento === 'credito') {
                 total *= 1.1;
@@ -190,50 +190,35 @@
             }
 
             const cotizacionHTML = `
-            <!DOCTYPE html>
-            <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Cotización Automotora para ${nombre}</title>
-                <style>
-                    body {
-                        font-family: 'Arial', sans-serif;
-                        line-height: 1.6;
-                        color: #333;
-                        max-width: 800px;
-                        margin: 0 auto;
-                        padding: 20px;
-                        background-color: #f9f9f9;
-                    }
-                    .container {
-                        background-color: #ffffff;
-                        padding: 40px;
-                        border-radius: 8px;
-                        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-                    }
-                    .header {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        border-bottom: 2px solid #3498db;
-                        padding-bottom: 20px;
-                    }
-                    .logo {
-                        max-width: 150px;
-                        height: auto;
-                        margin-bottom: 15px;
-                    }
-                    h1 {
-                        color: #3498db;
-                        margin: 0;
-                    }
-                    .section {
-                        margin-bottom: 30px;
-                    }
-                    .section h2 {
-                        color: #3498db;
-                        border-bottom: 1px solid #e0e0e0;
-                        padding-bottom: 10px;
-                    }
-                    .info-grid {
-                        display
+            <div class="container">
+                <div class="header">
+                    <img src="/api/placeholder/150/100" alt="Logo Automotora" class="logo">
+                    <h1>Cotización Automotora para ${nombre}</h1>
+                </div>
+                
+                <div class="section">
+                    <h2>Información del Cliente</h2>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Nombre:</strong> ${nombre}</div>
+                        <div class="info-item"><strong>Email:</strong> ${email}</div>
+                        <div class="info-item"><strong>Teléfono:</strong> ${telefono}</div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>Detalles del Vehículo</h2>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Marca:</strong> ${marca}</div>
+                        <div class="info-item"><strong>Modelo:</strong> ${modelo}</div>
+                        <div class="info-item"><strong>Año:</strong> ${anio}</div>
+                        <div class="info-item"><strong>Tipo:</strong> ${tipo}</div>
+                    </div>
+                    <div class="info-item"><strong>Características:</strong> ${caracteristicas}</div>
+                </div>
+                
+                <div class="section">
+                    <h2>Condiciones Comerciales</h2>
+                    <div class="info-grid">
+                        <div class="info-item"><strong>Precio Base:</strong> $${precio.toLocaleString('es-CL')} CLP</div>
+                        <div class="info-item"><strong>Financiamiento
+        
