@@ -229,9 +229,9 @@
                             font-family: 'Arial
                            ’, sans-serif;
                            line-height: 1.6;
-padding: 20px;
-background-color: #f4f4f4;
-color: #333;
+                           padding: 20px;
+                          background-color: #f4f4f4;
+                          color: #333;
 }
 .container {
 max-width: 800px;
@@ -254,7 +254,7 @@ padding: 20px;
 background-color: #e8f4f8;
 border-left: 6px solid #3498db;
 border-radius: 4px;
-}
+} 
 
 
 
@@ -263,8 +263,8 @@ ${resultadoHTML}
 
 
 
-`;
                            
+
 
 
         const blob = new Blob([cotizacionHTML], { type: 'text/html' });
@@ -272,11 +272,9 @@ ${resultadoHTML}
         link.href = URL.createObjectURL(blob);
         link.download = 'cotizacion.html';
         link.click();
-    });
+    
 </script>
 
-</body>
-</html>
                     line-height: 1.6;
                     margin: 0;
                     padding: 20px;
@@ -332,7 +330,7 @@ ${resultadoHTML}
         a.download = `cotizacion_${nombre}.html`;
         a.click();
         URL.revokeObjectURL(url);
-    });
+
     
     document.getElementById('whatsappBtn').addEventListener('click', function() {
         const nombre = document.getElementById('nombre').value;
