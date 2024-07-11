@@ -63,6 +63,26 @@
             border-left: 6px solid #3498db;
             border-radius: 4px;
         }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .action-buttons button {
+            flex: 1;
+        }
+        #whatsappBtn {
+            background-color: #25D366;
+        }
+        #whatsappBtn:hover {
+            background-color: #128C7E;
+        }
+        #imagenPreview {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
@@ -71,26 +91,26 @@
         <form id="cotizadorForm">
             <h2>Información del Cliente</h2>
             <label for="nombre">Nombre completo:</label>
-            <input type="text" id="nombre" name="nombre" required>
+            <input type="text" id="nombre" required>
             
             <label for="email">Correo electrónico:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" required>
             
             <label for="telefono">Teléfono:</label>
-            <input type="tel" id="telefono" name="telefono" required>
+            <input type="tel" id="telefono" required>
             
             <h2>Información del Vehículo</h2>
             <label for="marca">Marca:</label>
-            <input type="text" id="marca" name="marca" required>
+            <input type="text" id="marca" required>
             
             <label for="modelo">Modelo:</label>
-            <input type="text" id="modelo" name="modelo" required>
+            <input type="text" id="modelo" required>
             
             <label for="anio">Año:</label>
-            <input type="number" id="anio" name="anio" min="1900" max="2099" required>
+            <input type="number" id="anio" min="1900" max="2099" required>
             
             <label for="tipo">Tipo de vehículo:</label>
-            <select id="tipo" name="tipo" required>
+            <select id="tipo" required>
                 <option value="">Seleccione una opción</option>
                 <option value="sedan">Sedán</option>
                 <option value="suv">SUV</option>
@@ -99,18 +119,18 @@
             </select>
             
             <label for="caracteristicas">Características del vehículo:</label>
-            <textarea id="caracteristicas" name="caracteristicas" placeholder="Ingrese todas las características relevantes del vehículo"></textarea>
+            <textarea id="caracteristicas" placeholder="Ingrese todas las características relevantes del vehículo"></textarea>
             
             <label for="imagen">Imagen del vehículo:</label>
-            <input type="file" id="imagen" name="imagen" accept="image/*">
+            <input type="file" id="imagen" accept="image/*">
             <img id="imagenPreview" style="display: none;">
             
             <h2>Condiciones Comerciales</h2>
             <label for="precio">Precio base (CLP):</label>
-            <input type="number" id="precio" name="precio" min="0" step="100000" required>
+            <input type="number" id="precio" min="0" step="100000" required>
             
             <label for="financiamiento">Tipo de financiamiento:</label>
-            <select id="financiamiento" name="financiamiento" required>
+            <select id="financiamiento" required>
                 <option value="">Seleccione una opción</option>
                 <option value="contado">Contado</option>
                 <option value="credito">Crédito</option>
@@ -118,15 +138,20 @@
             </select>
             
             <label for="plazo">Plazo (meses):</label>
-            <input type="number" id="plazo" name="plazo" min="12" max="84" step="12">
+            <input type="number" id="plazo" min="12" max="84" step="12">
             
             <label for="condiciones">Condiciones adicionales:</label>
-            <textarea id="condiciones" name="condiciones" placeholder="Ingrese cualquier condición adicional o comentario"></textarea>
+            <textarea id="condiciones" placeholder="Ingrese cualquier condición adicional o comentario"></textarea>
             
             <button type="submit">Calcular Cotización</button>
         </form>
         
         <div id="resultado"></div>
+        
+        <div class="action-buttons" style="display: none;">
+            <button id="descargarBtn">Descargar Cotización</button>
+            <button id="whatsappBtn">Enviar por WhatsApp</button>
+        </div>
     </div>
 
     <script>
@@ -172,46 +197,83 @@
                 total *= 1.15; // 15% de interés simple
             }
             
-            // Generar resultado en HTML
+            // Generar resultado
+            const resultadoHTML = `
+                <h3>Cotización para ${nombre}</h3>
+                <p><strong>Vehículo:</strong> ${marca} ${modelo} (${anio})</p>
+                <p><strong>Tipo de vehículo:</strong> ${tipo}</p>
+                <p><strong>Características:</strong> ${caracteristicas}</p>
+                <p><strong>Precio base:</strong> $${precio.toLocaleString('es-CL')} CLP</p>
+                <p><strong>Financiamiento:</strong> ${financiamiento}</p>
+                <p><strong>Plazo:</strong> ${plazo} meses</p>
+                <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
+                <p><strong>Total estimado:</strong> $${total.toLocaleString('es-CL')} CLP</p>
+                <p>Se enviará una cotización detallada a ${email}.</p>
+            `;
+            
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = resultadoHTML;
+            
+            // Mostrar botones de acción
+            document.querySelector('.action-buttons').style.display = 'flex';
+            
+            // Crear y descargar archivo HTML
             const cotizacionHTML = `
-                <html>
+                <!DOCTYPE html>
+                <html lang="es">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Cotización para ${nombre}</title>
+                    <title>Cotización de Vehículo</title>
                     <style>
-                        body { font-family: 'Arial', sans-serif; line-height: 1.6; background-color: #f4f4f4; color: #333; padding: 20px; }
-                        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-                        h1, h2, h3 { color: #2c3e50; margin-bottom: 20px; }
-                        p { margin-bottom: 10px; }
-                        .highlight { background-color: #e8f4f8; border-left: 6px solid #3498db; padding: 10px; margin-top: 20px; border-radius: 4px; }
-                        img { max-width: 100%; margin-top: 15px; border-radius: 4px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <h1>Cotización para ${nombre}</h1>
-                        <p><strong>Vehículo:</strong> ${marca} ${modelo} (${anio})</p>
-                        <p><strong>Tipo de vehículo:</strong> ${tipo}</p>
-                        <p><strong>Características:</strong> ${caracteristicas}</p>
-                        <p><strong>Precio base:</strong> $${precio.toLocaleString('es-CL')} CLP</p>
-                        <p><strong>Financiamiento:</strong> ${financiamiento}</p>
-                        <p><strong>Plazo:</strong> ${plazo} meses</p>
-                        <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
-                        <p class="highlight"><strong>Total estimado:</strong> $${total.to
-                    // Crear un Blob con el contenido HTML
+                        body {
+                            font-family: 'Arial
+                           ’, sans-serif;
+line-height: 1.6;
+padding: 20px;
+background-color: #f4f4f4;
+color: #333;
+}
+.container {
+max-width: 800px;
+margin: auto;
+background: white;
+padding: 30px;
+border-radius: 8px;
+box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+h3 {
+color: #2c3e50;
+margin-bottom: 20px;
+}
+p {
+margin: 10px 0;
+}
+.cotizacion {
+margin-top: 30px;
+padding: 20px;
+background-color: #e8f4f8;
+border-left: 6px solid #3498db;
+border-radius: 4px;
+}
+
+
+
+
+${resultadoHTML}
+
+
+
+`;
+
         const blob = new Blob([cotizacionHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        
-        // Crear un enlace de descarga y hacer clic en él
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `cotizacion_${nombre.replace(/\s+/g, '_').toLowerCase()}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        
-        // Revocar la URL del objeto después de la descarga
-        URL.revokeObjectURL(url);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'cotizacion.html';
+        link.click();
     });
 </script>
+
+</body>
+</html>
