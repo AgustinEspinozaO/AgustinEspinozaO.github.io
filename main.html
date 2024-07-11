@@ -84,8 +84,6 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
     </style>
-</head>
-<body>
     <div class="container">
         <h1>Cotizador Automotora</h1>
         <form id="cotizadorForm">
@@ -230,7 +228,7 @@
                         body {
                             font-family: 'Arial
                            ’, sans-serif;
-line-height: 1.6;
+                           line-height: 1.6;
 padding: 20px;
 background-color: #f4f4f4;
 color: #333;
@@ -266,6 +264,8 @@ ${resultadoHTML}
 
 
 `;
+                           
+
 
         const blob = new Blob([cotizacionHTML], { type: 'text/html' });
         const link = document.createElement('a');
