@@ -113,7 +113,18 @@ table img {
     height: auto; /* Ajusta la altura automáticamente */
 }
 </style>
-    <script>let inventario = [];
+    <script>
+        let inventario = [];
+
+// Función para cargar datos del inventario desde localStorage al cargar la página
+window.onload = function() {
+    const inventarioGuardado = localStorage.getItem('inventario');
+    if (inventarioGuardado) {
+        inventario = JSON.parse(inventarioGuardado);
+        actualizarTabla();
+        calcularResumenGastos();
+    }
+};
 
 function agregarVehiculo() {
     const vehiculo = document.getElementById('vehiculo').value;
@@ -143,6 +154,8 @@ function agregarVehiculo() {
             });
             actualizarTabla();
             calcularResumenGastos();
+            guardarInventario(); // Guardar inventario en localStorage
+            limpiarCampos(); // Limpiar campos del formulario
         };
         reader.readAsDataURL(foto);
     }
@@ -160,6 +173,7 @@ function actualizarTabla() {
             if (key === 'foto') {
                 const img = document.createElement('img');
                 img.src = item[key];
+                img.classList.add('thumbnail');
                 cell.appendChild(img);
             } else if (key === 'qr') {
                 const img = document.createElement('img');
@@ -189,11 +203,28 @@ function eliminarVehiculo(index) {
     inventario.splice(index, 1);
     actualizarTabla();
     calcularResumenGastos();
+    guardarInventario(); // Guardar inventario actualizado en localStorage
 }
 
 function generarQR(text) {
     // Uso de una API de generación de QR (puede ser reemplazada con una librería local si es necesario)
     return `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=100x100`;
+}
+
+function guardarInventario() {
+    localStorage.setItem('inventario', JSON.stringify(inventario));
+}
+
+function limpiarCampos() {
+    document.getElementById('vehiculo').value = '';
+    document.getElementById('marca').value = '';
+    document.getElementById('modelo').value = '';
+    document.getElementById('anio').value = '';
+    document.getElementById('precioCompra').value = '';
+    document.getElementById('precioVenta').value = '';
+    document.getElementById('tipoGastos').value = '';
+    document.getElementById('gastosMonto').value = '';
+    document.getElementById('foto').value = '';
 }
 
 function formatCurrency(amount) {
