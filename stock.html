@@ -53,7 +53,7 @@
     <h2>Resumen de Gastos</h2>
     <ul id="resumenGastos"></ul>
 <style>
-    ### Actualización del CSS (`styles.css`)
+   ### CSS (`styles.css`)
 
 ```css
 body {
@@ -126,7 +126,7 @@ li {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     .form-container, table {
         width: 95%;
     }
@@ -308,12 +308,13 @@ function calcularResumenGastos() {
 
     sortedResumen.forEach(entry => {
         const tipoGasto = entry[0];
-            const monto = entry[1];
-    
-    const listItem = document.createElement('li');
-    listItem.textContent = `${tipoGasto}: ${formatCurrency(monto)}`;
-    resumenContainer.appendChild(listItem);
+        const monto = entry[1];
+        
+        const listItem = document.createElement('li');
+        listItem.textContent = `${tipoGasto}: ${formatCurrency(monto)}`;
+resumenContainer.appendChild(listItem);
 });
+}
     </script>
 
     
