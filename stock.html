@@ -111,7 +111,28 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWOc4NfmUWxM0D386fbQsmjwGIcCxjlPo",
+            authDomain: "control-stock-d1c59.firebaseapp.com",
+            projectId: "control-stock-d1c59",
+            storageBucket: "control-stock-d1c59.appspot.com",
+            messagingSenderId: "298416047948",
+            appId: "1:298416047948:web:f8897acce0c87e373d31e9",
+            measurementId: "G-9R7FF95W92"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
         // Función para generar un salt aleatorio
         function generateSalt() {
             return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -131,7 +152,7 @@
             localStorage.setItem('salt', salt);
         }
 
-        function login() {
+        window.login = function() {
             const password = document.getElementById('password').value;
             const storedHash = localStorage.getItem('passwordHash');
             const salt = localStorage.getItem('salt');
@@ -144,9 +165,9 @@
             } else {
                 alert("Contraseña incorrecta. Intente de nuevo.");
             }
-        }
+        };
 
-        function cambiarContrasena() {
+        window.cambiarContrasena = function() {
             const currentPassword = prompt("Ingrese la contraseña actual:");
             const storedHash = localStorage.getItem('passwordHash');
             const salt = localStorage.getItem('salt');
@@ -168,10 +189,10 @@
             } else {
                 alert("Contraseña actual incorrecta. Intente de nuevo.");
             }
-        }
+        };
 
         function initializeApp() {
-            let stock = JSON.parse(localStorage.getItem('stock')) || [];
+            const stockRef = ref(database, 'stock');
 
             document.getElementById('stockForm').addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -195,10 +216,9 @@
                     gastos: gastos
                 };
                 
-                stock.push(auto);
-                actualizarListaStock();
-                actualizarResumenGastos();
-                guardarStock();
+                // Agregar el auto a Firebase
+                push(stockRef, auto);
+
                 this.reset();
                 document.getElementById('gastosInputs').innerHTML = `
                     <div>
@@ -227,11 +247,17 @@
                 document.getElementById('gastosInputs').appendChild(nuevoGasto);
             });
 
-            function actualizarListaStock() {
+            // Escuchar cambios en la base de datos y actualizar la lista
+            onValue(stockRef, (snapshot) => {
+                actualizarListaStock(snapshot.val());
+                actualizarResumenGastos(snapshot.val());
+            });
+
+            function actualizarListaStock(stock) {
                 let stockList = document.getElementById('stockList');
                 stockList.innerHTML = '';
                 
-                stock.forEach((auto, index) => {
+                for (let [key, auto] of Object.entries(stock || {})) {
                     let autoElement = document.createElement('div');
                     autoElement.classList.add('stock-item');
                     let gastosHTML = '<ul class="gastos-list">';
@@ -255,17 +281,17 @@
                         ${gastosHTML}
                         <h4>Código QR:</h4>
                         <img src="${qrImage}" alt="QR Code">
-                        <button onclick="eliminarAuto(${index})">Eliminar</button>
+                        <button onclick="eliminarAuto('${key}')">Eliminar</button>
                     `;
                     stockList.appendChild(autoElement);
-                });
+                }
             }
 
-            function actualizarResumenGastos() {
+            function actualizarResumenGastos(stock) {
                 let gastosSummary = document.getElementById('gastosSummary');
                 let totalGastos = {};
                 
-                stock.forEach(auto => {
+                for (let auto of Object.values(stock || {})) {
                     auto.gastos.forEach(gasto => {
                         if (totalGastos[gasto.tipo]) {
                             totalGastos[gasto.tipo] += gasto.monto;
@@ -273,7 +299,7 @@
                             totalGastos[gasto.tipo] = gasto.monto;
                         }
                     });
-                });
+                }
                 
                 let gastosOrdenados = Object.entries(totalGastos).sort((a, b) => b[1] - a[1]);
                 
@@ -285,33 +311,17 @@
                 
                 gastosSummary.innerHTML = resumenHTML;
             }
-
-            function eliminarAuto(index) {
-                stock.splice(index, 1);
-                actualizarListaStock();
-                actualizarResumenGastos();
-                guardarStock();
-            }
-
-            function guardarStock() {
-                localStorage.setItem('stock', JSON.stringify(stock));
-            }
-
-            function formatearPrecioCLP(precio) {
-                return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
-            }
-
-            // Inicializar la página
-            actualizarListaStock();
-            actualizarResumenGastos();
         }
 
-        // Asignar la función eliminarAuto al objeto window para que esté disponible globalmente
-        window.eliminarAuto = function(index) {
-            let stock = JSON.parse(localStorage.getItem('stock')) || [];
-            stock.splice(index, 1);
-            localStorage.setItem('stock', JSON.stringify(stock));
-            initializeApp();
+        function formatearPrecioCLP(precio) {
+            return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
+        }
+
+        // Función global para eliminar un auto
+        window.eliminarAuto = function(key) {
+            if (confirm('¿Está seguro de que desea eliminar este auto?')) {
+                remove(ref(database, 'stock/' + key));
+            }
         };
     </script>
 </body>
