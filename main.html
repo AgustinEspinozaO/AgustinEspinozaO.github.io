@@ -6,7 +6,127 @@
     <title>Cotizador Automotora Profesional</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* ... (el mismo CSS que antes) ... */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        h1, h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 120px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #resultado, #listaCotizaciones {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+
+        .cotizacion-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        #whatsappBtn {
+            background-color: #25D366;
+        }
+
+        #whatsappBtn:hover {
+            background-color: #128C7E;
+        }
+
+        #busquedaForm {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #busquedaForm input {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -14,7 +134,78 @@
         <h1>Cotizador Automotora Profesional</h1>
         
         <form id="cotizadorForm">
-            <!-- ... (el mismo formulario que antes) ... -->
+            <div class="form-group">
+                <label for="nombre">Nombre completo:</label>
+                <input type="text" id="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="marca">Marca:</label>
+                <input type="text" id="marca" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="anio">Año:</label>
+                <input type="number" id="anio" min="1900" max="2099" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo">Tipo de vehículo:</label>
+                <select id="tipo" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="sedan">Sedán</option>
+                    <option value="suv">SUV</option>
+                    <option value="pickup">Pickup</option>
+                    <option value="deportivo">Deportivo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="caracteristicas">Características del vehículo:</label>
+                <textarea id="caracteristicas" placeholder="Ingrese todas las características relevantes del vehículo"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="precio">Precio base (CLP):</label>
+                <input type="number" id="precio" min="0" step="100000" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="financiamiento">Tipo de financiamiento:</label>
+                <select id="financiamiento" required>
+                    <option value="">Seleccione una opción</option>
+                    <option value="contado">Contado</option>
+                    <option value="credito">Crédito</option>
+                    <option value="leasing">Leasing</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="plazo">Plazo (meses):</label>
+                <input type="number" id="plazo" min="12" max="84" step="12">
+            </div>
+            
+            <div class="form-group">
+                <label for="condiciones">Condiciones adicionales:</label>
+                <textarea id="condiciones" placeholder="Ingrese cualquier condición adicional o comentario"></textarea>
+            </div>
+            
+            <button type="submit">Calcular y Guardar Cotización</button>
         </form>
         
         <div id="resultado"></div>
@@ -168,7 +359,7 @@
                     });
                 }
             } catch (error) {
-                document.getElementById('listaCotizaciones').innerHTML = '<p>Error al buscar cotizaciones. Por favor, intente nuevamente.</p>';
+                document.getElementById('listaCotizaciones').document.getElementById('listaCotizaciones').innerHTML = '<p>Error al buscar cotizaciones. Por favor, intente nuevamente.</p>';
             }
         });
 
