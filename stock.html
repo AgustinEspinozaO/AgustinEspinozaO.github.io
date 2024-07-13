@@ -15,7 +15,62 @@
     </style>
 </head>
 <body class="h-full">
-    <!-- ... (el resto del HTML se mantiene igual) ... -->
+    <div class="min-h-full">
+        <nav class="bg-indigo-600">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300" alt="Your Company">
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="#" class="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="bg-white shadow">
+            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+            </div>
+        </header>
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                <div class="px-4 py-6 sm:px-0">
+                    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Agregar Nuevo Vehículo</h3>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <form id="stockForm" class="p-4">
+                                <!-- ... (el resto del formulario se mantiene igual) ... -->
+                            </form>
+                        </div>
+                    </div>
+                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Inventario Actual</h3>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <div id="stockList" class="px-4 py-5 sm:p-6"></div>
+                        </div>
+                    </div>
+                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Resumen de Gastos</h3>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <div id="gastosSummary" class="px-4 py-5 sm:p-6"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -43,137 +98,164 @@
         // Reference to the 'stock' location in the database
         const stockRef = ref(database, 'stock');
 
-        document.getElementById('stockForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            let gastos = [];
-            document.querySelectorAll('#gastosInputs > div').forEach(div => {
-                gastos.push({
-                    tipo: div.querySelector('.tipoGasto').value,
-                    monto: parseFloat(div.querySelector('.montoGasto').value)
+        // Wrap all our JavaScript in a DOMContentLoaded event listener
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const stockForm = document.getElementById('stockForm');
+            const addGastoButton = document.getElementById('addGasto');
+
+            if (stockForm) {
+                stockForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let gastos = [];
+                    document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                        gastos.push({
+                            tipo: div.querySelector('.tipoGasto').value,
+                            monto: parseFloat(div.querySelector('.montoGasto').value)
+                        });
+                    });
+                    
+                    let auto = {
+                        modelo: document.getElementById('modelo').value,
+                        anio: document.getElementById('anio').value,
+                        color: document.getElementById('color').value,
+                        precio: parseFloat(document.getElementById('precio').value),
+                        precioCompra: parseFloat(document.getElementById('precioCompra').value),
+                        imagen: document.getElementById('imagen').value,
+                        linkQR: document.getElementById('linkQR').value,
+                        gastos: gastos
+                    };
+                    
+                    // Add the car to Firebase
+                    push(stockRef, auto)
+                        .then(() => {
+                            console.log("Auto agregado exitosamente");
+                            this.reset();
+                            resetGastosInputs();
+                        })
+                        .catch((error) => {
+                            console.error("Error al agregar el auto: ", error);
+                        });
                 });
+            } else {
+                console.error("El formulario de stock no se encontró en el DOM");
+            }
+
+            if (addGastoButton) {
+                addGastoButton.addEventListener('click', function() {
+                    let nuevoGasto = document.createElement('div');
+                    nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+                    nuevoGasto.innerHTML = `
+                        <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    `;
+                    document.getElementById('gastosInputs').appendChild(nuevoGasto);
+                });
+            } else {
+                console.error("El botón de agregar gasto no se encontró en el DOM");
+            }
+
+            // Listen for changes in the database and update the list
+            onValue(stockRef, (snapshot) => {
+                const data = snapshot.val();
+                updateStockList(data);
+                updateGastosSummary(data);
+            }, {
+                onlyOnce: false
             });
-            
-            let auto = {
-                modelo: document.getElementById('modelo').value,
-                anio: document.getElementById('anio').value,
-                color: document.getElementById('color').value,
-                precio: parseFloat(document.getElementById('precio').value),
-                precioCompra: parseFloat(document.getElementById('precioCompra').value),
-                imagen: document.getElementById('imagen').value,
-                linkQR: document.getElementById('linkQR').value,
-                gastos: gastos
-            };
-            
-            // Add the car to Firebase
-            push(stockRef, auto)
-                .then(() => {
-                    console.log("Auto agregado exitosamente");
-                    this.reset();
-                    resetGastosInputs();
-                })
-                .catch((error) => {
-                    console.error("Error al agregar el auto: ", error);
-                });
         });
 
         function resetGastosInputs() {
-            document.getElementById('gastosInputs').innerHTML = `
-                <div class="flex items-center space-x-2 mt-1">
-                    <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="reparacion">Reparación</option>
-                        <option value="mantenimiento">Mantenimiento</option>
-                        <option value="impuestos">Impuestos</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                    <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                </div>
-            `;
+            const gastosInputs = document.getElementById('gastosInputs');
+            if (gastosInputs) {
+                gastosInputs.innerHTML = `
+                    <div class="flex items-center space-x-2 mt-1">
+                        <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    </div>
+                `;
+            } else {
+                console.error("El contenedor de gastos no se encontró en el DOM");
+            }
         }
-
-        document.getElementById('addGasto').addEventListener('click', function() {
-            let nuevoGasto = document.createElement('div');
-            nuevoGasto.className = 'flex items-center space-x-2 mt-1';
-            nuevoGasto.innerHTML = `
-                <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <option value="reparacion">Reparación</option>
-                    <option value="mantenimiento">Mantenimiento</option>
-                    <option value="impuestos">Impuestos</option>
-                    <option value="otro">Otro</option>
-                </select>
-                <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-            `;
-            document.getElementById('gastosInputs').appendChild(nuevoGasto);
-        });
-
-        // Listen for changes in the database and update the list
-        onValue(stockRef, (snapshot) => {
-            const data = snapshot.val();
-            updateStockList(data);
-            updateGastosSummary(data);
-        }, {
-            onlyOnce: false
-        });
 
         function updateStockList(stock) {
             let stockList = document.getElementById('stockList');
-            stockList.innerHTML = '';
-            
-            for (let [key, auto] of Object.entries(stock || {})) {
-                let autoElement = document.createElement('div');
-                autoElement.className = 'mb-4 p-4 bg-gray-50 rounded-lg';
-                let gastosHTML = '<ul class="list-disc pl-5">';
-                auto.gastos.forEach(gasto => {
-                    gastosHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)}</li>`;
-                });
-                gastosHTML += '</ul>';
+            if (stockList) {
+                stockList.innerHTML = '';
                 
-                let qr = qrcode(0, 'L');
-                qr.addData(auto.linkQR);
-                qr.make();
-                let qrImage = qr.createDataURL(4);
-                
-                autoElement.innerHTML = `
-                    <h3 class="text-lg font-semibold">${auto.modelo} (${auto.anio})</h3>
-                    <p>Color: ${auto.color}</p>
-                    <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
-                    <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
-                    <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full max-w-xs h-auto my-2">
-                    <h4 class="font-medium mt-2">Gastos:</h4>
-                    ${gastosHTML}
-                    <h4 class="font-medium mt-2">Código QR:</h4>
-                    <img src="${qrImage}" alt="QR Code" class="my-2">
-                    <button onclick="eliminarAuto('${key}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        Eliminar
-                    </button>
-                `;
-                stockList.appendChild(autoElement);
+                for (let [key, auto] of Object.entries(stock || {})) {
+                    let autoElement = document.createElement('div');
+                    autoElement.className = 'mb-4 p-4 bg-gray-50 rounded-lg';
+                    let gastosHTML = '<ul class="list-disc pl-5">';
+                    auto.gastos.forEach(gasto => {
+                        gastosHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)}</li>`;
+                    });
+                    gastosHTML += '</ul>';
+                    
+                    let qr = qrcode(0, 'L');
+                    qr.addData(auto.linkQR);
+                    qr.make();
+                    let qrImage = qr.createDataURL(4);
+                    
+                    autoElement.innerHTML = `
+                        <h3 class="text-lg font-semibold">${auto.modelo} (${auto.anio})</h3>
+                        <p>Color: ${auto.color}</p>
+                        <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                        <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full max-w-xs h-auto my-2">
+                        <h4 class="font-medium mt-2">Gastos:</h4>
+                        ${gastosHTML}
+                        <h4 class="font-medium mt-2">Código QR:</h4>
+                        <img src="${qrImage}" alt="QR Code" class="my-2">
+                        <button onclick="eliminarAuto('${key}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Eliminar
+                        </button>
+                    `;
+                    stockList.appendChild(autoElement);
+                }
+            } else {
+                console.error("La lista de stock no se encontró en el DOM");
             }
         }
 
         function updateGastosSummary(stock) {
             let gastosSummary = document.getElementById('gastosSummary');
-            let totalGastos = {};
-            
-            for (let auto of Object.values(stock || {})) {
-                auto.gastos.forEach(gasto => {
-                    if (totalGastos[gasto.tipo]) {
-                        totalGastos[gasto.tipo] += gasto.monto;
-                    } else {
-                        totalGastos[gasto.tipo] = gasto.monto;
-                    }
+            if (gastosSummary) {
+                let totalGastos = {};
+                
+                for (let auto of Object.values(stock || {})) {
+                    auto.gastos.forEach(gasto => {
+                        if (totalGastos[gasto.tipo]) {
+                            totalGastos[gasto.tipo] += gasto.monto;
+                        } else {
+                            totalGastos[gasto.tipo] = gasto.monto;
+                        }
+                    });
+                }
+                
+                let gastosOrdenados = Object.entries(totalGastos).sort((a, b) => b[1] - a[1]);
+                
+                let resumenHTML = '<ul class="list-disc pl-5">';
+                gastosOrdenados.forEach(([tipo, monto]) => {
+                    resumenHTML += `<li>${tipo}: ${formatearPrecioCLP(monto)}</li>`;
                 });
+                resumenHTML += '</ul>';
+                
+                gastosSummary.innerHTML = resumenHTML;
+            } else {
+                console.error("El resumen de gastos no se encontró en el DOM");
             }
-            
-            let gastosOrdenados = Object.entries(totalGastos).sort((a, b) => b[1] - a[1]);
-            
-            let resumenHTML = '<ul class="list-disc pl-5">';
-            gastosOrdenados.forEach(([tipo, monto]) => {
-                resumenHTML += `<li>${tipo}: ${formatearPrecioCLP(monto)}</li>`;
-            });
-            resumenHTML += '</ul>';
-            
-            gastosSummary.innerHTML = resumenHTML;
         }
 
         function formatearPrecioCLP(precio) {
@@ -184,14 +266,3 @@
         window.eliminarAuto = function(key) {
             if (confirm('¿Está seguro de que desea eliminar este auto?')) {
                 remove(ref(database, 'stock/' + key))
-                    .then(() => {
-                        console.log("Auto eliminado exitosamente");
-                    })
-                    .catch((error) => {
-                        console.error("Error al eliminar el auto: ", error);
-                    });
-            }
-        };
-    </script>
-</body>
-</html>
