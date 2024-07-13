@@ -247,15 +247,17 @@
         const db = getFirestore(app);
 
         async function guardarCotizacion(cotizacion) {
-            try {
-                const docRef = await addDoc(collection(db, "cotizaciones"), cotizacion);
-                console.log("Cotización guardada con ID: ", docRef.id);
-                return { id: docRef.id, ...cotizacion };
-            } catch (error) {
-                console.error("Error al guardar la cotización: ", error);
-                throw error;
-            }
-        }
+    try {
+        const docRef = await addDoc(collection(db, "cotizaciones"), cotizacion);
+        console.log("Cotización guardada con ID: ", docRef.id);
+        return { id: docRef.id, ...cotizacion };
+    } catch (error) {
+        console.error("Error al guardar la cotización: ", error);
+        console.error("Detalles del error:", error.code, error.message);
+        alert("Hubo un error al guardar la cotización. Por favor, intenta de nuevo.");
+        throw error;
+    }
+}
 
         async function buscarCotizaciones(nombre) {
             try {
