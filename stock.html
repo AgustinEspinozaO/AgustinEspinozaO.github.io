@@ -235,7 +235,7 @@
                     console.log("Login exitoso");
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('mainContent').classList.remove('hidden');
-                    initializeApp();
+                    initializeAppFunctions();
                 })
                 .catch((error) => {
                     console.error("Error de login:", error.message);
@@ -259,14 +259,14 @@
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('mainContent').classList.remove('hidden');
-                initializeApp();
+                initializeAppFunctions();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('mainContent').classList.add('hidden');
             }
         });
 
-        function initializeApp() {
+        function initializeAppFunctions() {
             const stockForm = document.getElementById('stockForm');
             const addGastoButton = document.getElementById('addGasto');
             const applyFilterButton = document.getElementById('applyFilter');
