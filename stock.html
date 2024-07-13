@@ -192,7 +192,7 @@
                     </form>
                 </div>
             </div>
-        </main>
+            </main>
     </div>
 
     <script type="module">
@@ -348,11 +348,15 @@
         function filterAndUpdateStockList(marca, modelo) {
             onValue(stockRef, (snapshot) => {
                 const data = snapshot.val();
-                const filteredData = Object.entries(data || {}).filter(([key, auto]) => {
-                    return (!marca || auto.marca.toLowerCase().includes(marca)) &&
-                           (!modelo || auto.modelo.toLowerCase().includes(modelo));
-                });
-                updateStockList(Object.fromEntries(filteredData));
+                if (data) {
+                    const filteredData = Object.entries(data).filter(([key, auto]) => {
+                        return (!marca || (auto.marca && auto.marca.toLowerCase().includes(marca))) &&
+                               (!modelo || (auto.modelo && auto.modelo.toLowerCase().includes(modelo)));
+                    });
+                    updateStockList(Object.fromEntries(filteredData));
+                } else {
+                    updateStockList({});
+                }
             }, { onlyOnce: true });
         }
 
@@ -361,7 +365,12 @@
             if (stockList) {
                 stockList.innerHTML = '';
                 
-                for (let [key, auto] of Object.entries(stock || {})) {
+                if (Object.keys(stock).length === 0) {
+                    stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
+                    return;
+                }
+
+                for (let [key, auto] of Object.entries(stock)) {
                     let autoElement = document.createElement('div');
                     autoElement.className = 'car-card p-4';
                     
