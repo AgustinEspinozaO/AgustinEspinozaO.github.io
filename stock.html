@@ -297,12 +297,12 @@
                     imagen: document.getElementById('imagen').value,
                     linkQR: document.getElementById('linkQR').value,
                     gastos: gastos,
-                    valorReal: parseFloat(document.getElementById('precioCompra').value) || 0,
+                    valorReal: 0,
                     vendido: false,
                     precioVenta: 0
                 };
 
-                auto.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
+                auto.valorReal = auto.precioCompra + gastos.reduce((total, gasto) => total + (parseFloat(gasto.monto) || 0), 0);
                 
                 push(stockRef, auto)
                     .then(() => {
@@ -412,28 +412,30 @@
             }
         }
 
-        function updateSalesSummary(stock) {
-            let salesSummary = document.getElementById('salesSummary');
-            if (salesSummary) {
-                let totalVentas = 0;
-                let totalGanancia = 0;
-                let autosVendidos = 0;
+       function updateSalesSummary(stock) {
+    let salesSummary = document.getElementById('salesSummary');
+    if (salesSummary) {
+        let totalVentas = 0;
+        let totalGanancia = 0;
+        let autosVendidos = 0;
 
-                for (let auto of Object.values(stock || {})) {
-                    if (auto.vendido) {
-                        autosVendidos++;
-                        totalVentas += auto.precioVenta;
-                        totalGanancia += auto.precioVenta - auto.valorReal;
-                    }
-                }
-
-                salesSummary.innerHTML = `
-                    <p>Total de autos vendidos: ${autosVendidos}</p>
-                    <p>Total de ventas: ${formatearPrecioCLP(totalVentas)}</p>
-                    <p>Ganancia total: ${formatearPrecioCLP(totalGanancia)}</p>
-                `;
+        for (let auto of Object.values(stock || {})) {
+            if (auto.vendido) {
+                autosVendidos++;
+                let precioVenta = parseFloat(auto.precioVenta) || 0;
+                let valorReal = parseFloat(auto.valorReal) || 0;
+                totalVentas += precioVenta;
+                totalGanancia += precioVenta - valorReal;
             }
         }
+
+        salesSummary.innerHTML = `
+            <p>Total de autos vendidos: ${autosVendidos}</p>
+            <p>Total de ventas: ${formatearPrecioCLP(totalVentas)}</p>
+            <p>Ganancia total: ${formatearPrecioCLP(totalGanancia)}</p>
+        `;
+    }
+}
 
         function formatearPrecioCLP(precio) {
             return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
@@ -471,18 +473,24 @@
         };
 
         window.marcarComoVendido = function(key) {
-            const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
-            if (precioVenta !== null && !isNaN(precioVenta)) {
-                update(ref(database, 'stock/' + key), {
-                    vendido: true,
-                    precioVenta: parseFloat(precioVenta)
-                }).then(() => {
-                    console.log("Auto marcado como vendido");
-                }).catch((error) => {
-                    console.error("Error al marcar el auto como vendido: ", error);
-                });
-            }
-        };
+    const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
+    if (precioVenta !== null && !isNaN(precioVenta)) {
+        const precioVentaNum = parseFloat(precioVenta);
+        get(ref(database, 'stock/' + key)).then((snapshot) => {
+            const auto = snapshot.val();
+            const ganancia = precioVentaNum - (auto.valorReal || 0);
+            update(ref(database, 'stock/' + key), {
+                vendido: true,
+                precioVenta: precioVentaNum,
+                ganancia: ganancia
+            }).then(() => {
+                console.log("Auto marcado como vendido");
+            }).catch((error) => {
+                console.error("Error al marcar el auto como vendido: ", error);
+            });
+        });
+    }
+};
     </script>
 </body>
 </html>
