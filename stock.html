@@ -1,137 +1,210 @@
 <!DOCTYPE html>
 <html lang="es" class="h-full bg-gray-100">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoStock - Control de Inventario</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <!-- ... (el resto del head se mantiene igual) ... -->
 </head>
 <body class="h-full">
-    <div class="min-h-full">
-        <nav class="bg-indigo-600">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300" alt="Your Company">
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="#" class="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <header class="bg-white shadow">
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-            </div>
-        </header>
-        <main>
-            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-                <div class="px-4 py-6 sm:px-0">
-                    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Agregar Nuevo Vehículo</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <form id="stockForm" class="p-4">
-                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                                    <div class="sm:col-span-3">
-                                        <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
-                                        <input type="text" name="modelo" id="modelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
-                                        <input type="number" name="anio" id="anio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                                        <input type="text" name="color" id="color" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="precio" class="block text-sm font-medium text-gray-700">Precio de Venta (CLP)</label>
-                                        <input type="number" name="precio" id="precio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="precioCompra" class="block text-sm font-medium text-gray-700">Precio de Compra (CLP)</label>
-                                        <input type="number" name="precioCompra" id="precioCompra" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
-                                        <input type="text" name="imagen" id="imagen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-6">
-                                        <label for="linkQR" class="block text-sm font-medium text-gray-700">Link para Código QR</label>
-                                        <input type="url" name="linkQR" id="linkQR" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-6">
-                                        <label class="block text-sm font-medium text-gray-700">Gastos</label>
-                                        <div id="gastosInputs">
-                                            <div class="flex items-center space-x-2 mt-1">
-                                                <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                                    <option value="reparacion">Reparación</option>
-                                                    <option value="mantenimiento">Mantenimiento</option>
-                                                    <option value="impuestos">Impuestos</option>
-                                                    <option value="otro">Otro</option>
-                                                </select>
-                                                <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                                            </div>
-                                        </div>
-                                        <button type="button" id="addGasto" class="mt-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Agregar otro gasto
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-6">
-                                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        Agregar al Stock
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Inventario Actual</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <div id="stockList" class="px-4 py-5 sm:p-6"></div>
-                        </div>
-                    </div>
-                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Resumen de Gastos</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <div id="gastosSummary" class="px-4 py-5 sm:p-6"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+    <!-- ... (el resto del HTML se mantiene igual) ... -->
 
     <script type="module">
-        // ... (el resto del código JavaScript se mantiene igual) ...
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWOc4NfmUWxM0D386fbQsmjwGIcCxjlPo",
+            authDomain: "control-stock-d1c59.firebaseapp.com",
+            databaseURL: "https://control-stock-d1c59-default-rtdb.firebaseio.com",
+            projectId: "control-stock-d1c59",
+            storageBucket: "control-stock-d1c59.appspot.com",
+            messagingSenderId: "298416047948",
+            appId: "1:298416047948:web:f8897acce0c87e373d31e9",
+            measurementId: "G-9R7FF95W92"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+
+        // Reference to the 'stock' location in the database
+        const stockRef = ref(database, 'stock');
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const stockForm = document.getElementById('stockForm');
+            const addGastoButton = document.getElementById('addGasto');
+
+            if (stockForm) {
+                stockForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let gastos = [];
+                    document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                        const tipoGasto = div.querySelector('.tipoGasto');
+                        const montoGasto = div.querySelector('.montoGasto');
+                        if (tipoGasto && montoGasto) {
+                            gastos.push({
+                                tipo: tipoGasto.value,
+                                monto: parseFloat(montoGasto.value) || 0
+                            });
+                        }
+                    });
+                    
+                    let auto = {
+                        modelo: document.getElementById('modelo').value,
+                        anio: parseInt(document.getElementById('anio').value) || 0,
+                        color: document.getElementById('color').value,
+                        precio: parseFloat(document.getElementById('precio').value) || 0,
+                        precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
+                        imagen: document.getElementById('imagen').value,
+                        linkQR: document.getElementById('linkQR').value,
+                        gastos: gastos
+                    };
+                    
+                    // Add the car to Firebase
+                    push(stockRef, auto)
+                        .then(() => {
+                            console.log("Auto agregado exitosamente");
+                            this.reset();
+                            resetGastosInputs();
+                        })
+                        .catch((error) => {
+                            console.error("Error al agregar el auto: ", error);
+                        });
+                });
+            }
+
+            if (addGastoButton) {
+                addGastoButton.addEventListener('click', function() {
+                    let nuevoGasto = document.createElement('div');
+                    nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+                    nuevoGasto.innerHTML = `
+                        <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    `;
+                    document.getElementById('gastosInputs').appendChild(nuevoGasto);
+                });
+            }
+
+            // Listen for changes in the database and update the list
+            onValue(stockRef, (snapshot) => {
+                const data = snapshot.val();
+                updateStockList(data);
+                updateGastosSummary(data);
+            }, {
+                onlyOnce: false
+            });
+        });
+
+        function resetGastosInputs() {
+            const gastosInputs = document.getElementById('gastosInputs');
+            if (gastosInputs) {
+                gastosInputs.innerHTML = `
+                    <div class="flex items-center space-x-2 mt-1">
+                        <select class="tipoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    </div>
+                `;
+            }
+        }
+
+        function updateStockList(stock) {
+            let stockList = document.getElementById('stockList');
+            if (stockList) {
+                stockList.innerHTML = '';
+                
+                for (let [key, auto] of Object.entries(stock || {})) {
+                    let autoElement = document.createElement('div');
+                    autoElement.className = 'mb-4 p-4 bg-gray-50 rounded-lg';
+                    let gastosHTML = '<ul class="list-disc pl-5">';
+                    if (auto.gastos && Array.isArray(auto.gastos)) {
+                        auto.gastos.forEach(gasto => {
+                            gastosHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)}</li>`;
+                        });
+                    }
+                    gastosHTML += '</ul>';
+                    
+                    let qr = qrcode(0, 'L');
+                    qr.addData(auto.linkQR || '');
+                    qr.make();
+                    let qrImage = qr.createDataURL(4);
+                    
+                    autoElement.innerHTML = `
+                        <h3 class="text-lg font-semibold">${auto.modelo} (${auto.anio})</h3>
+                        <p>Color: ${auto.color}</p>
+                        <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                        <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full max-w-xs h-auto my-2">
+                        <h4 class="font-medium mt-2">Gastos:</h4>
+                        ${gastosHTML}
+                        <h4 class="font-medium mt-2">Código QR:</h4>
+                        <img src="${qrImage}" alt="QR Code" class="my-2">
+                        <button onclick="eliminarAuto('${key}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Eliminar
+                        </button>
+                    `;
+                    stockList.appendChild(autoElement);
+                }
+            }
+        }
+
+        function updateGastosSummary(stock) {
+            let gastosSummary = document.getElementById('gastosSummary');
+            if (gastosSummary) {
+                let totalGastos = {};
+                
+                for (let auto of Object.values(stock || {})) {
+                    if (auto.gastos && Array.isArray(auto.gastos)) {
+                        auto.gastos.forEach(gasto => {
+                            if (totalGastos[gasto.tipo]) {
+                                totalGastos[gasto.tipo] += gasto.monto;
+                            } else {
+                                totalGastos[gasto.tipo] = gasto.monto;
+                            }
+                        });
+                    }
+                }
+                
+                let gastosOrdenados = Object.entries(totalGastos).sort((a, b) => b[1] - a[1]);
+                
+                let resumenHTML = '<ul class="list-disc pl-5">';
+                gastosOrdenados.forEach(([tipo, monto]) => {
+                    resumenHTML += `<li>${tipo}: ${formatearPrecioCLP(monto)}</li>`;
+                });
+                resumenHTML += '</ul>';
+                
+                gastosSummary.innerHTML = resumenHTML;
+            }
+        }
+
+        function formatearPrecioCLP(precio) {
+            return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
+        }
+
+        // Global function to delete a car
+        window.eliminarAuto = function(key) {
+            if (confirm('¿Está seguro de que desea eliminar este auto?')) {
+                remove(ref(database, 'stock/' + key))
+                    .then(() => {
+                        console.log("Auto eliminado exitosamente");
+                    })
+                    .catch((error) => {
+                        console.error("Error al eliminar el auto: ", error);
+                    });
+            }
+        };
     </script>
 </body>
 </html>
