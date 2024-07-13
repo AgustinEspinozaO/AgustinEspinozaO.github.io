@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" src="style.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Stock - Automotora</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1>Control de Stock - Automotora</h1>
@@ -35,8 +33,141 @@
                 <th>Acciones</th>
             </tr>
         </thead>
+        <style> body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+h1 {
+    text-align: center;
+}
+
+.form-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+img {
+    max-width: 100px;
+}
+
+.qr-code {
+    width: 100px;
+    height: 100px;
+}
+        </style>
         <tbody id="stockTableBody">
             <!-- Filas dinámicas -->
         </tbody>
     </table>
-    <script src="script.js"></script>
+    <script>let inventario = [];
+
+function agregarVehiculo() {
+    const vehiculo = document.getElementById('vehiculo').value;
+    const marca = document.getElementById('marca').value;
+    const modelo = document.getElementById('modelo').value;
+    const anio = document.getElementById('anio').value;
+    const precioCompra = document.getElementById('precioCompra').value;
+    const precioVenta = document.getElementById('precioVenta').value;
+    const gastosReparacion = document.getElementById('gastosReparacion').value;
+    const foto = document.getElementById('foto').files[0];
+
+    if (vehiculo && marca && modelo && anio && precioCompra && precioVenta && gastosReparacion && foto) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            inventario.push({
+                vehiculo,
+                marca,
+                modelo,
+                anio,
+                precioCompra,
+                precioVenta,
+                gastosReparacion,
+                foto: event.target.result,
+                qr: generarQR(vehiculo)
+            });
+            actualizarTabla();
+        };
+        reader.readAsDataURL(foto);
+    }
+}
+
+function actualizarTabla() {
+    const tbody = document.getElementById('stockTableBody');
+    tbody.innerHTML = '';
+
+    inventario.forEach((item, index) => {
+        const row = document.createElement('tr');
+
+        Object.keys(item).forEach(key => {
+            const cell = document.createElement('td');
+            if (key === 'foto') {
+                const img = document.createElement('img');
+                img.src = item[key];
+                cell.appendChild(img);
+            } else if (key === 'qr') {
+                const img = document.createElement('img');
+                img.src = item[key];
+                img.classList.add('qr-code');
+                cell.appendChild(img);
+            } else {
+                cell.innerText = item[key];
+            }
+            row.appendChild(cell);
+        });
+
+        const cellAcciones = document.createElement('td');
+        const btnEliminar = document.createElement('button');
+        btnEliminar.innerText = 'Eliminar';
+        btnEliminar.onclick = () => eliminarVehiculo(index);
+        cellAcciones.appendChild(btnEliminar);
+        row.appendChild(cellAcciones);
+
+        tbody.appendChild(row);
+    });
+}
+
+function eliminarVehiculo(index) {
+    inventario.splice(index, 1);
+    actualizarTabla();
+}
+
+function generarQR(text) {
+    // Uso de una API de generación de QR (puede ser reemplazada con una librería local si es necesario)
+    return `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(text)}&size=100x100`;
+}
+    </script>
