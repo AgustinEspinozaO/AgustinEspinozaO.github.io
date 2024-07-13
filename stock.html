@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Stock - Automotora</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Control de Stock - Automotora</h1>
+    <div class="form-container">
+        <input type="text" id="vehiculo" placeholder="Nombre del Vehículo">
+        <input type="text" id="marca" placeholder="Marca">
+        <input type="text" id="modelo" placeholder="Modelo">
+        <input type="number" id="anio" placeholder="Año">
+        <input type="number" id="precioCompra" placeholder="Precio de Compra">
+        <input type="number" id="precioVenta" placeholder="Precio de Venta">
+        <input type="number" id="gastosReparacion" placeholder="Gastos de Reparación">
+        <input type="file" id="foto" accept="image/*">
+        <button onclick="agregarVehiculo()">Agregar Vehículo</button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Vehículo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Año</th>
+                <th>Precio de Compra</th>
+                <th>Precio de Venta</th>
+                <th>Gastos de Reparación</th>
+                <th>Imagen</th>
+                <th>QR</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="stockTableBody">
+            <!-- Filas dinámicas -->
+        </tbody>
+    </table>
+    <script src="script.js"></script>
+</body>
+</html>
