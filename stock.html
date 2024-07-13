@@ -19,7 +19,7 @@
         <div class="max-w-md w-full space-y-8">
             <div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Iniciar sesión en AutoStock
+                    Iniciar sesión en AdeoSuiteStock
                 </h2>
             </div>
             <form id="loginForm" class="mt-8 space-y-6">
@@ -179,7 +179,7 @@
                     <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
                         <div class="px-4 py-5 sm:px-6">
                             <h3 class="text-lg font-medium leading-6 text-gray-900">Inventario Actual</h3>
-                            </div>
+                        </div>
                         <div class="border-t border-gray-200">
                             <div id="stockList" class="px-4 py-5 sm:p-6"></div>
                         </div>
@@ -233,6 +233,9 @@
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     console.log("Login exitoso");
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('mainContent').classList.remove('hidden');
+                    initializeApp();
                 })
                 .catch((error) => {
                     console.error("Error de login:", error.message);
@@ -244,6 +247,8 @@
         document.getElementById('logoutButton').addEventListener('click', () => {
             signOut(auth).then(() => {
                 console.log("Logout exitoso");
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainContent').classList.add('hidden');
             }).catch((error) => {
                 console.error("Error de logout:", error);
             });
@@ -465,7 +470,7 @@
                     precioVenta: parseFloat(precioVenta)
                 }).then(() => {
                     console.log("Auto marcado como vendido");
-                }).catch((error) => {
+                    }).catch((error) => {
                     console.error("Error al marcar el auto como vendido: ", error);
                 });
             }
