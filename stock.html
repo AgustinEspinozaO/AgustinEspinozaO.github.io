@@ -7,7 +7,68 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
     <style>
-        /* ... (estilos previos) ... */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, select, button {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #stockList, #gastosSummary {
+            margin-top: 20px;
+        }
+        .stock-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .gastos-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -19,7 +80,35 @@
     </div>
 
     <div id="mainContent" class="hidden">
-        <!-- ... (contenido principal previo) ... -->
+        <div class="container">
+            <h1>Control de Stock - Automotora</h1>
+            <form id="stockForm">
+                <input type="text" id="modelo" placeholder="Modelo del auto" required>
+                <input type="number" id="anio" placeholder="Año" required>
+                <input type="text" id="color" placeholder="Color" required>
+                <input type="number" id="precio" placeholder="Precio de venta (CLP)" required>
+                <input type="number" id="precioCompra" placeholder="Precio de compra (CLP)" required>
+                <input type="text" id="imagen" placeholder="URL de la imagen" required>
+                <input type="url" id="linkQR" placeholder="Link para código QR" required>
+                <h3>Gastos:</h3>
+                <div id="gastosInputs">
+                    <div>
+                        <select class="tipoGasto">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto" placeholder="Monto del gasto (CLP)" required>
+                    </div>
+                </div>
+                <button type="button" id="addGasto">Agregar otro gasto</button>
+                <button type="submit">Agregar al Stock</button>
+            </form>
+            <div id="stockList"></div>
+            <h2>Resumen de Gastos</h2>
+            <div id="gastosSummary"></div>
+        </div>
     </div>
 
     <script>
@@ -82,10 +171,148 @@
         }
 
         function initializeApp() {
-            // ... (código de inicialización previo) ...
+            let stock = JSON.parse(localStorage.getItem('stock')) || [];
+
+            document.getElementById('stockForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                let gastos = [];
+                document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                    gastos.push({
+                        tipo: div.querySelector('.tipoGasto').value,
+                        monto: parseFloat(div.querySelector('.montoGasto').value)
+                    });
+                });
+                
+                let auto = {
+                    modelo: document.getElementById('modelo').value,
+                    anio: document.getElementById('anio').value,
+                    color: document.getElementById('color').value,
+                    precio: parseFloat(document.getElementById('precio').value),
+                    precioCompra: parseFloat(document.getElementById('precioCompra').value),
+                    imagen: document.getElementById('imagen').value,
+                    linkQR: document.getElementById('linkQR').value,
+                    gastos: gastos
+                };
+                
+                stock.push(auto);
+                actualizarListaStock();
+                actualizarResumenGastos();
+                guardarStock();
+                this.reset();
+                document.getElementById('gastosInputs').innerHTML = `
+                    <div>
+                        <select class="tipoGasto">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto" placeholder="Monto del gasto (CLP)" required>
+                    </div>
+                `;
+            });
+
+            document.getElementById('addGasto').addEventListener('click', function() {
+                let nuevoGasto = document.createElement('div');
+                nuevoGasto.innerHTML = `
+                    <select class="tipoGasto">
+                        <option value="reparacion">Reparación</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="impuestos">Impuestos</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <input type="number" class="montoGasto" placeholder="Monto del gasto (CLP)" required>
+                `;
+                document.getElementById('gastosInputs').appendChild(nuevoGasto);
+            });
+
+            function actualizarListaStock() {
+                let stockList = document.getElementById('stockList');
+                stockList.innerHTML = '';
+                
+                stock.forEach((auto, index) => {
+                    let autoElement = document.createElement('div');
+                    autoElement.classList.add('stock-item');
+                    let gastosHTML = '<ul class="gastos-list">';
+                    auto.gastos.forEach(gasto => {
+                        gastosHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)}</li>`;
+                    });
+                    gastosHTML += '</ul>';
+                    
+                    let qr = qrcode(0, 'L');
+                    qr.addData(auto.linkQR);
+                    qr.make();
+                    let qrImage = qr.createDataURL(4);
+                    
+                    autoElement.innerHTML = `
+                        <h3>${auto.modelo} (${auto.anio})</h3>
+                        <p>Color: ${auto.color}</p>
+                        <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                        <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                        <img src="${auto.imagen}" alt="${auto.modelo}" style="max-width: 200px;">
+                        <h4>Gastos:</h4>
+                        ${gastosHTML}
+                        <h4>Código QR:</h4>
+                        <img src="${qrImage}" alt="QR Code">
+                        <button onclick="eliminarAuto(${index})">Eliminar</button>
+                    `;
+                    stockList.appendChild(autoElement);
+                });
+            }
+
+            function actualizarResumenGastos() {
+                let gastosSummary = document.getElementById('gastosSummary');
+                let totalGastos = {};
+                
+                stock.forEach(auto => {
+                    auto.gastos.forEach(gasto => {
+                        if (totalGastos[gasto.tipo]) {
+                            totalGastos[gasto.tipo] += gasto.monto;
+                        } else {
+                            totalGastos[gasto.tipo] = gasto.monto;
+                        }
+                    });
+                });
+                
+                let gastosOrdenados = Object.entries(totalGastos).sort((a, b) => b[1] - a[1]);
+                
+                let resumenHTML = '<ul>';
+                gastosOrdenados.forEach(([tipo, monto]) => {
+                    resumenHTML += `<li>${tipo}: ${formatearPrecioCLP(monto)}</li>`;
+                });
+                resumenHTML += '</ul>';
+                
+                gastosSummary.innerHTML = resumenHTML;
+            }
+
+            function eliminarAuto(index) {
+                stock.splice(index, 1);
+                actualizarListaStock();
+                actualizarResumenGastos();
+                guardarStock();
+            }
+
+            function guardarStock() {
+                localStorage.setItem('stock', JSON.stringify(stock));
+            }
+
+            function formatearPrecioCLP(precio) {
+                return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
+            }
+
+            // Inicializar la página
+            actualizarListaStock();
+            actualizarResumenGastos();
         }
 
-        // ... (resto del código de la aplicación) ...
+        // Asignar la función eliminarAuto al objeto window para que esté disponible globalmente
+        window.eliminarAuto = function(index) {
+            let stock = JSON.parse(localStorage.getItem('stock')) || [];
+            stock.splice(index, 1);
+            localStorage.setItem('stock', JSON.stringify(stock));
+            initializeApp();
+        };
     </script>
 </body>
-</html>
+</
