@@ -11,10 +11,63 @@
     </style>
 </head>
 <body>
-    <!-- ... (contenido HTML sin cambios) ... -->
+    <div id="loginForm">
+        <h2>Ingrese la contraseña</h2>
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="login()">Ingresar</button>
+        <button onclick="cambiarContrasena()">Cambiar Contraseña</button>
+    </div>
+
+    <div id="mainContent" class="hidden">
+        <div class="container">
+            <h1>Control de Stock - Automotora</h1>
+            <form id="stockForm">
+                <!-- ... (formulario sin cambios) ... -->
+            </form>
+            <div id="stockList"></div>
+            <h2>Resumen de Gastos</h2>
+            <div id="gastosSummary"></div>
+        </div>
+    </div>
 
     <script>
-        // ... (funciones de login y cambio de contraseña sin cambios) ...
+        // Función para generar un salt aleatorio
+        function generateSalt() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+
+        // Función para hashear la contraseña con un salt
+        function hashPassword(password, salt) {
+            return sha256(password + salt);
+        }
+
+        // Inicialización: si no hay contraseña almacenada, crear una por defecto
+        if (!localStorage.getItem('passwordHash')) {
+            const defaultPassword = "contraseña123";
+            const salt = generateSalt();
+            const hash = hashPassword(defaultPassword, salt);
+            localStorage.setItem('passwordHash', hash);
+            localStorage.setItem('salt', salt);
+        }
+
+        function login() {
+            const password = document.getElementById('password').value;
+            const storedHash = localStorage.getItem('passwordHash');
+            const salt = localStorage.getItem('salt');
+            const inputHash = hashPassword(password, salt);
+
+            if (inputHash === storedHash) {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                initializeApp();
+            } else {
+                alert("Contraseña incorrecta. Intente de nuevo.");
+            }
+        }
+
+        function cambiarContrasena() {
+            // ... (función sin cambios) ...
+        }
 
         function initializeApp() {
             let stock = JSON.parse(localStorage.getItem('stock')) || [];
@@ -59,7 +112,19 @@
                 `;
             });
 
-            // ... (resto del código sin cambios) ...
+            document.getElementById('addGasto').addEventListener('click', function() {
+                let nuevoGasto = document.createElement('div');
+                nuevoGasto.innerHTML = `
+                    <select class="tipoGasto">
+                        <option value="reparacion">Reparación</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="impuestos">Impuestos</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <input type="number" class="montoGasto" placeholder="Monto del gasto (CLP)" required>
+                `;
+                document.getElementById('gastosInputs').appendChild(nuevoGasto);
+            });
 
             function actualizarListaStock() {
                 let stockList = document.getElementById('stockList');
@@ -120,13 +185,6 @@
                 gastosSummary.innerHTML = resumenHTML;
             }
 
-            function eliminarAuto(index) {
-                stock.splice(index, 1);
-                actualizarListaStock();
-                actualizarResumenGastos();
-                guardarStock();
-            }
-
             function guardarStock() {
                 localStorage.setItem('stock', JSON.stringify(stock));
             }
@@ -147,22 +205,6 @@
             localStorage.setItem('stock', JSON.stringify(stock));
             initializeApp();
         };
-
-        // Llamar a initializeApp después de un inicio de sesión exitoso
-        function login() {
-            const password = document.getElementById('password').value;
-            const storedHash = localStorage.getItem('passwordHash');
-            const salt = localStorage.getItem('salt');
-            const inputHash = hashPassword(password, salt);
-
-            if (inputHash === storedHash) {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                initializeApp();  // Llamar a initializeApp aquí
-            } else {
-                alert("Contraseña incorrecta. Intente de nuevo.");
-            }
-        }
     </script>
 </body>
 </html>
