@@ -12,6 +12,21 @@
         body {
             font-family: 'Poppins', sans-serif;
         }
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .car-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .car-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
     </style>
 </head>
 <body class="h-full">
@@ -19,7 +34,7 @@
         <div class="max-w-md w-full space-y-8">
             <div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Iniciar sesión en AdeoSuiteStock.
+                    Iniciar sesión en AutoStock
                 </h2>
             </div>
             <form id="loginForm" class="mt-8 space-y-6">
@@ -74,124 +89,107 @@
                 <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
             </div>
         </header>
-        <main>
-            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-                <div class="px-4 py-6 sm:px-0">
-                    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Agregar Nuevo Vehículo</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <form id="stockForm" class="p-4">
-                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                                    <div class="sm:col-span-3">
-                                        <label for="marca" class="block text-sm font-medium text-gray-700">Marca</label>
-                                        <input type="text" name="marca" id="marca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
-                                        <input type="text" name="modelo" id="modelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-2">
-                                        <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
-                                        <input type="number" name="anio" id="anio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-2">
-                                        <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
-                                        <input type="text" name="matricula" id="matricula" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-2">
-                                        <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                                        <input type="text" name="color" id="color" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="precio" class="block text-sm font-medium text-gray-700">Precio de Venta (CLP)</label>
-                                        <input type="number" name="precio" id="precio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-3">
-                                        <label for="precioCompra" class="block text-sm font-medium text-gray-700">Precio de Compra (CLP)</label>
-                                        <input type="number" name="precioCompra" id="precioCompra" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-6">
-                                        <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
-                                        <input type="text" name="imagen" id="imagen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-6">
-                                        <label for="linkQR" class="block text-sm font-medium text-gray-700">Link para Código QR</label>
-                                        <input type="url" name="linkQR" id="linkQR" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                    </div>
-
-                                    <div class="sm:col-span-6">
-                                        <label class="block text-sm font-medium text-gray-700">Gastos</label>
-                                        <div id="gastosInputs">
-                                            <div class="flex items-center space-x-2 mt-1">
-                                                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                                    <option value="reparacion">Reparación</option>
-                                                    <option value="mantenimiento">Mantenimiento</option>
-                                                    <option value="impuestos">Impuestos</option>
-                                                    <option value="otro">Otro</option>
-                                                </select>
-                                                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                                                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-                                            </div>
-                                        </div>
-                                        <button type="button" id="addGasto" class="mt-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                            Agregar otro gasto
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-6">
-                                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        Agregar al Stock
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+        <main class="py-6">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Filtrar Vehículos</h2>
+                    <div class="flex space-x-4">
+                        <input type="text" id="filterMarca" placeholder="Marca" class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <input type="text" id="filterModelo" placeholder="Modelo" class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <button id="applyFilter" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            Aplicar Filtro
+                        </button>
                     </div>
-                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Filtrar Vehículos</h3>
-                        </div>
-                        <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
-                            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                                <div class="sm:col-span-3">
-                                    <label for="filterMarca" class="block text-sm font-medium text-gray-700">Marca</label>
-                                    <input type="text" id="filterMarca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label for="filterModelo" class="block text-sm font-medium text-gray-700">Modelo</label>
-                                    <input type="text" id="filterModelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                                </div>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Inventario Actual</h2>
+                    <div id="stockList" class="car-grid">
+                        <!-- Los autos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Resumen de Ventas y Estadísticas</h2>
+                    <div id="salesSummary" class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+                        <!-- El resumen se cargará aquí dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Agregar Nuevo Vehículo</h2>
+                    <form id="stockForm" class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label for="marca" class="block text-sm font-medium text-gray-700">Marca</label>
+                                <input type="text" name="marca" id="marca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
                             </div>
-                            <button id="applyFilter" class="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Aplicar Filtro
+
+                            <div class="sm:col-span-3">
+                                <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
+                                <input type="text" name="modelo" id="modelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
+                                <input type="number" name="anio" id="anio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
+                                <input type="text" name="matricula" id="matricula" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-2">
+                                <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
+                                <input type="text" name="color" id="color" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label for="precio" class="block text-sm font-medium text-gray-700">Precio de Venta (CLP)</label>
+                                <input type="number" name="precio" id="precio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-3">
+                                <label for="precioCompra" class="block text-sm font-medium text-gray-700">Precio de Compra (CLP)</label>
+                                <input type="number" name="precioCompra" id="precioCompra" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-6">
+                                <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
+                                <input type="text" name="imagen" id="imagen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-6">
+                                <label for="linkQR" class="block text-sm font-medium text-gray-700">Link para Código QR</label>
+                                <input type="url" name="linkQR" id="linkQR" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            </div>
+
+                            <div class="sm:col-span-6">
+                                <label class="block text-sm font-medium text-gray-700">Gastos</label>
+                                <div id="gastosInputs">
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                            <option value="reparacion">Reparación</option>
+                                            <option value="mantenimiento">Mantenimiento</option>
+                                            <option value="impuestos">Impuestos</option>
+                                            <option value="otro">Otro</option>
+                                        </select>
+                                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+                                    </div>
+                                </div>
+                                <button type="button" id="addGasto" class="mt-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Agregar otro gasto
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Agregar al Stock
                             </button>
                         </div>
-                    </div>
-                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Inventario Actual</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <div id="stockList" class="px-4 py-5 sm:p-6"></div>
-                        </div>
-                    </div>
-                    <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Resumen de Ventas y Estadísticas</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <div id="salesSummary" class="px-4 py-5 sm:p-6"></div>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </main>
@@ -336,16 +334,10 @@
             applyFilterButton.addEventListener('click', function() {
                 const marca = document.getElementById('filterMarca').value.toLowerCase();
                 const modelo = document.getElementById('filterModelo').value.toLowerCase();
-                onValue(stockRef, (snapshot) => {
-                    const data = snapshot.val();
-                    const filteredData = Object.entries(data || {}).filter(([key, auto]) => {
-                        return (!marca || auto.marca.toLowerCase().includes(marca)) &&
-                               (!modelo || auto.modelo.toLowerCase().includes(modelo));
-                    });
-                    updateStockList(Object.fromEntries(filteredData));
-                }, { onlyOnce: true });
+                filterAndUpdateStockList(marca, modelo);
             });
 
+            // Cargar inventario inicial
             onValue(stockRef, (snapshot) => {
                 const data = snapshot.val();
                 updateStockList(data);
@@ -353,22 +345,15 @@
             });
         }
 
-        function resetGastosInputs() {
-            const gastosInputs = document.getElementById('gastosInputs');
-            if (gastosInputs) {
-                gastosInputs.innerHTML = `
-                    <div class="flex items-center space-x-2 mt-1">
-                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                            <option value="reparacion">Reparación</option>
-                            <option value="mantenimiento">Mantenimiento</option>
-                            <option value="impuestos">Impuestos</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-                    </div>
-                `;
-            }
+        function filterAndUpdateStockList(marca, modelo) {
+            onValue(stockRef, (snapshot) => {
+                const data = snapshot.val();
+                const filteredData = Object.entries(data || {}).filter(([key, auto]) => {
+                    return (!marca || auto.marca.toLowerCase().includes(marca)) &&
+                           (!modelo || auto.modelo.toLowerCase().includes(modelo));
+                });
+                updateStockList(Object.fromEntries(filteredData));
+            }, { onlyOnce: true });
         }
 
         function updateStockList(stock) {
@@ -378,14 +363,11 @@
                 
                 for (let [key, auto] of Object.entries(stock || {})) {
                     let autoElement = document.createElement('div');
-                    autoElement.className = 'mb-4 p-4 bg-gray-50 rounded-lg';
-                    let gastosHTML = '<ul class="list-disc pl-5">';
-                    if (auto.gastos && Array.isArray(auto.gastos)) {
-                        auto.gastos.forEach(gasto => {
-                            gastosHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`;
-                        });
-                    }
-                    gastosHTML += '</ul>';
+                    autoElement.className = 'car-card p-4';
+                    
+                    let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
+                        auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
+                        '<li>No hay gastos registrados</li>';
                     
                     let qr = qrcode(0, 'L');
                     qr.addData(auto.linkQR || '');
@@ -401,11 +383,10 @@
                         <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
                         <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
                         <p>Valor real: ${formatearPrecioCLP(auto.valorReal)}</p>
-                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full max-w-xs h-auto my-2">
+                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2">
                         <h4 class="font-medium mt-2">Gastos:</h4>
-                        ${gastosHTML}
-                        <h4 class="font-medium mt-2">Código QR:</h4>
-                        <img src="${qrImage}" alt="QR Code" class="my-2">
+                        <ul class="list-disc pl-5">${gastosHTML}</ul>
+                        <img src="${qrImage}" alt="QR Code" class="my-2 w-32 h-32">
                         ${auto.vendido 
                             ? `<p>Vendido por: ${formatearPrecioCLP(auto.precioVenta)}</p>
                                <p>Descuento aplicado: ${descuento}%</p>`
@@ -449,6 +430,24 @@
             return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
         }
 
+        function resetGastosInputs() {
+            const gastosInputs = document.getElementById('gastosInputs');
+            if (gastosInputs) {
+                gastosInputs.innerHTML = `
+                    <div class="flex items-center space-x-2 mt-1">
+                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion">Reparación</option>
+                            <option value="mantenimiento">Mantenimiento</option>
+                            <option value="impuestos">Impuestos</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+                    </div>
+                `;
+            }
+        }
+
         // Global functions
         window.eliminarAuto = function(key) {
             if (confirm('¿Está seguro de que desea eliminar este auto?')) {
@@ -470,7 +469,7 @@
                     precioVenta: parseFloat(precioVenta)
                 }).then(() => {
                     console.log("Auto marcado como vendido");
-                    }).catch((error) => {
+                }).catch((error) => {
                     console.error("Error al marcar el auto como vendido: ", error);
                 });
             }
