@@ -52,7 +52,8 @@
         <h2>Resumen de Gastos</h2>
         <ul id="resumenGastos"></ul>
     </div>
-<style>/* Estilos generales */
+<style>
+    /* Estilos generales */
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -80,6 +81,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    overflow-x: auto;
 }
 
 table, th, td {
@@ -97,6 +99,11 @@ img.qr-code {
     height: 50px;
 }
 
+img.thumbnail {
+    max-width: 100px;
+    height: auto;
+}
+
 /* Estilos para el resumen de gastos */
 #resumenGastos {
     list-style-type: none;
@@ -107,10 +114,32 @@ img.qr-code {
     margin-bottom: 5px;
 }
 
-/* Ajuste para imágenes dentro de la tabla */
-table img {
-    max-width: 100px; /* Ajusta el tamaño máximo de las imágenes */
-    height: auto; /* Ajusta la altura automáticamente */
+/* Estilos responsivos */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .form-container {
+        max-width: 100%;
+    }
+
+    table, th, td {
+        font-size: 14px;
+    }
+
+    img.qr-code {
+        width: 40px;
+        height: 40px;
+    }
+
+    img.thumbnail {
+        max-width: 80px;
+    }
+
+    input, select, button {
+        padding: 6px;
+    }
 }
 </style>
     <script>
