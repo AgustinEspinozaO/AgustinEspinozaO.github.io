@@ -32,7 +32,12 @@
                 <th>QR</th>
                 <th>Acciones</th>
             </tr>
-        </thead>
+        </thead><tbody id="stockTableBody">
+            <!-- Filas dinámicas -->
+        </tbody>
+    </table>
+
+    
         <style> body {
     font-family: Arial, sans-serif;
     padding: 20px;
@@ -90,10 +95,7 @@ img {
     height: 100px;
 }
         </style>
-        <tbody id="stockTableBody">
-            <!-- Filas dinámicas -->
-        </tbody>
-    </table>
+        
     <script>let inventario = [];
 
 function agregarVehiculo() {
