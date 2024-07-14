@@ -142,8 +142,20 @@
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Inventario Actual</h3>
                 </div>
                 <div class="border-t border-gray-200">
-                    <div id="stockList" class="car-grid p-4">
+                    <div id="stockList" class="p-4">
                         <!-- Los autos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehículos Vendidos -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Vehículos Vendidos</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="soldList" class="p-4">
+                        <!-- Los autos vendidos se cargarán aquí dinámicamente -->
                     </div>
                 </div>
             </div>
@@ -390,6 +402,7 @@
             onValue(stockRef, (snapshot) => {
                 const data = snapshot.val();
                 updateStockList(data);
+                updateSoldList(data);
                 updateSalesSummary(data);
             });
         }
@@ -399,7 +412,8 @@
                 const data = snapshot.val();
                 if (data) {
                     const filteredData = Object.entries(data).filter(([key, auto]) => {
-                        return (!marca || (auto.marca && auto.marca.toLowerCase().includes(marca))) &&
+                        return (!auto.vendido) && 
+                               (!marca || (auto.marca && auto.marca.toLowerCase().includes(marca))) &&
                                (!modelo || (auto.modelo && auto.modelo.toLowerCase().includes(modelo)));
                     });
                     updateStockList(Object.fromEntries(filteredData));
@@ -420,43 +434,101 @@
                 }
 
                 for (let [key, auto] of Object.entries(stock)) {
+                    if (!auto.vendido) {
+                        let autoElement = document.createElement('div');
+                        autoElement.className = 'car-card p-4 mb-4 fade-in';
+                        
+                        let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
+                            auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
+                            '<li>No hay gastos registrados</li>';
+                        
+                        let qr = qrcode(0, 'L');
+                        qr.addData(auto.linkQR || '');
+                        qr.make();
+                        let qrImage = qr.createDataURL(4);
+                        
+                        autoElement.innerHTML = `
+                            <h3 class="text-lg font-semibold">${auto.marca} ${auto.modelo} (${auto.anio})</h3>
+                            <p>Matrícula: ${auto.matricula}</p>
+                            <p>Color: ${auto.color}</p>
+                            <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                            <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                            <p>Valor real: ${formatearPrecioCLP(auto.valorReal)}</p>
+                            <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2 rounded">
+                            <button class="toggle-details mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Ver detalles
+                            </button>
+                            <div class="details hidden mt-4">
+                                <h4 class="font-medium mt-2">Gastos:</h4>
+                                <ul class="list-disc pl-5">${gastosHTML}</ul>
+                                <img src="${qrImage}" alt="QR Code" class="my-2 w-32 h-32">
+                                <button onclick="editarAuto('${key}')" class="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">
+                                    Editar
+                                </button>
+                                <button onclick="marcarComoVendido('${key}')" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+                                    Marcar como Vendido
+                                </button>
+                                <button onclick="eliminarAuto('${key}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Eliminar
+                                </button>
+                            </div>
+                        `;
+                        stockList.appendChild(autoElement);
+
+                        // Agregar evento para mostrar/ocultar detalles
+                        autoElement.querySelector('.toggle-details').addEventListener('click', function() {
+                            const details = this.nextElementSibling;
+                            details.classList.toggle('hidden');
+                            this.textContent = details.classList.contains('hidden') ? 'Ver detalles' : 'Ocultar detalles';
+                        });
+                    }
+                }
+            }
+        }
+
+        function updateSoldList(stock) {
+            let soldList = document.getElementById('soldList');
+            if (soldList) {
+                soldList.innerHTML = '';
+                
+                let soldCars = Object.entries(stock).filter(([key, auto]) => auto.vendido);
+
+                if (soldCars.length === 0) {
+                    soldList.innerHTML = '<p class="text-center text-gray-500">No hay autos vendidos.</p>';
+                    return;
+                }
+
+                for (let [key, auto] of soldCars) {
                     let autoElement = document.createElement('div');
-                    autoElement.className = 'car-card p-4 fade-in';
+                    autoElement.className = 'car-card p-4 mb-4 fade-in';
                     
                     let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
                         auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
                         '<li>No hay gastos registrados</li>';
                     
-                    let qr = qrcode(0, 'L');
-                    qr.addData(auto.linkQR || '');
-                    qr.make();
-                    let qrImage = qr.createDataURL(4);
-                    
-                    let descuento = auto.vendido ? ((auto.precio - auto.precioVenta) / auto.precio * 100).toFixed(2) : 0;
-                    
                     autoElement.innerHTML = `
                         <h3 class="text-lg font-semibold">${auto.marca} ${auto.modelo} (${auto.anio})</h3>
                         <p>Matrícula: ${auto.matricula}</p>
                         <p>Color: ${auto.color}</p>
-                        <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                        <p>Precio de venta: ${formatearPrecioCLP(auto.precioVenta)}</p>
                         <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
-                        <p>Valor real: ${formatearPrecioCLP(auto.valorReal)}</p>
-                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2 rounded">
-                        <h4 class="font-medium mt-2">Gastos:</h4>
-                        <ul class="list-disc pl-5">${gastosHTML}</ul>
-                        <img src="${qrImage}" alt="QR Code" class="my-2 w-32 h-32">
-                        ${auto.vendido 
-                            ? `<p>Vendido por: ${formatearPrecioCLP(auto.precioVenta)}</p>
-                               <p>Descuento aplicado: ${descuento}%</p>`
-                            : `<button onclick="marcarComoVendido('${key}')" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                Marcar como Vendido
-                               </button>`
-                        }
-                        <button onclick="eliminarAuto('${key}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                            Eliminar
+                        <p>Ganancia: ${formatearPrecioCLP(auto.precioVenta - auto.valorReal)}</p>
+                        <button class="toggle-details mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Ver detalles
                         </button>
+                        <div class="details hidden mt-4">
+                            <h4 class="font-medium mt-2">Gastos:</h4>
+                            <ul class="list-disc pl-5">${gastosHTML}</ul>
+                        </div>
                     `;
-                    stockList.appendChild(autoElement);
+                    soldList.appendChild(autoElement);
+
+                    // Agregar evento para mostrar/ocultar detalles
+                    autoElement.querySelector('.toggle-details').addEventListener('click', function() {
+                        const details = this.nextElementSibling;
+                        details.classList.toggle('hidden');
+                        this.textContent = details.classList.contains('hidden') ? 'Ver detalles' : 'Ocultar detalles';
+                    });
                 }
             }
         }
@@ -542,6 +614,97 @@
                 });
             }
         };
+
+        window.editarAuto = function(key) {
+            get(ref(database, 'stock/' + key)).then((snapshot) => {
+                const auto = snapshot.val();
+                // Rellenar el formulario con los datos actuales del auto
+                document.getElementById('marca').value = auto.marca;
+                document.getElementById('modelo').value = auto.modelo;
+                document.getElementById('anio').value = auto.anio;
+                document.getElementById('matricula').value = auto.matricula;
+                document.getElementById('color').value = auto.color;
+                document.getElementById('precio').value = auto.precio;
+                document.getElementById('precioCompra').value = auto.precioCompra;
+                document.getElementById('imagen').value = auto.imagen;
+                document.getElementById('linkQR').value = auto.linkQR;
+
+                // Rellenar los gastos
+                const gastosInputs = document.getElementById('gastosInputs');
+                gastosInputs.innerHTML = '';
+                auto.gastos.forEach(gasto => {
+                    let gastoElement = document.createElement('div');
+                    gastoElement.className = 'flex items-center space-x-2 mt-1';
+                    gastoElement.innerHTML = `
+                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion" ${gasto.tipo === 'reparacion' ? 'selected' : ''}>Reparación</option>
+                            <option value="mantenimiento" ${gasto.tipo === 'mantenimiento' ? 'selected' : ''}>Mantenimiento</option>
+                            <option value="impuestos" ${gasto.tipo === 'impuestos' ? 'selected' : ''}>Impuestos</option>
+                            <option value="otro" ${gasto.tipo === 'otro' ? 'selected' : ''}>Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)" value="${gasto.monto}">
+                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto" value="${gasto.detalle}">
+                    `;
+                    gastosInputs.appendChild(gastoElement);
+                });
+
+                // Cambiar el botón de "Agregar al Stock" a "Actualizar Auto"
+                const submitButton = document.querySelector('#stockForm button[type="submit"]');
+                submitButton.textContent = 'Actualizar Auto';
+                submitButton.onclick = function(e) {
+                    e.preventDefault();
+                    actualizarAuto(key);
+                };
+            });
+        };
+
+        function actualizarAuto(key) {
+            let gastos = [];
+            document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                const tipoGasto = div.querySelector('.tipoGasto');
+                const montoGasto = div.querySelector('.montoGasto');
+                const detalleGasto = div.querySelector('.detalleGasto');
+                if (tipoGasto && montoGasto && detalleGasto) {
+                    gastos.push({
+                        tipo: tipoGasto.value,
+                        monto: parseFloat(montoGasto.value) || 0,
+                        detalle: detalleGasto.value
+                    });
+                }
+            });
+            
+            let autoActualizado = {
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: parseInt(document.getElementById('anio').value) || 0,
+                matricula: document.getElementById('matricula').value,
+                color: document.getElementById('color').value,
+                precio: parseFloat(document.getElementById('precio').value) || 0,
+                precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
+                imagen: document.getElementById('imagen').value,
+                linkQR: document.getElementById('linkQR').value,
+                gastos: gastos,
+                valorReal: parseFloat(document.getElementById('precioCompra').value) || 0
+            };
+
+            autoActualizado.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
+
+            update(ref(database, 'stock/' + key), autoActualizado)
+                .then(() => {
+                    console.log("Auto actualizado exitosamente");
+                    // Restablecer el formulario
+                    document.getElementById('stockForm').reset();
+                    resetGastosInputs();
+                    // Cambiar el botón de vuelta a "Agregar al Stock"
+                    const submitButton = document.querySelector('#stockForm button[type="submit"]');
+                    submitButton.textContent = 'Agregar al Stock';
+                    submitButton.onclick = null;
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar el auto: ", error);
+                    alert("Error al actualizar el auto: " + error.message);
+                });
+        }
     </script>
 </body>
 </html>
