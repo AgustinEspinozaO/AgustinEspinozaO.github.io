@@ -161,6 +161,48 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -238,6 +280,13 @@
 
     <div id="loadingOverlay">
         <div class="spinner"></div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modalImages"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -362,35 +411,49 @@
                         <p>Año: ${peritaje.anio}</p>
                         <p>Kilometraje: ${peritaje.kilometraje}</p>
                         <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
-                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">` : ''}
-                    `;
-                    listaPeritajes.appendChild(peritajeElement);
-                });
-            } catch (error) {
-                console.error('Error al cargar el historial:', error);
-            } finally {
-                hideLoading();
-            }
+                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                            `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
+                         <button onclick="mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})">Ver más imágenes</button>` 
+                        : ''}
+                    ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                        `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                         <button onclick="descargarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})">Descargar adjuntos</button>`
+                        : ''}
+                `;
+                listaPeritajes.appendChild(peritajeElement);
+            });
+        } catch (error) {
+            console.error('Error al cargar el historial:', error);
+        } finally {
+            hideLoading();
         }
+    }
 
-        window.buscarPeritajes = async function() {
-            const busqueda = document.getElementById('busqueda').value.toLowerCase();
-            const resultadosBusqueda = document.getElementById('resultadosBusqueda');
-            resultadosBusqueda.innerHTML = '';
+    window.buscarPeritajes = async function() {
+        const busqueda = document.getElementById('busqueda').value.toLowerCase();
+        const resultadosBusqueda = document.getElementById('resultadosBusqueda');
+        resultadosBusqueda.innerHTML = '';
 
-            showLoading();
+        showLoading();
 
-            try {
-                const querySnapshot = await getDocs(query(collection(db, 'peritajes'), where('marca', '==', busqueda)));
-                querySnapshot.forEach((doc) => {
-                    const peritaje = doc.data();
-                    const peritajeElement = document.createElement('div');
-                    peritajeElement.className = 'peritaje-item';
-                    peritajeElement.innerHTML = `
-                        <h3>${peritaje.marca} ${peritaje.modelo}</h3>
-                        <p>Año: ${peritaje.anio}</p>
-                        <p>Kilometraje: ${peritaje.kilometraje}</p>
-                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">` : ''}
+        try {
+            const querySnapshot = await getDocs(query(collection(db, 'peritajes'), where('marca', '==', busqueda)));
+            querySnapshot.forEach((doc) => {
+                const peritaje = doc.data();
+                const peritajeElement = document.createElement('div');
+                peritajeElement.className = 'peritaje-item';
+                peritajeElement.innerHTML = `
+                    <h3>${peritaje.marca} ${peritaje.modelo}</h3>
+                    <p>Año: ${peritaje.anio}</p>
+                    <p>Kilometraje: ${peritaje.kilometraje}</p>
+                    ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                        `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
+                         <button onclick="mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})">Ver más imágenes</button>` 
+                        : ''}
+                    ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                        `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                         <button onclick="descargarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})">Descargar adjuntos</button>`
+                        : ''}
                 `;
                 resultadosBusqueda.appendChild(peritajeElement);
             });
@@ -399,6 +462,30 @@
         } finally {
             hideLoading();
         }
+    }
+
+    window.mostrarImagenes = function(imagenes) {
+        const modal = document.getElementById('imageModal');
+        const modalImages = document.getElementById('modalImages');
+        modalImages.innerHTML = '';
+        imagenes.forEach(url => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'modal-image';
+            modalImages.appendChild(img);
+        });
+        modal.style.display = 'block';
+    }
+
+    window.descargarAdjuntos = function(adjuntos) {
+        adjuntos.forEach(url => {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = url.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
     }
 
     // Verificar el estado de autenticación
@@ -439,6 +526,17 @@
         }
     });
 
+    // Cerrar modal
+    const modal = document.getElementById('imageModal');
+    const span = document.getElementsByClassName('close')[0];
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
 </script>
 </body>
 </html>
