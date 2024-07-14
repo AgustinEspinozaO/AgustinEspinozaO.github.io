@@ -1,283 +1,269 @@
-// src/firebase.js
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peritaje Vehicular App</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
 
-const firebaseConfig = {
-  // Reemplaza esto con tu configuración de Firebase
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+    <script type="text/babel">
+        // Configuración de Firebase (reemplazar con tus propias credenciales)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
 
-// src/components/Login.js
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+        // Componente de Login
+        const Login = ({ setIsAuthenticated }) => {
+            const [email, setEmail] = React.useState('');
+            const [password, setPassword] = React.useState('');
 
-const Login = ({ setIsAuthenticated }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+            const handleLogin = (e) => {
+                e.preventDefault();
+                firebase.auth().signInWithEmailAndPassword(email, password)
+                    .then(() => setIsAuthenticated(true))
+                    .catch(error => console.error('Error al iniciar sesión:', error));
+            };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-    }
-  };
+            return (
+                <div className="flex justify-center items-center h-screen bg-gray-100">
+                    <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md">
+                        <h2 className="text-2xl font-bold mb-4">Iniciar Sesión</h2>
+                        <input
+                            type="email"
+                            placeholder="Correo electrónico"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-2 mb-4 border rounded"
+                        />
+                        <input
+                            type="password"
+                            placeholder="Contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-2 mb-4 border rounded"
+                        />
+                        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+                            Iniciar Sesión
+                        </button>
+                    </form>
+                </div>
+            );
+        };
 
-  return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Iniciar Sesión</h2>
-        <input
-          type="email"
-          placeholder="Correo electrónico"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-4 border rounded"
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 mb-4 border rounded"
-        />
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-          Iniciar Sesión
-        </button>
-      </form>
-    </div>
-  );
-};
+        // Componente de Nuevo Peritaje
+        const NuevoPeritaje = () => {
+            const [formData, setFormData] = React.useState({
+                marca: '',
+                modelo: '',
+                anio: '',
+                kilometraje: '',
+            });
+            const [imagenes, setImagenes] = React.useState([]);
+            const [comentario, setComentario] = React.useState('');
 
-// src/components/NuevoPeritaje.js
-import React, { useState } from 'react';
-import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../firebase';
+            const handleInputChange = (e) => {
+                setFormData({ ...formData, [e.target.name]: e.target.value });
+            };
 
-const NuevoPeritaje = () => {
-  const [formData, setFormData] = useState({
-    marca: '',
-    modelo: '',
-    anio: '',
-    kilometraje: '',
-  });
-  const [imagenes, setImagenes] = useState([]);
-  const [comentario, setComentario] = useState('');
+            const handleImageUpload = (e) => {
+                const files = Array.from(e.target.files);
+                const uploadPromises = files.map(file => {
+                    return new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                });
+                Promise.all(uploadPromises).then(urls => setImagenes([...imagenes, ...urls]));
+            };
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                const peritaje = {
+                    ...formData,
+                    imagenes,
+                    comentario,
+                    fecha: new Date().toISOString(),
+                };
+                firebase.firestore().collection('peritajes').add(peritaje)
+                    .then(() => {
+                        alert('Peritaje guardado con éxito');
+                        setFormData({ marca: '', modelo: '', anio: '', kilometraje: '' });
+                        setImagenes([]);
+                        setComentario('');
+                    })
+                    .catch(error => console.error('Error al guardar el peritaje:', error));
+            };
 
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    const uploadPromises = files.map(async (file) => {
-      const storageRef = ref(storage, `peritajes/${Date.now()}_${file.name}`);
-      await uploadBytes(storageRef, file);
-      return getDownloadURL(storageRef);
-    });
-    const urls = await Promise.all(uploadPromises);
-    setImagenes([...imagenes, ...urls]);
-  };
+            return (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <input
+                        name="marca"
+                        value={formData.marca}
+                        onChange={handleInputChange}
+                        placeholder="Marca del vehículo"
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        name="modelo"
+                        value={formData.modelo}
+                        onChange={handleInputChange}
+                        placeholder="Modelo"
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        name="anio"
+                        value={formData.anio}
+                        onChange={handleInputChange}
+                        placeholder="Año"
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        name="kilometraje"
+                        value={formData.kilometraje}
+                        onChange={handleInputChange}
+                        placeholder="Kilometraje"
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        type="file"
+                        multiple
+                        onChange={handleImageUpload}
+                        className="w-full p-2 border rounded"
+                    />
+                    {imagenes.length > 0 && (
+                        <div className="grid grid-cols-3 gap-2">
+                            {imagenes.map((url, index) => (
+                                <img key={index} src={url} alt={`Imagen ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                            ))}
+                        </div>
+                    )}
+                    <textarea
+                        value={comentario}
+                        onChange={(e) => setComentario(e.target.value)}
+                        placeholder="Añadir comentario"
+                        className="w-full p-2 border rounded"
+                    />
+                    <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
+                        Guardar Peritaje
+                    </button>
+                </form>
+            );
+        };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await addDoc(collection(db, 'peritajes'), {
-        ...formData,
-        imagenes,
-        comentario,
-        fecha: new Date(),
-      });
-      // Limpiar el formulario después de guardar
-      setFormData({ marca: '', modelo: '', anio: '', kilometraje: '' });
-      setImagenes([]);
-      setComentario('');
-      alert('Peritaje guardado con éxito');
-    } catch (error) {
-      console.error('Error al guardar el peritaje:', error);
-    }
-  };
+        // Componente de Historial de Peritajes
+        const HistorialPeritajes = () => {
+            const [peritajes, setPeritajes] = React.useState([]);
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        name="marca"
-        value={formData.marca}
-        onChange={handleInputChange}
-        placeholder="Marca del vehículo"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        name="modelo"
-        value={formData.modelo}
-        onChange={handleInputChange}
-        placeholder="Modelo"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        name="anio"
-        value={formData.anio}
-        onChange={handleInputChange}
-        placeholder="Año"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        name="kilometraje"
-        value={formData.kilometraje}
-        onChange={handleInputChange}
-        placeholder="Kilometraje"
-        className="w-full p-2 border rounded"
-      />
-      <input
-        type="file"
-        multiple
-        onChange={handleImageUpload}
-        className="w-full p-2 border rounded"
-      />
-      {imagenes.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {imagenes.map((url, index) => (
-            <img key={index} src={url} alt={`Imagen ${index + 1}`} className="w-full h-24 object-cover rounded" />
-          ))}
-        </div>
-      )}
-      <textarea
-        value={comentario}
-        onChange={(e) => setComentario(e.target.value)}
-        placeholder="Añadir comentario"
-        className="w-full p-2 border rounded"
-      />
-      <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-        Guardar Peritaje
-      </button>
-    </form>
-  );
-};
+            React.useEffect(() => {
+                firebase.firestore().collection('peritajes').orderBy('fecha', 'desc').get()
+                    .then(querySnapshot => {
+                        const peritajesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setPeritajes(peritajesData);
+                    })
+                    .catch(error => console.error('Error al obtener peritajes:', error));
+            }, []);
 
-// src/components/HistorialPeritajes.js
-import React, { useEffect, useState } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '../firebase';
+            return (
+                <div className="space-y-4">
+                    {peritajes.map((peritaje) => (
+                        <div key={peritaje.id} className="bg-white p-4 rounded shadow">
+                            <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
+                            <p>Año: {peritaje.anio}</p>
+                            <p>Kilometraje: {peritaje.kilometraje}</p>
+                            <p>Fecha: {new Date(peritaje.fecha).toLocaleDateString()}</p>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
 
-const HistorialPeritajes = () => {
-  const [peritajes, setPeritajes] = useState([]);
+        // Componente de Búsqueda de Peritaje
+        const BuscarPeritaje = () => {
+            const [busqueda, setBusqueda] = React.useState('');
+            const [resultados, setResultados] = React.useState([]);
 
-  useEffect(() => {
-    const fetchPeritajes = async () => {
-      const q = query(collection(db, 'peritajes'), orderBy('fecha', 'desc'));
-      const querySnapshot = await getDocs(q);
-      setPeritajes(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    };
-    fetchPeritajes();
-  }, []);
+            const handleSearch = () => {
+                firebase.firestore().collection('peritajes').where('marca', '==', busqueda).get()
+                    .then(querySnapshot => {
+                        const resultadosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        setResultados(resultadosData);
+                    })
+                    .catch(error => console.error('Error al buscar peritajes:', error));
+            };
 
-  return (
-    <div className="space-y-4">
-      {peritajes.map((peritaje) => (
-        <div key={peritaje.id} className="bg-white p-4 rounded shadow">
-          <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
-          <p>Año: {peritaje.anio}</p>
-          <p>Kilometraje: {peritaje.kilometraje}</p>
-          <p>Fecha: {peritaje.fecha.toDate().toLocaleDateString()}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
+            return (
+                <div className="space-y-4">
+                    <div className="flex space-x-2">
+                        <input
+                            value={busqueda}
+                            onChange={(e) => setBusqueda(e.target.value)}
+                            placeholder="Buscar por marca"
+                            className="flex-grow p-2 border rounded"
+                        />
+                        <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded">
+                            Buscar
+                        </button>
+                    </div>
+                    <div className="space-y-2">
+                        {resultados.map((peritaje) => (
+                            <div key={peritaje.id} className="bg-white p-4 rounded shadow">
+                                <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
+                                <p>Año: {peritaje.anio}</p>
+                                <p>Kilometraje: {peritaje.kilometraje}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
 
-// src/components/BuscarPeritaje.js
-import React, { useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+        // Componente principal de la aplicación
+        const App = () => {
+            const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+            const [currentTab, setCurrentTab] = React.useState('nuevo');
 
-const BuscarPeritaje = () => {
-  const [busqueda, setBusqueda] = useState('');
-  const [resultados, setResultados] = useState([]);
+            if (!isAuthenticated) {
+                return <Login setIsAuthenticated={setIsAuthenticated} />;
+            }
 
-  const handleSearch = async () => {
-    const q = query(
-      collection(db, 'peritajes'),
-      where('marca', '==', busqueda)
-    );
-    const querySnapshot = await getDocs(q);
-    setResultados(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-  };
+            return (
+                <div className="container mx-auto p-4">
+                    <nav className="mb-4">
+                        <ul className="flex space-x-4">
+                            <li><button onClick={() => setCurrentTab('nuevo')} className="text-blue-500 hover:underline">Nuevo Peritaje</button></li>
+                            <li><button onClick={() => setCurrentTab('historial')} className="text-blue-500 hover:underline">Historial</button></li>
+                            <li><button onClick={() => setCurrentTab('buscar')} className="text-blue-500 hover:underline">Buscar</button></li>
+                        </ul>
+                    </nav>
+                    {currentTab === 'nuevo' && <NuevoPeritaje />}
+                    {currentTab === 'historial' && <HistorialPeritajes />}
+                    {currentTab === 'buscar' && <BuscarPeritaje />}
+                </div>
+            );
+        };
 
-  return (
-    <div className="space-y-4">
-      <div className="flex space-x-2">
-        <input
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar por marca"
-          className="flex-grow p-2 border rounded"
-        />
-        <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded">
-          Buscar
-        </button>
-      </div>
-      <div className="space-y-2">
-        {resultados.map((peritaje) => (
-          <div key={peritaje.id} className="bg-white p-4 rounded shadow">
-            <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
-            <p>Año: {peritaje.anio}</p>
-            <p>Kilometraje: {peritaje.kilometraje}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// src/App.js
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
-import Login from './components/Login';
-import NuevoPeritaje from './components/NuevoPeritaje';
-import HistorialPeritajes from './components/HistorialPeritajes';
-import BuscarPeritaje from './components/BuscarPeritaje';
-
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  if (!isAuthenticated) {
-    return <Login setIsAuthenticated={setIsAuthenticated} />;
-  }
-
-  return (
-    <Router>
-      <div className="container mx-auto p-4">
-        <nav className="mb-4">
-          <ul className="flex space-x-4">
-            <li><Link to="/" className="text-blue-500 hover:underline">Nuevo Peritaje</Link></li>
-            <li><Link to="/historial" className="text-blue-500 hover:underline">Historial</Link></li>
-            <li><Link to="/buscar" className="text-blue-500 hover:underline">Buscar</Link></li>
-          </ul>
-        </nav>
-        <Switch>
-          <Route exact path="/" component={NuevoPeritaje} />
-          <Route path="/historial" component={HistorialPeritajes} />
-          <Route path="/buscar" component={BuscarPeritaje} />
-        </Switch>
-      </div>
-    </Router>
-  );
-};
-
-export default App;
+        // Renderizar la aplicación
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
