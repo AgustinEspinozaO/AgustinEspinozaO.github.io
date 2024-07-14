@@ -15,27 +15,37 @@
         .car-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
+            gap: 1.5rem;
         }
         .car-card {
             background-color: white;
             border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.3s ease;
         }
         .car-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body class="h-full">
-    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-2xl fade-in">
             <div>
                 <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Iniciar sesión en AutoStock
+                    AutoStock
                 </h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    Control de Inventario Automotriz
+                </p>
             </div>
             <form id="loginForm" class="mt-8 space-y-6">
                 <input type="hidden" name="remember" value="true">
@@ -51,7 +61,12 @@
                 </div>
 
                 <div>
-                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                        <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                            <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
                         Iniciar sesión
                     </button>
                 </div>
@@ -61,22 +76,25 @@
 
     <div id="mainContent" class="hidden min-h-full">
         <nav class="bg-indigo-600">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="flex h-16 items-center justify-between">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300" alt="Your Company">
+                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/workflow-mark-indigo-300.svg" alt="Workflow">
                         </div>
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="#" class="bg-indigo-700 text-white rounded-md px-3 py-2 text-sm font-medium" aria-current="page">Dashboard</a>
+                                <a href="#" class="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium" aria-current="page">Dashboard</a>
                             </div>
                         </div>
                     </div>
                     <div class="hidden md:block">
                         <div class="ml-4 flex items-center md:ml-6">
-                            <button id="logoutButton" class="rounded-full bg-indigo-600 p-1 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600">
-                                Cerrar sesión
+                            <button id="logoutButton" class="bg-indigo-700 p-1 rounded-full text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-600 focus:ring-white">
+                                <span class="sr-only">Cerrar sesión</span>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -85,87 +103,117 @@
         </nav>
 
         <header class="bg-white shadow">
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
             </div>
         </header>
-        <main class="py-6">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4">Filtrar Vehículos</h2>
-                    <div class="flex space-x-4">
-                        <input type="text" id="filterMarca" placeholder="Marca" class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <input type="text" id="filterModelo" placeholder="Modelo" class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <button id="applyFilter" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                            Aplicar Filtro
-                        </button>
-                    </div>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Filtro -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Filtrar Vehículos</h3>
                 </div>
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+                    <dl class="sm:divide-y sm:divide-gray-200">
+                        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Marca</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <input type="text" id="filterMarca" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </dd>
+                        </div>
+                        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Modelo</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <input type="text" id="filterModelo" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <button id="applyFilter" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Aplicar Filtro
+                    </button>
+                </div>
+            </div>
 
-                <div class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4">Inventario Actual</h2>
-                    <div id="stockList" class="car-grid">
+            <!-- Inventario -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Inventario Actual</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="stockList" class="car-grid p-4">
                         <!-- Los autos se cargarán aquí dinámicamente -->
                     </div>
                 </div>
+            </div>
 
-                <div class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4">Resumen de Ventas y Estadísticas</h2>
-                    <div id="salesSummary" class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+            <!-- Resumen de Ventas -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Resumen de Ventas y Estadísticas</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="salesSummary" class="px-4 py-5 sm:p-6">
                         <!-- El resumen se cargará aquí dinámicamente -->
                     </div>
                 </div>
+            </div>
 
-                <div class="mb-8">
-                    <h2 class="text-2xl font-semibold mb-4">Agregar Nuevo Vehículo</h2>
-                    <form id="stockForm" class="bg-white shadow overflow-hidden sm:rounded-lg p-6">
-                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                            <div class="sm:col-span-3">
+            <!-- Formulario para agregar nuevo vehículo -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Agregar Nuevo Vehículo</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <form id="stockForm" class="px-4 py-5 sm:p-6">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
                                 <label for="marca" class="block text-sm font-medium text-gray-700">Marca</label>
-                                <input type="text" name="marca" id="marca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" name="marca" id="marca" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div class="col-span-6 sm:col-span-3">
                                 <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
-                                <input type="text" name="modelo" id="modelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" name="modelo" id="modelo" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="col-span-6 sm:col-span-2">
                                 <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
-                                <input type="number" name="anio" id="anio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="number" name="anio" id="anio" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="col-span-6 sm:col-span-2">
                                 <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
-                                <input type="text" name="matricula" id="matricula" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" name="matricula" id="matricula" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div class="col-span-6 sm:col-span-2">
                                 <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
-                                <input type="text" name="color" id="color" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" name="color" id="color" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div class="col-span-6 sm:col-span-3">
                                 <label for="precio" class="block text-sm font-medium text-gray-700">Precio de Venta (CLP)</label>
-                                <input type="number" name="precio" id="precio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="number" name="precio" id="precio" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div class="col-span-6 sm:col-span-3">
                                 <label for="precioCompra" class="block text-sm font-medium text-gray-700">Precio de Compra (CLP)</label>
-                                <input type="number" name="precioCompra" id="precioCompra" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="number" name="precioCompra" id="precioCompra" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-6">
+                            <div class="col-span-6">
                                 <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
-                                <input type="text" name="imagen" id="imagen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="text" name="imagen" id="imagen" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-6">
+                            <div class="col-span-6">
                                 <label for="linkQR" class="block text-sm font-medium text-gray-700">Link para Código QR</label>
-                                <input type="url" name="linkQR" id="linkQR" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <input type="url" name="linkQR" id="linkQR" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="sm:col-span-6">
+                            <div class="col-span-6">
                                 <label class="block text-sm font-medium text-gray-700">Gastos</label>
                                 <div id="gastosInputs">
                                     <div class="flex items-center space-x-2 mt-1">
@@ -192,14 +240,14 @@
                     </form>
                 </div>
             </div>
-            </main>
+        </main>
     </div>
 
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
         // Your web app's Firebase configuration
@@ -297,12 +345,12 @@
                     imagen: document.getElementById('imagen').value,
                     linkQR: document.getElementById('linkQR').value,
                     gastos: gastos,
-                    valorReal: 0,
+                    valorReal: parseFloat(document.getElementById('precioCompra').value) || 0,
                     vendido: false,
                     precioVenta: 0
                 };
 
-                auto.valorReal = auto.precioCompra + gastos.reduce((total, gasto) => total + (parseFloat(gasto.monto) || 0), 0);
+                auto.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
                 
                 push(stockRef, auto)
                     .then(() => {
@@ -312,6 +360,7 @@
                     })
                     .catch((error) => {
                         console.error("Error al agregar el auto: ", error);
+                        alert("Error al agregar el auto: " + error.message);
                     });
             });
 
@@ -372,7 +421,7 @@
 
                 for (let [key, auto] of Object.entries(stock)) {
                     let autoElement = document.createElement('div');
-                    autoElement.className = 'car-card p-4';
+                    autoElement.className = 'car-card p-4 fade-in';
                     
                     let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
                         auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
@@ -392,7 +441,7 @@
                         <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
                         <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
                         <p>Valor real: ${formatearPrecioCLP(auto.valorReal)}</p>
-                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2">
+                        <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2 rounded">
                         <h4 class="font-medium mt-2">Gastos:</h4>
                         <ul class="list-disc pl-5">${gastosHTML}</ul>
                         <img src="${qrImage}" alt="QR Code" class="my-2 w-32 h-32">
@@ -412,30 +461,30 @@
             }
         }
 
-       function updateSalesSummary(stock) {
-    let salesSummary = document.getElementById('salesSummary');
-    if (salesSummary) {
-        let totalVentas = 0;
-        let totalGanancia = 0;
-        let autosVendidos = 0;
+        function updateSalesSummary(stock) {
+            let salesSummary = document.getElementById('salesSummary');
+            if (salesSummary) {
+                let totalVentas = 0;
+                let totalGanancia = 0;
+                let autosVendidos = 0;
 
-        for (let auto of Object.values(stock || {})) {
-            if (auto.vendido) {
-                autosVendidos++;
-                let precioVenta = parseFloat(auto.precioVenta) || 0;
-                let valorReal = parseFloat(auto.valorReal) || 0;
-                totalVentas += precioVenta;
-                totalGanancia += precioVenta - valorReal;
+                for (let auto of Object.values(stock || {})) {
+                    if (auto.vendido) {
+                        autosVendidos++;
+                        let precioVenta = parseFloat(auto.precioVenta) || 0;
+                        let valorReal = parseFloat(auto.valorReal) || 0;
+                        totalVentas += precioVenta;
+                        totalGanancia += precioVenta - valorReal;
+                    }
+                }
+
+                salesSummary.innerHTML = `
+                    <p class="text-lg"><strong>Total de autos vendidos:</strong> ${autosVendidos}</p>
+                    <p class="text-lg"><strong>Total de ventas:</strong> ${formatearPrecioCLP(totalVentas)}</p>
+                    <p class="text-lg"><strong>Ganancia total:</strong> ${formatearPrecioCLP(totalGanancia)}</p>
+                `;
             }
         }
-
-        salesSummary.innerHTML = `
-            <p>Total de autos vendidos: ${autosVendidos}</p>
-            <p>Total de ventas: ${formatearPrecioCLP(totalVentas)}</p>
-            <p>Ganancia total: ${formatearPrecioCLP(totalGanancia)}</p>
-        `;
-    }
-}
 
         function formatearPrecioCLP(precio) {
             return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
@@ -468,29 +517,31 @@
                     })
                     .catch((error) => {
                         console.error("Error al eliminar el auto: ", error);
+                        alert("Error al eliminar el auto: " + error.message);
                     });
             }
         };
 
         window.marcarComoVendido = function(key) {
-    const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
-    if (precioVenta !== null && !isNaN(precioVenta)) {
-        const precioVentaNum = parseFloat(precioVenta);
-        get(ref(database, 'stock/' + key)).then((snapshot) => {
-            const auto = snapshot.val();
-            const ganancia = precioVentaNum - (auto.valorReal || 0);
-            update(ref(database, 'stock/' + key), {
-                vendido: true,
-                precioVenta: precioVentaNum,
-                ganancia: ganancia
-            }).then(() => {
-                console.log("Auto marcado como vendido");
-            }).catch((error) => {
-                console.error("Error al marcar el auto como vendido: ", error);
-            });
-        });
-    }
-};
+            const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
+            if (precioVenta !== null && !isNaN(precioVenta)) {
+                const precioVentaNum = parseFloat(precioVenta);
+                get(ref(database, 'stock/' + key)).then((snapshot) => {
+                    const auto = snapshot.val();
+                    const ganancia = precioVentaNum - (auto.valorReal || 0);
+                    update(ref(database, 'stock/' + key), {
+                        vendido: true,
+                        precioVenta: precioVentaNum,
+                        ganancia: ganancia
+                    }).then(() => {
+                        console.log("Auto marcado como vendido");
+                    }).catch((error) => {
+                        console.error("Error al marcar el auto como vendido: ", error);
+                        alert("Error al marcar el auto como vendido: " + error.message);
+                    });
+                });
+            }
+        };
     </script>
 </body>
 </html>
