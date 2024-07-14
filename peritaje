@@ -4,266 +4,252 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peritaje Vehicular App</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        #loginForm, #nuevoPeritaje, #historialPeritajes, #buscarPeritaje {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showSection('nuevoPeritaje')">Nuevo Peritaje</a></li>
+            <li><a href="#" onclick="showSection('historialPeritajes')">Historial</a></li>
+            <li><a href="#" onclick="showSection('buscarPeritaje')">Buscar</a></li>
+        </ul>
+    </nav>
 
-    <script type="text/babel">
-        // Configuración de Firebase (reemplazar con tus propias credenciales)
+    <div class="container">
+        <div id="loginForm">
+            <h2>Iniciar Sesión</h2>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" required>
+            </div>
+            <button onclick="login()">Iniciar Sesión</button>
+        </div>
+
+        <div id="nuevoPeritaje" style="display: none;">
+            <h2>Nuevo Peritaje</h2>
+            <div class="form-group">
+                <label for="marca">Marca:</label>
+                <input type="text" id="marca" required>
+            </div>
+            <div class="form-group">
+                <label for="modelo">Modelo:</label>
+                <input type="text" id="modelo" required>
+            </div>
+            <div class="form-group">
+                <label for="anio">Año:</label>
+                <input type="number" id="anio" required>
+            </div>
+            <div class="form-group">
+                <label for="kilometraje">Kilometraje:</label>
+                <input type="number" id="kilometraje" required>
+            </div>
+            <div class="form-group">
+                <label for="comentario">Comentario:</label>
+                <textarea id="comentario"></textarea>
+            </div>
+            <button onclick="guardarPeritaje()">Guardar Peritaje</button>
+        </div>
+
+        <div id="historialPeritajes" style="display: none;">
+            <h2>Historial de Peritajes</h2>
+            <div id="listaPeritajes"></div>
+        </div>
+
+        <div id="buscarPeritaje" style="display: none;">
+            <h2>Buscar Peritaje</h2>
+            <div class="form-group">
+                <label for="busqueda">Buscar por marca:</label>
+                <input type="text" id="busqueda">
+            </div>
+            <button onclick="buscarPeritajes()">Buscar</button>
+            <div id="resultadosBusqueda"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDm2FqhvJbzl-IDjpfo9o_yjBo-EsIFKkc",
+            authDomain: "peritaje-ef38c.firebaseapp.com",
+            projectId: "peritaje-ef38c",
+            storageBucket: "peritaje-ef38c.appspot.com",
+            messagingSenderId: "749420033603",
+            appId: "1:749420033603:web:3c07290dd36322cb50c6f6",
+            measurementId: "G-12KB1GDQDG"
         };
 
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // Componente de Login
-        const Login = ({ setIsAuthenticated }) => {
-            const [email, setEmail] = React.useState('');
-            const [password, setPassword] = React.useState('');
-
-            const handleLogin = (e) => {
-                e.preventDefault();
-                firebase.auth().signInWithEmailAndPassword(email, password)
-                    .then(() => setIsAuthenticated(true))
-                    .catch(error => console.error('Error al iniciar sesión:', error));
-            };
-
-            return (
-                <div className="flex justify-center items-center h-screen bg-gray-100">
-                    <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md">
-                        <h2 className="text-2xl font-bold mb-4">Iniciar Sesión</h2>
-                        <input
-                            type="email"
-                            placeholder="Correo electrónico"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 mb-4 border rounded"
-                        />
-                        <input
-                            type="password"
-                            placeholder="Contraseña"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 mb-4 border rounded"
-                        />
-                        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-                            Iniciar Sesión
-                        </button>
-                    </form>
-                </div>
-            );
-        };
-
-        // Componente de Nuevo Peritaje
-        const NuevoPeritaje = () => {
-            const [formData, setFormData] = React.useState({
-                marca: '',
-                modelo: '',
-                anio: '',
-                kilometraje: '',
-            });
-            const [imagenes, setImagenes] = React.useState([]);
-            const [comentario, setComentario] = React.useState('');
-
-            const handleInputChange = (e) => {
-                setFormData({ ...formData, [e.target.name]: e.target.value });
-            };
-
-            const handleImageUpload = (e) => {
-                const files = Array.from(e.target.files);
-                const uploadPromises = files.map(file => {
-                    return new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
+        window.login = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    document.getElementById('loginForm').style.display = 'none';
+                    showSection('nuevoPeritaje');
+                })
+                .catch((error) => {
+                    alert('Error de autenticación: ' + error.message);
                 });
-                Promise.all(uploadPromises).then(urls => setImagenes([...imagenes, ...urls]));
-            };
+        }
 
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                const peritaje = {
-                    ...formData,
-                    imagenes,
-                    comentario,
-                    fecha: new Date().toISOString(),
-                };
-                firebase.firestore().collection('peritajes').add(peritaje)
-                    .then(() => {
-                        alert('Peritaje guardado con éxito');
-                        setFormData({ marca: '', modelo: '', anio: '', kilometraje: '' });
-                        setImagenes([]);
-                        setComentario('');
-                    })
-                    .catch(error => console.error('Error al guardar el peritaje:', error));
-            };
+        window.showSection = function(sectionId) {
+            document.getElementById('nuevoPeritaje').style.display = 'none';
+            document.getElementById('historialPeritajes').style.display = 'none';
+            document.getElementById('buscarPeritaje').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
 
-            return (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        name="marca"
-                        value={formData.marca}
-                        onChange={handleInputChange}
-                        placeholder="Marca del vehículo"
-                        className="w-full p-2 border rounded"
-                    />
-                    <input
-                        name="modelo"
-                        value={formData.modelo}
-                        onChange={handleInputChange}
-                        placeholder="Modelo"
-                        className="w-full p-2 border rounded"
-                    />
-                    <input
-                        name="anio"
-                        value={formData.anio}
-                        onChange={handleInputChange}
-                        placeholder="Año"
-                        className="w-full p-2 border rounded"
-                    />
-                    <input
-                        name="kilometraje"
-                        value={formData.kilometraje}
-                        onChange={handleInputChange}
-                        placeholder="Kilometraje"
-                        className="w-full p-2 border rounded"
-                    />
-                    <input
-                        type="file"
-                        multiple
-                        onChange={handleImageUpload}
-                        className="w-full p-2 border rounded"
-                    />
-                    {imagenes.length > 0 && (
-                        <div className="grid grid-cols-3 gap-2">
-                            {imagenes.map((url, index) => (
-                                <img key={index} src={url} alt={`Imagen ${index + 1}`} className="w-full h-24 object-cover rounded" />
-                            ))}
-                        </div>
-                    )}
-                    <textarea
-                        value={comentario}
-                        onChange={(e) => setComentario(e.target.value)}
-                        placeholder="Añadir comentario"
-                        className="w-full p-2 border rounded"
-                    />
-                    <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-                        Guardar Peritaje
-                    </button>
-                </form>
-            );
-        };
-
-        // Componente de Historial de Peritajes
-        const HistorialPeritajes = () => {
-            const [peritajes, setPeritajes] = React.useState([]);
-
-            React.useEffect(() => {
-                firebase.firestore().collection('peritajes').orderBy('fecha', 'desc').get()
-                    .then(querySnapshot => {
-                        const peritajesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        setPeritajes(peritajesData);
-                    })
-                    .catch(error => console.error('Error al obtener peritajes:', error));
-            }, []);
-
-            return (
-                <div className="space-y-4">
-                    {peritajes.map((peritaje) => (
-                        <div key={peritaje.id} className="bg-white p-4 rounded shadow">
-                            <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
-                            <p>Año: {peritaje.anio}</p>
-                            <p>Kilometraje: {peritaje.kilometraje}</p>
-                            <p>Fecha: {new Date(peritaje.fecha).toLocaleDateString()}</p>
-                        </div>
-                    ))}
-                </div>
-            );
-        };
-
-        // Componente de Búsqueda de Peritaje
-        const BuscarPeritaje = () => {
-            const [busqueda, setBusqueda] = React.useState('');
-            const [resultados, setResultados] = React.useState([]);
-
-            const handleSearch = () => {
-                firebase.firestore().collection('peritajes').where('marca', '==', busqueda).get()
-                    .then(querySnapshot => {
-                        const resultadosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                        setResultados(resultadosData);
-                    })
-                    .catch(error => console.error('Error al buscar peritajes:', error));
-            };
-
-            return (
-                <div className="space-y-4">
-                    <div className="flex space-x-2">
-                        <input
-                            value={busqueda}
-                            onChange={(e) => setBusqueda(e.target.value)}
-                            placeholder="Buscar por marca"
-                            className="flex-grow p-2 border rounded"
-                        />
-                        <button onClick={handleSearch} className="bg-blue-500 text-white p-2 rounded">
-                            Buscar
-                        </button>
-                    </div>
-                    <div className="space-y-2">
-                        {resultados.map((peritaje) => (
-                            <div key={peritaje.id} className="bg-white p-4 rounded shadow">
-                                <h3 className="font-bold">{peritaje.marca} {peritaje.modelo}</h3>
-                                <p>Año: {peritaje.anio}</p>
-                                <p>Kilometraje: {peritaje.kilometraje}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        // Componente principal de la aplicación
-        const App = () => {
-            const [isAuthenticated, setIsAuthenticated] = React.useState(false);
-            const [currentTab, setCurrentTab] = React.useState('nuevo');
-
-            if (!isAuthenticated) {
-                return <Login setIsAuthenticated={setIsAuthenticated} />;
+            if (sectionId === 'historialPeritajes') {
+                cargarHistorialPeritajes();
             }
+        }
 
-            return (
-                <div className="container mx-auto p-4">
-                    <nav className="mb-4">
-                        <ul className="flex space-x-4">
-                            <li><button onClick={() => setCurrentTab('nuevo')} className="text-blue-500 hover:underline">Nuevo Peritaje</button></li>
-                            <li><button onClick={() => setCurrentTab('historial')} className="text-blue-500 hover:underline">Historial</button></li>
-                            <li><button onClick={() => setCurrentTab('buscar')} className="text-blue-500 hover:underline">Buscar</button></li>
-                        </ul>
-                    </nav>
-                    {currentTab === 'nuevo' && <NuevoPeritaje />}
-                    {currentTab === 'historial' && <HistorialPeritajes />}
-                    {currentTab === 'buscar' && <BuscarPeritaje />}
-                </div>
-            );
-        };
+        window.guardarPeritaje = function() {
+            const peritaje = {
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: document.getElementById('anio').value,
+                kilometraje: document.getElementById('kilometraje').value,
+                comentario: document.getElementById('comentario').value,
+                fecha: new Date()
+            };
 
-        // Renderizar la aplicación
-        ReactDOM.render(<App />, document.getElementById('root'));
+            addDoc(collection(db, 'peritajes'), peritaje)
+                .then(() => {
+                    alert('Peritaje guardado con éxito');
+                    document.getElementById('marca').value = '';
+                    document.getElementById('modelo').value = '';
+                    document.getElementById('anio').value = '';
+                    document.getElementById('kilometraje').value = '';
+                    document.getElementById('comentario').value = '';
+                })
+                .catch((error) => {
+                    alert('Error al guardar el peritaje: ' + error.message);
+                });
+        }
+
+        function cargarHistorialPeritajes() {
+            const listaPeritajes = document.getElementById('listaPeritajes');
+            listaPeritajes.innerHTML = '';
+
+            getDocs(query(collection(db, 'peritajes'), orderBy('fecha', 'desc')))
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const peritaje = doc.data();
+                        const peritajeElement = document.createElement('div');
+                        peritajeElement.innerHTML = `
+                            <h3>${peritaje.marca} ${peritaje.modelo}</h3>
+                            <p>Año: ${peritaje.anio}</p>
+                            <p>Kilometraje: ${peritaje.kilometraje}</p>
+                            <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
+                            <hr>
+                        `;
+                        listaPeritajes.appendChild(peritajeElement);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error al cargar el historial: ', error);
+                });
+        }
+
+        window.buscarPeritajes = function() {
+            const busqueda = document.getElementById('busqueda').value.toLowerCase();
+            const resultadosBusqueda = document.getElementById('resultadosBusqueda');
+            resultadosBusqueda.innerHTML = '';
+
+            getDocs(query(collection(db, 'peritajes'), where('marca', '==', busqueda)))
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const peritaje = doc.data();
+                        const peritajeElement = document.createElement('div');
+                        peritajeElement.innerHTML = `
+                            <h3>${peritaje.marca} ${peritaje.modelo}</h3>
+                            <p>Año: ${peritaje.anio}</p>
+                            <p>Kilometraje: ${peritaje.kilometraje}</p>
+                            <hr>
+                        `;
+                        resultadosBusqueda.appendChild(peritajeElement);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error en la búsqueda: ', error);
+                });
+        }
+
+        // Verificar el estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('loginForm').style.display = 'none';
+                showSection('nuevoPeritaje');
+            } else {
+                document.getElementById('loginForm').style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
