@@ -143,7 +143,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Cotizador Automotora EMSA</h1>
+        <h1>Cotizador Automotora Premium</h1>
         <form id="cotizadorForm">
             <div class="form-section">
                 <h2>Información del Cliente</h2>
@@ -269,7 +269,7 @@
             const plazo = document.getElementById('plazo').value;
             const condiciones = document.getElementById('condiciones').value;
             
-            // Cálculo simple (esto debe ser ajustado según las necesidades específicas)
+            // Cálculo del total
             let total = precio;
             if (financiamiento === 'credito') {
                 total *= 1.1; // 10% de interés simple
@@ -300,15 +300,37 @@
         });
         
         document.getElementById('descargarBtn').addEventListener('click', function() {
-            const cotizacionActual = document.getElementById('resultado').innerHTML;
+            const cotizacion = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: document.getElementById('anio').value,
+                tipo: document.getElementById('tipo').value,
+                caracteristicas: document.getElementById('caracteristicas').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                financiamiento: document.getElementById('financiamiento').value,
+                plazo: document.getElementById('plazo').value,
+                condiciones: document.getElementById('condiciones').value,
+                total: parseFloat(document.getElementById('resultado').querySelector('p:last-child strong').innerText.replace(/[^0-9]/g, ''))
+            };
+
             const estilos = `
                 <style>
-                    body { font-family: 'Roboto', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
-                    .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                    h3 { color: #2c3e50; margin-bottom: 20px; }
-                    p { margin-bottom: 10px; }
-                    strong { color: #34495e; }
-                    img { max-width: 100%; border-radius: 8px; margin-top: 20px; }
+                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+                    body { font-family: 'Roboto', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+                    .container { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .logo { font-size: 24px; font-weight: bold; color: #3498db; }
+                    h1 { color: #2c3e50; margin: 20px 0; }
+                    .client-info, .vehicle-info, .financial-info { background-color: #f9f9f9; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+                    h2 { color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+                    p { margin: 10px 0; }
+                    strong { color: #2c3e50; }
+                    .total { font-size: 1.2em; color: #e74c3c; font-weight: bold; }
+                    .vehicle-image { max-width: 100%; border-radius: 5px; margin-top: 20px; }
+                    .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #7f8c8d; }
                 </style>
             `;
             
@@ -317,14 +339,752 @@
                 <html lang="es">
                 <head>
                     <meta charset="UTF-8">
-                    <title>Cotización Automotora Premium</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+                    <title>Cotización Automotora Premium - ${cotizacion.nombre}</title>
                     ${estilos}
                 </head>
                 <body>
                     <div class="container">
-                        ${cotizacionActual}
-                        ${imagenBase64 ? `<img src="${imagenBase64}" alt="Imagen del vehículo">` : ''}
+                        <div class="header">
+                            <div class="logo">AUTOMOTORA PREMIUM</div>
+                            <h1>Cotización de Vehículo</h1>
+                        </div>
+                        <div class="client-info">
+                            <h2>Información del Cliente</h2>
+                            <p><strong>Nombre:</strong> ${cotizacion.nombre}</p>
+                            <p><strong>Email:</strong> ${cotizacion.email}</p>
+                            <p><strong>Teléfono:</strong> ${cotizacion.telefono}</p>
+                        <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Automotora Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1, h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-left: 6px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        #whatsappBtn {
+            background-color: #25D366;
+        }
+
+        #whatsappBtn:hover {
+            background-color: #128C7E;
+        }
+
+        #imagenPreview {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        @media (min-width: 768px) {
+            form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-section {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cotizador Automotora Premium</h1>
+        <form id="cotizadorForm">
+            <div class="form-section">
+                <h2>Información del Cliente</h2>
+                <div class="form-group">
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Información del Vehículo</h2>
+                <div class="form-group">
+                    <label for="marca">Marca:</label>
+                    <input type="text" id="marca" required>
+                </div>
+                <div class="form-group">
+                    <label for="modelo">Modelo:</label>
+                    <input type="text" id="modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="anio">Año:</label>
+                    <input type="number" id="anio" min="1900" max="2099" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo de vehículo:</label>
+                    <select id="tipo" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="sedan">Sedán</option>
+                        <option value="suv">SUV</option>
+                        <option value="pickup">Pickup</option>
+                        <option value="deportivo">Deportivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="caracteristicas">Características del vehículo:</label>
+                    <textarea id="caracteristicas" placeholder="Ingrese todas las características relevantes del vehículo"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="imagen">Imagen del vehículo:</label>
+                    <input type="file" id="imagen" accept="image/*">
+                </div>
+                <img id="imagenPreview" style="display: none;">
+            </div>
+            
+            <div class="form-section">
+                <h2>Condiciones Comerciales</h2>
+                <div class="form-group">
+                    <label for="precio">Precio base (CLP):</label>
+                    <input type="number" id="precio" min="0" step="100000" required>
+                </div>
+                <div class="form-group">
+                    <label for="financiamiento">Tipo de financiamiento:</label>
+                    <select id="financiamiento" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="contado">Contado</option>
+                        <option value="credito">Crédito</option>
+                        <option value="leasing">Leasing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plazo">Plazo (meses):</label>
+                    <input type="number" id="plazo" min="12" max="84" step="12">
+                </div>
+                <div class="form-group">
+                    <label for="condiciones">Condiciones adicionales:</label>
+                    <textarea id="condiciones" placeholder="Ingrese cualquier condición adicional o comentario"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <button type="submit">Calcular Cotización</button>
+            </div>
+        </form>
+        
+        <div id="resultado" style="display: none;"></div>
+        
+        <div class="action-buttons" style="display: none;">
+            <button id="descargarBtn">Descargar Cotización</button>
+            <button id="whatsappBtn">Enviar por WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+        let imagenBase64 = '';
+
+        document.getElementById('imagen').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function() {
+                imagenBase64 = reader.result;
+                document.getElementById('imagenPreview').src = imagenBase64;
+                document.getElementById('imagenPreview').style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('cotizadorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Recopilar datos del formulario
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const anio = document.getElementById('anio').value;
+            const tipo = document.getElementById('tipo').value;
+            const caracteristicas = document.getElementById('caracteristicas').value;
+            const precio = parseFloat(document.getElementById('precio').value);
+            const financiamiento = document.getElementById('financiamiento').value;
+            const plazo = document.getElementById('plazo').value;
+            const condiciones = document.getElementById('condiciones').value;
+            
+            // Cálculo del total
+            let total = precio;
+            if (financiamiento === 'credito') {
+                total *= 1.1; // 10% de interés simple
+            } else if (financiamiento === 'leasing') {
+                total *= 1.15; // 15% de interés simple
+            }
+            
+            // Generar resultado
+            const resultadoHTML = `
+                <h3>Cotización para ${nombre}</h3>
+                <p><strong>Vehículo:</strong> ${marca} ${modelo} (${anio})</p>
+                <p><strong>Tipo de vehículo:</strong> ${tipo}</p>
+                <p><strong>Características:</strong> ${caracteristicas}</p>
+                <p><strong>Precio base:</strong> $${precio.toLocaleString('es-CL')} CLP</p>
+                <p><strong>Financiamiento:</strong> ${financiamiento}</p>
+                <p><strong>Plazo:</strong> ${plazo} meses</p>
+                <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
+                <p><strong>Total estimado:</strong> $${total.toLocaleString('es-CL')} CLP</p>
+            `;
+            
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = resultadoHTML;
+            resultadoDiv.style.display = 'block';
+            
+            // Mostrar botones de acción
+            document.querySelector('.action-buttons').style.display = 'flex';
+        });
+        
+        document.getElementById('descargarBtn').addEventListener('click', function() {
+            const cotizacion = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: document.getElementById('anio').value,
+                tipo: document.getElementById('tipo').value,
+                caracteristicas: document.getElementById('caracteristicas').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                financiamiento: document.getElementById('financiamiento').value,
+                plazo: document.getElementById('plazo').value,
+                condiciones: document.getElementById('condiciones').value,
+                total: parseFloat(document.getElementById('resultado').querySelector('p:last-child strong').innerText.replace(/[^0-9]/g, ''))
+            };
+
+            const estilos = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+                    body { font-family: 'Roboto', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+                    .container { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .logo { font-size: 24px; font-weight: bold; color: #3498db; }
+                    h1 { color: #2c3e50; margin: 20px 0; }
+                    .client-info, .vehicle-info, .financial-info { background-color: #f9f9f9; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+                    h2 { color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+                    p { margin: 10px 0; }
+                    strong { color: #2c3e50; }
+                    .total { font-size: 1.2em; color: #e74c3c; font-weight: bold; }
+                    .vehicle-image { max-width: 100%; border-radius: 5px; margin-top: 20px; }
+                    .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #7f8c8d; }
+                </style>
+            `;
+            
+            const htmlCompleto = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Cotización Automotora Premium - ${cotizacion.nombre}</title>
+                    ${estilos}
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">AUTOMOTORA PREMIUM</div>
+                            <h1>Cotización de Vehículo</h1>
+                        </div>
+                        <div class="client-info">
+                            <h2>Información del Cliente</h2>
+                            <p><strong>Nombre:</strong> ${cotizacion.nombre}</p>
+                            <p><strong>Email:</strong> ${cotizacion.email}</p>
+                            <p><strong>Teléfono:</strong> ${cotizacion.telefono}</p>
+                        <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador Automotora Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1, h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--secondary-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f4f8;
+            border-left: 6px solid var(--primary-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .action-buttons button {
+            flex: 1;
+        }
+
+        #whatsappBtn {
+            background-color: #25D366;
+        }
+
+        #whatsappBtn:hover {
+            background-color: #128C7E;
+        }
+
+        #imagenPreview {
+            max-width: 100%;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        @media (min-width: 768px) {
+            form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-section {
+                grid-column: span 2;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cotizador Automotora Premium</h1>
+        <form id="cotizadorForm">
+            <div class="form-section">
+                <h2>Información del Cliente</h2>
+                <div class="form-group">
+                    <label for="nombre">Nombre completo:</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo electrónico:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Información del Vehículo</h2>
+                <div class="form-group">
+                    <label for="marca">Marca:</label>
+                    <input type="text" id="marca" required>
+                </div>
+                <div class="form-group">
+                    <label for="modelo">Modelo:</label>
+                    <input type="text" id="modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="anio">Año:</label>
+                    <input type="number" id="anio" min="1900" max="2099" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo de vehículo:</label>
+                    <select id="tipo" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="sedan">Sedán</option>
+                        <option value="suv">SUV</option>
+                        <option value="pickup">Pickup</option>
+                        <option value="deportivo">Deportivo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="caracteristicas">Características del vehículo:</label>
+                    <textarea id="caracteristicas" placeholder="Ingrese todas las características relevantes del vehículo"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="imagen">Imagen del vehículo:</label>
+                    <input type="file" id="imagen" accept="image/*">
+                </div>
+                <img id="imagenPreview" style="display: none;">
+            </div>
+            
+            <div class="form-section">
+                <h2>Condiciones Comerciales</h2>
+                <div class="form-group">
+                    <label for="precio">Precio base (CLP):</label>
+                    <input type="number" id="precio" min="0" step="100000" required>
+                </div>
+                <div class="form-group">
+                    <label for="financiamiento">Tipo de financiamiento:</label>
+                    <select id="financiamiento" required>
+                        <option value="">Seleccione una opción</option>
+                        <option value="contado">Contado</option>
+                        <option value="credito">Crédito</option>
+                        <option value="leasing">Leasing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="plazo">Plazo (meses):</label>
+                    <input type="number" id="plazo" min="12" max="84" step="12">
+                </div>
+                <div class="form-group">
+                    <label for="condiciones">Condiciones adicionales:</label>
+                    <textarea id="condiciones" placeholder="Ingrese cualquier condición adicional o comentario"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <button type="submit">Calcular Cotización</button>
+            </div>
+        </form>
+        
+        <div id="resultado" style="display: none;"></div>
+        
+        <div class="action-buttons" style="display: none;">
+            <button id="descargarBtn">Descargar Cotización</button>
+            <button id="whatsappBtn">Enviar por WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+        let imagenBase64 = '';
+
+        document.getElementById('imagen').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function() {
+                imagenBase64 = reader.result;
+                document.getElementById('imagenPreview').src = imagenBase64;
+                document.getElementById('imagenPreview').style.display = 'block';
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('cotizadorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Recopilar datos del formulario
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const anio = document.getElementById('anio').value;
+            const tipo = document.getElementById('tipo').value;
+            const caracteristicas = document.getElementById('caracteristicas').value;
+            const precio = parseFloat(document.getElementById('precio').value);
+            const financiamiento = document.getElementById('financiamiento').value;
+            const plazo = document.getElementById('plazo').value;
+            const condiciones = document.getElementById('condiciones').value;
+            
+            // Cálculo del total
+            let total = precio;
+            if (financiamiento === 'credito') {
+                total *= 1.1; // 10% de interés simple
+            } else if (financiamiento === 'leasing') {
+                total *= 1.15; // 15% de interés simple
+            }
+            
+            // Generar resultado
+            const resultadoHTML = `
+                <h3>Cotización para ${nombre}</h3>
+                <p><strong>Vehículo:</strong> ${marca} ${modelo} (${anio})</p>
+                <p><strong>Tipo de vehículo:</strong> ${tipo}</p>
+                <p><strong>Características:</strong> ${caracteristicas}</p>
+                <p><strong>Precio base:</strong> $${precio.toLocaleString('es-CL')} CLP</p>
+                <p><strong>Financiamiento:</strong> ${financiamiento}</p>
+                <p><strong>Plazo:</strong> ${plazo} meses</p>
+                <p><strong>Condiciones adicionales:</strong> ${condiciones}</p>
+                <p><strong>Total estimado:</strong> $${total.toLocaleString('es-CL')} CLP</p>
+            `;
+            
+            // Mostrar resultado
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = resultadoHTML;
+            resultadoDiv.style.display = 'block';
+            
+            // Mostrar botones de acción
+            document.querySelector('.action-buttons').style.display = 'flex';
+        });
+        
+        document.getElementById('descargarBtn').addEventListener('click', function() {
+            const cotizacion = {
+                nombre: document.getElementById('nombre').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: document.getElementById('anio').value,
+                tipo: document.getElementById('tipo').value,
+                caracteristicas: document.getElementById('caracteristicas').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                financiamiento: document.getElementById('financiamiento').value,
+                plazo: document.getElementById('plazo').value,
+                condiciones: document.getElementById('condiciones').value,
+                total: parseFloat(document.getElementById('resultado').querySelector('p:last-child strong').innerText.replace(/[^0-9]/g, ''))
+            };
+
+            const estilos = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+                    body { font-family: 'Roboto', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
+                    .container { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .logo { font-size: 24px; font-weight: bold; color: #3498db; }
+                    h1 { color: #2c3e50; margin: 20px 0; }
+                    .client-info, .vehicle-info, .financial-info { background-color: #f9f9f9; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+                    h2 { color: #3498db; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+                    p { margin: 10px 0; }
+                    strong { color: #2c3e50; }
+                    .total { font-size: 1.2em; color: #e74c3c; font-weight: bold; }
+                    .vehicle-image { max-width: 100%; border-radius: 5px; margin-top: 20px; }
+                    .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #7f8c8d; }
+                </style>
+            `;
+            
+            const htmlCompleto = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Cotización Automotora Premium - ${cotizacion.nombre}</title>
+                    ${estilos}
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <div class="logo">AUTOMOTORA PREMIUM</div>
+                            <h1>Cotización de Vehículo</h1>
+                        </div>
+                        <div class="client-info">
+                            <h2>Información del Cliente</h2>
+                            <p><strong>Nombre:</strong> ${cotizacion.nombre}</p>
+                            <p><strong>Email:</strong> ${cotizacion.email}</p>
+                            <p><strong>Teléfono:</strong> ${cotizacion.telefono}</p>
+                        </div>
+                        <div class="vehicle-info">
+                            <h2>Información del Vehículo</h2>
+                            <p><strong>Marca:</strong> ${cotizacion.marca}</p>
+                            <p><strong>Modelo:</strong> ${cotizacion.modelo}</p>
+                            <p><strong>Año:</strong> ${cotizacion.anio}</p>
+                            <p><strong>Tipo:</strong> ${cotizacion.tipo}</p>
+                            <p><strong>Características:</strong> ${cotizacion.caracteristicas}</p>
+                            ${imagenBase64 ? `<img src="${imagenBase64}" alt="Imagen del vehículo" class="vehicle-image">` : ''}
+                        </div>
+                        <div class="financial-info">
+                            <h2>Condiciones Financieras</h2>
+                            <p><strong>Precio base:</strong> $${cotizacion.precio.toLocaleString('es-CL')} CLP</p>
+                            <p><strong>Financiamiento:</strong> ${cotizacion.financiamiento}</p>
+                            <p><strong>Plazo:</strong> ${cotizacion.plazo} meses</p>
+                            <p><strong>Condiciones adicionales:</strong> ${cotizacion.condiciones}</p>
+                            <p class="total"><strong>Total estimado:</strong> $${cotizacion.total.toLocaleString('es-CL')} CLP</p>
+                        </div>
+                        <div class="footer">
+                            <p>Esta cotización es válida por 30 días. Para más información, por favor contáctenos.</p>
+                            <p>© ${new Date().getFullYear()} Automotora Premium. Todos los derechos reservados.</p>
+                        </div>
                     </div>
                 </body>
                 </html>
@@ -334,13 +1094,13 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'cotizacion_automotora_premium.html';
+            a.download = `cotizacion_${cotizacion.nombre.replace(/\s+/g, '_')}.html`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         });
-        
+
         document.getElementById('whatsappBtn').addEventListener('click', function() {
             const contenido = encodeURIComponent(document.getElementById('resultado').innerText);
             window.open(`https://web.whatsapp.com/send?text=${contenido}`, '_blank');
