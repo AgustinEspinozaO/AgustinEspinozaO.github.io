@@ -264,6 +264,10 @@
                 <input type="number" id="kilometraje" required>
             </div>
             <div class="form-group">
+                <label for="matricula">Matrícula:</label>
+                <input type="text" id="matricula" required>
+            </div>
+            <div class="form-group">
                 <label for="comentario">Comentario:</label>
                 <textarea id="comentario"></textarea>
             </div>
@@ -312,6 +316,7 @@
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDm2FqhvJbzl-IDjpfo9o_yjBo-EsIFKkc",
@@ -409,47 +414,49 @@
         }
 
         async function guardarPeritaje() {
-        if (!auth.currentUser) {
-            alert("Por favor, inicia sesión para guardar un peritaje.");
-            return;
-        }
-
-        const marca = document.getElementById('marca').value;
-        const modelo = document.getElementById('modelo').value;
-        const anio = document.getElementById('anio').value;
-        const kilometraje = document.getElementById('kilometraje').value;
-        const comentario = document.getElementById('comentario').value;
-        const imagenes = document.getElementById('imagenes').files;
-        const adjuntos = document.getElementById('adjuntos').files;
-
-        showLoading();
-
-        try {
-            const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
-            const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
-
-            const peritaje = {
-                marca: marca.toLowerCase(),
-                modelo,
-                anio,
-                kilometraje,
-                comentario,
-                imagenesUrls,
-                adjuntosUrls,
-                fecha: new Date(),
-                userId: auth.currentUser.uid
-            };
-
-            await addDoc(collection(db, 'peritajes'), peritaje);
-            alert('Peritaje guardado con éxito');
-            limpiarFormulario();
-        } catch (error) {
-            console.error('Error al guardar el peritaje:', error);
-            alert('Error al guardar el peritaje: ' + error.message);
-        } finally {
-            hideLoading();
-        }
+    if (!auth.currentUser) {
+        alert("Por favor, inicia sesión para guardar un peritaje.");
+        return;
     }
+
+    const marca = document.getElementById('marca').value;
+    const modelo = document.getElementById('modelo').value;
+    const anio = document.getElementById('anio').value;
+    const kilometraje = document.getElementById('kilometraje').value;
+    const matricula = document.getElementById('matricula').value; // Nuevo campo
+    const comentario = document.getElementById('comentario').value;
+    const imagenes = document.getElementById('imagenes').files;
+    const adjuntos = document.getElementById('adjuntos').files;
+
+    showLoading();
+
+    try {
+        const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
+        const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
+
+        const peritaje = {
+            marca: marca.toLowerCase(),
+            modelo,
+            anio,
+            kilometraje,
+            matricula, // Nuevo campo
+            comentario,
+            imagenesUrls,
+            adjuntosUrls,
+            fecha: new Date(),
+            userId: auth.currentUser.uid
+        };
+
+        await addDoc(collection(db, 'peritajes'), peritaje);
+        alert('Peritaje guardado con éxito');
+        limpiarFormulario();
+    } catch (error) {
+        console.error('Error al guardar el peritaje:', error);
+        alert('Error al guardar el peritaje: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
 
     async function uploadFile(file) {
         const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
@@ -458,20 +465,22 @@
     }
 
     function limpiarFormulario() {
-        document.getElementById('marca').value = '';
-        document.getElementById('modelo').value = '';
-        document.getElementById('anio').value = '';
-        document.getElementById('kilometraje').value = '';
-        document.getElementById('comentario').value = '';
-        document.getElementById('imagenes').value = '';
-        document.getElementById('adjuntos').value = '';
-        document.getElementById('imagePreview').innerHTML = '';
-    }
+    document.getElementById('marca').value = '';
+    document.getElementById('modelo').value = '';
+    document.getElementById('anio').value = '';
+    document.getElementById('kilometraje').value = '';
+    document.getElementById('matricula').value = ''; // Nuevo campo
+    document.getElementById('comentario').value = '';
+    document.getElementById('imagenes').value = '';
+    document.getElementById('adjuntos').value = '';
+    document.getElementById('imagePreview').innerHTML = '';
+}
 
     async function cargarHistorialPeritajes() {
     showLoading();
     const listaPeritajes = document.getElementById('listaPeritajes');
     listaPeritajes.innerHTML = '';
+    <p>Matrícula: ${peritaje.matricula}</p>
 
     try {
         // Cambiamos la consulta para que no requiera el índice compuesto
@@ -515,6 +524,7 @@
         const busqueda = document.getElementById('busqueda').value.toLowerCase();
         const resultadosBusqueda = document.getElementById('resultadosBusqueda');
         resultadosBusqueda.innerHTML = '';
+        <p>Matrícula: ${peritaje.matricula}</p>
 
         showLoading();
 
@@ -601,16 +611,21 @@
         });
     }
 
-    async function approveUser(docId, uid) {
-        try {
-            await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
-            alert('Usuario aprobado');
-            loadPendingUsers();
-        } catch (error) {
-            console.error('Error al aprobar usuario:', error);
-            alert('Error al aprobar usuario: ' + error.message);
-        }
+   async function approveUser(docId, uid) {
+    try {
+        // Primero, aprobamos al usuario
+        await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
+        
+        // Luego, eliminamos al usuario de la lista de pendientes
+        await deleteDoc(doc(db, 'pendingUsers', docId));
+        
+        alert('Usuario aprobado y removido de la lista de pendientes');
+        loadPendingUsers(); // Recarga la lista de usuarios pendientes
+    } catch (error) {
+        console.error('Error al aprobar usuario:', error);
+        alert('Error al aprobar usuario: ' + error.message);
     }
+}
 
     // Event Listeners
     document.getElementById('imagenes').addEventListener('change', function(event) {
