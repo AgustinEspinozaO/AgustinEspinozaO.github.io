@@ -469,39 +469,47 @@
     }
 
     async function cargarHistorialPeritajes() {
-        showLoading();
-        const listaPeritajes = document.getElementById('listaPeritajes');
-        listaPeritajes.innerHTML = '';
+    showLoading();
+    const listaPeritajes = document.getElementById('listaPeritajes');
+    listaPeritajes.innerHTML = '';
 
-        try {
-            const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), orderBy('fecha', 'desc'));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-                const peritaje = doc.data();
-                const peritajeElement = document.createElement('div');
-                peritajeElement.className = 'peritaje-item';
-                peritajeElement.innerHTML = `
-                    <h3>${peritaje.marca} ${peritaje.modelo}</h3>
-                    <p>Año: ${peritaje.anio}</p>
-                    <p>Kilometraje: ${peritaje.kilometraje}</p>
-                    <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
-                    ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                        `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
-                         <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
-                        : ''}
-                    ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                        `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                         <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
-                        : ''}
-                `;
-                listaPeritajes.appendChild(peritajeElement);
-            });
-        } catch (error) {
-            console.error('Error al cargar el historial:', error);
-        } finally {
-            hideLoading();
-        }
+    try {
+        // Cambiamos la consulta para que no requiera el índice compuesto
+        const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        // Ordenamos los resultados en el cliente
+        const peritajes = [];
+        querySnapshot.forEach((doc) => {
+            peritajes.push({...doc.data(), id: doc.id});
+        });
+        peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
+
+        peritajes.forEach((peritaje) => {
+            const peritajeElement = document.createElement('div');
+            peritajeElement.className = 'peritaje-item';
+            peritajeElement.innerHTML = `
+                <h3>${peritaje.marca} ${peritaje.modelo}</h3>
+                <p>Año: ${peritaje.anio}</p>
+                <p>Kilometraje: ${peritaje.kilometraje}</p>
+                <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
+                ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                    `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
+                     <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
+                    : ''}
+                ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                    `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                     <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
+                    : ''}
+            `;
+            listaPeritajes.appendChild(peritajeElement);
+        });
+    } catch (error) {
+        console.error('Error al cargar el historial:', error);
+    } finally {
+        hideLoading();
     }
+}
 
     async function buscarPeritajes() {
         const busqueda = document.getElementById('busqueda').value.toLowerCase();
