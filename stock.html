@@ -354,21 +354,24 @@
 
         // Check user role and show appropriate screen
         function checkUserRole(userId) {
-            get(ref(database, 'users/' + userId)).then((snapshot) => {
-                const userData = snapshot.val();
-                if (userData && userData.email === adminEmail) {
-                    showAdminPanel();
-                } else if (userData && userData.approved) {
-                    showMainContent();
-                } else {
-                    alert("Su cuenta aún no ha sido aprobada. Por favor, espere la aprobación del administrador.");
-                    signOut(auth);
-                }
-            }).catch((error) => {
-                console.error("Error al obtener rol de usuario:", error);
-                alert("Error al obtener rol de usuario: " + error.message);
-            });
+    get(ref(database, 'users/' + userId)).then((snapshot) => {
+        const userData = snapshot.val();
+        if (userData && userData.email === adminEmail) {
+            console.log("Admin login successful");
+            showAdminPanel();
+        } else if (userData && userData.approved) {
+            console.log("Approved user login successful");
+            showMainContent();
+        } else {
+            console.log("User not approved:", userData);
+            alert("Su cuenta aún no ha sido aprobada. Por favor, espere la aprobación del administrador.");
+            signOut(auth);
         }
+    }).catch((error) => {
+        console.error("Error al obtener rol de usuario:", error);
+        alert("Error al obtener rol de usuario: " + error.message);
+    });
+}
 
         // Show appropriate screen
         function showAuthScreen() {
