@@ -454,16 +454,16 @@
             const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
 
             const peritaje = {
-                marca: marca.toLowerCase(),
-                modelo,
-                anio,
-                kilometraje,
-                comentario,
-                imagenesUrls,
-                adjuntosUrls,
-                fecha: new Date(),
-                userId: auth.currentUser.uid
-            };
+    marca: marca.toLowerCase(),
+    modelo,
+    anio,
+    kilometraje,
+    comentario,
+    imagenesUrls,
+    adjuntosUrls,
+    fecha: new Date(),
+    userId: auth.currentUser.uid  // Asegúrate de incluir esto
+};
 
             await addDoc(collection(db, 'peritajes'), peritaje);
             alert('Peritaje guardado con éxito');
