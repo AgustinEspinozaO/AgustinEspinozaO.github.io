@@ -202,11 +202,11 @@
 <body>
     <nav>
         <ul>
-            <li><a href="#" onclick="showSection('nuevoPeritaje')">Nuevo Peritaje</a></li>
-            <li><a href="#" onclick="showSection('historialPeritajes')">Historial</a></li>
-            <li><a href="#" onclick="showSection('buscarPeritaje')">Buscar</a></li>
-            <li><a href="#" id="adminPanelButton" style="display:none;" onclick="showSection('adminPanel')">Panel Admin</a></li>
-            <li><a href="#" id="logoutButton" style="display:none;" onclick="logout()">Cerrar Sesión</a></li>
+            <li><a href="#" id="nuevoPeritajeLink">Nuevo Peritaje</a></li>
+            <li><a href="#" id="historialPeritajesLink">Historial</a></li>
+            <li><a href="#" id="buscarPeritajeLink">Buscar</a></li>
+            <li><a href="#" id="adminPanelButton" style="display:none;">Panel Admin</a></li>
+            <li><a href="#" id="logoutButton" style="display:none;">Cerrar Sesión</a></li>
         </ul>
     </nav>
 
@@ -223,7 +223,7 @@
                     <label for="loginPassword">Contraseña:</label>
                     <input type="password" id="loginPassword" required>
                 </div>
-                <button onclick="login()">Iniciar Sesión</button>
+                <button id="loginButton">Iniciar Sesión</button>
             </div>
             <div id="registerForm">
                 <h3>Registro</h3>
@@ -235,7 +235,7 @@
                     <label for="registerPassword">Contraseña:</label>
                     <input type="password" id="registerPassword" required>
                 </div>
-                <button onclick="register()">Registrarse</button>
+                <button id="registerButton">Registrarse</button>
             </div>
         </div>
 
@@ -280,7 +280,7 @@
                 <label for="adjuntos">Archivos Adjuntos:</label>
                 <input type="file" id="adjuntos" multiple>
             </div>
-            <button onclick="guardarPeritaje()">Guardar Peritaje</button>
+            <button id="guardarPeritajeButton">Guardar Peritaje</button>
         </div>
 
         <div id="historialPeritajes" style="display: none;">
@@ -294,7 +294,7 @@
                 <label for="busqueda">Buscar por marca:</label>
                 <input type="text" id="busqueda">
             </div>
-            <button onclick="buscarPeritajes()">Buscar</button>
+            <button id="buscarPeritajesButton">Buscar</button>
             <div id="resultadosBusqueda" class="grid"></div>
         </div>
     </div>
@@ -314,9 +314,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDm2FqhvJbzl-IDjpfo9o_yjBo-EsIFKkc",
@@ -334,7 +333,7 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
+        const adminEmail = "tu-email-de-administrador@ejemplo.com"; // Reemplaza esto con tu email real
 
         function login() {
             const email = document.getElementById('loginEmail').value;
@@ -411,52 +410,52 @@
             if (sectionId === 'historialPeritajes') {
                 cargarHistorialPeritajes();
             }
+            }
+
+    async function guardarPeritaje() {
+        if (!auth.currentUser) {
+            alert("Por favor, inicia sesión para guardar un peritaje.");
+            return;
         }
 
-        async function guardarPeritaje() {
-    if (!auth.currentUser) {
-        alert("Por favor, inicia sesión para guardar un peritaje.");
-        return;
+        const marca = document.getElementById('marca').value;
+        const modelo = document.getElementById('modelo').value;
+        const anio = document.getElementById('anio').value;
+        const kilometraje = document.getElementById('kilometraje').value;
+        const matricula = document.getElementById('matricula').value;
+        const comentario = document.getElementById('comentario').value;
+        const imagenes = document.getElementById('imagenes').files;
+        const adjuntos = document.getElementById('adjuntos').files;
+
+        showLoading();
+
+        try {
+            const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
+            const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
+
+            const peritaje = {
+                marca: marca.toLowerCase(),
+                modelo,
+                anio,
+                kilometraje,
+                matricula,
+                comentario,
+                imagenesUrls,
+                adjuntosUrls,
+                fecha: new Date(),
+                userId: auth.currentUser.uid
+            };
+
+            await addDoc(collection(db, 'peritajes'), peritaje);
+            alert('Peritaje guardado con éxito');
+            limpiarFormulario();
+        } catch (error) {
+            console.error('Error al guardar el peritaje:', error);
+            alert('Error al guardar el peritaje: ' + error.message);
+        } finally {
+            hideLoading();
+        }
     }
-
-    const marca = document.getElementById('marca').value;
-    const modelo = document.getElementById('modelo').value;
-    const anio = document.getElementById('anio').value;
-    const kilometraje = document.getElementById('kilometraje').value;
-    const matricula = document.getElementById('matricula').value; // Nuevo campo
-    const comentario = document.getElementById('comentario').value;
-    const imagenes = document.getElementById('imagenes').files;
-    const adjuntos = document.getElementById('adjuntos').files;
-
-    showLoading();
-
-    try {
-        const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
-        const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
-
-        const peritaje = {
-            marca: marca.toLowerCase(),
-            modelo,
-            anio,
-            kilometraje,
-            matricula, // Nuevo campo
-            comentario,
-            imagenesUrls,
-            adjuntosUrls,
-            fecha: new Date(),
-            userId: auth.currentUser.uid
-        };
-
-        await addDoc(collection(db, 'peritajes'), peritaje);
-        alert('Peritaje guardado con éxito');
-        limpiarFormulario();
-    } catch (error) {
-        console.error('Error al guardar el peritaje:', error);
-        alert('Error al guardar el peritaje: ' + error.message);
-    } finally {
-        hideLoading();
-    }
-}
 
     async function uploadFile(file) {
         const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
@@ -465,66 +464,57 @@
     }
 
     function limpiarFormulario() {
-    document.getElementById('marca').value = '';
-    document.getElementById('modelo').value = '';
-    document.getElementById('anio').value = '';
-    document.getElementById('kilometraje').value = '';
-    document.getElementById('matricula').value = ''; // Nuevo campo
-    document.getElementById('comentario').value = '';
-    document.getElementById('imagenes').value = '';
-    document.getElementById('adjuntos').value = '';
-    document.getElementById('imagePreview').innerHTML = '';
-}
+        document.getElementById('marca').value = '';
+        document.getElementById('modelo').value = '';
+        document.getElementById('anio').value = '';
+        document.getElementById('kilometraje').value = '';
+        document.getElementById('matricula').value = '';
+        document.getElementById('comentario').value = '';
+        document.getElementById('imagenes').value = '';
+        document.getElementById('adjuntos').value = '';
+        document.getElementById('imagePreview').innerHTML = '';
+    }
 
     async function cargarHistorialPeritajes() {
-    showLoading();
-    const listaPeritajes = document.getElementById('listaPeritajes');
-    listaPeritajes.innerHTML = '';
-    <p>Matrícula: ${peritaje.matricula}</p>
+        showLoading();
+        const listaPeritajes = document.getElementById('listaPeritajes');
+        listaPeritajes.innerHTML = '';
 
-    try {
-        // Cambiamos la consulta para que no requiera el índice compuesto
-        const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
-        const querySnapshot = await getDocs(q);
-        
-        // Ordenamos los resultados en el cliente
-        const peritajes = [];
-        querySnapshot.forEach((doc) => {
-            peritajes.push({...doc.data(), id: doc.id});
-        });
-        peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
-
-        peritajes.forEach((peritaje) => {
-            const peritajeElement = document.createElement('div');
-            peritajeElement.className = 'peritaje-item';
-            peritajeElement.innerHTML = `
-                <h3>${peritaje.marca} ${peritaje.modelo}</h3>
-                <p>Año: ${peritaje.anio}</p>
-                <p>Kilometraje: ${peritaje.kilometraje}</p>
-                <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
-                ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                    `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
-                     <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
-                    : ''}
-                ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                    `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                     <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
-                    : ''}
-            `;
-            listaPeritajes.appendChild(peritajeElement);
-        });
-    } catch (error) {
-        console.error('Error al cargar el historial:', error);
-    } finally {
-        hideLoading();
+        try {
+            const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), orderBy('fecha', 'desc'));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                const peritaje = doc.data();
+                const peritajeElement = document.createElement('div');
+                peritajeElement.className = 'peritaje-item';
+                peritajeElement.innerHTML = `
+                    <h3>${peritaje.marca} ${peritaje.modelo}</h3>
+                    <p>Año: ${peritaje.anio}</p>
+                    <p>Kilometraje: ${peritaje.kilometraje}</p>
+                    <p>Matrícula: ${peritaje.matricula}</p>
+                    <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
+                    ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                        `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
+                         <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
+                        : ''}
+                    ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                        `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                         <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
+                        : ''}
+                `;
+                listaPeritajes.appendChild(peritajeElement);
+            });
+        } catch (error) {
+            console.error('Error al cargar el historial:', error);
+        } finally {
+            hideLoading();
+        }
     }
-}
 
     async function buscarPeritajes() {
         const busqueda = document.getElementById('busqueda').value.toLowerCase();
         const resultadosBusqueda = document.getElementById('resultadosBusqueda');
         resultadosBusqueda.innerHTML = '';
-        <p>Matrícula: ${peritaje.matricula}</p>
 
         showLoading();
 
@@ -539,6 +529,7 @@
                     <h3>${peritaje.marca} ${peritaje.modelo}</h3>
                     <p>Año: ${peritaje.anio}</p>
                     <p>Kilometraje: ${peritaje.kilometraje}</p>
+                    <p>Matrícula: ${peritaje.matricula}</p>
                     ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
                         `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
                          <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
@@ -597,7 +588,7 @@
         const pendingUsersList = document.getElementById('pendingUsersList');
         pendingUsersList.innerHTML = '';
 
-        const q = query(collection(db, 'pendingUsers'));
+        const q = query(collection(db, 'pendingUsers'), where("approved", "==", false));
         const querySnapshot = await getDocs(q);
 
         querySnapshot.forEach((doc) => {
@@ -611,23 +602,29 @@
         });
     }
 
-   async function approveUser(docId, uid) {
-    try {
-        // Primero, aprobamos al usuario
-        await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
-        
-        // Luego, eliminamos al usuario de la lista de pendientes
-        await deleteDoc(doc(db, 'pendingUsers', docId));
-        
-        alert('Usuario aprobado y removido de la lista de pendientes');
-        loadPendingUsers(); // Recarga la lista de usuarios pendientes
-    } catch (error) {
-        console.error('Error al aprobar usuario:', error);
-        alert('Error al aprobar usuario: ' + error.message);
+    async function approveUser(docId, uid) {
+        try {
+            await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
+            await deleteDoc(doc(db, 'pendingUsers', docId));
+            alert('Usuario aprobado y removido de la lista de pendientes');
+            loadPendingUsers();
+        } catch (error) {
+            console.error('Error al aprobar usuario:', error);
+            alert('Error al aprobar usuario: ' + error.message);
+        }
     }
-}
 
     // Event Listeners
+    document.getElementById('loginButton').addEventListener('click', login);
+    document.getElementById('registerButton').addEventListener('click', register);
+    document.getElementById('logoutButton').addEventListener('click', logout);
+    document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
+    document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
+    document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
+    document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
+    document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
+    document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
+
     document.getElementById('imagenes').addEventListener('change', function(event) {
         const imagePreview = document.getElementById('imagePreview');
         imagePreview.innerHTML = '';
@@ -669,16 +666,7 @@
     });
 
     // Hacer las funciones disponibles globalmente
-    window.login = login;
-    window.register = register;
-    window.logout = logout;
-    window.showSection = showSection;
-    window.guardarPeritaje = guardarPeritaje;
-    window.buscarPeritajes = buscarPeritajes;
     window.mostrarImagenes = mostrarImagenes;
     window.mostrarAdjuntos = mostrarAdjuntos;
     window.approveUser = approveUser;
 </script>
-</body>
-</html>
-</antArtifact>
