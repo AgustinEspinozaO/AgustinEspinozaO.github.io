@@ -317,7 +317,8 @@
         });
 
         // Register form submission
-        function register() {
+        registerForm.addEventListener('submit', (e) => {
+    e.preventDefault();
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
     
@@ -348,7 +349,7 @@
             console.error("Error en el registro:", error);
             alert("Error en el registro: " + error.message);
         });
-}
+});
 
         // Logout buttons
         document.getElementById('logoutButton').addEventListener('click', logout);
@@ -371,14 +372,18 @@
         console.log("User data:", userData);
         
         if (!userData) {
-            console.log("User not found in database. Adding as pending user.");
-            // Si el usuario no existe en la base de datos, lo añadimos como usuario pendiente
-            return set(ref(database, 'pendingUsers/' + userId), {
-                email: auth.currentUser.email,
-                createdAt: new Date().toISOString()
-            }).then(() => {
-                alert("Su cuenta ha sido registrada y está pendiente de aprobación.");
-                signOut(auth);
+            // Si no está en 'users', verificar en 'pendingUsers'
+            return get(ref(database, 'pendingUsers/' + userId)).then((pendingSnapshot) => {
+                const pendingUserData = pendingSnapshot.val();
+                if (pendingUserData) {
+                    console.log("User is pending approval");
+                    alert("Su cuenta está pendiente de aprobación por un administrador.");
+                    signOut(auth);
+                } else {
+                    console.log("User not found in database");
+                    alert("Error: Usuario no encontrado en la base de datos.");
+                    signOut(auth);
+                }
             });
         }
         
