@@ -317,6 +317,38 @@
             appId: "1:749420033603:web:3c07290dd36322cb50c6f6",
             measurementId: "G-12KB1GDQDG"
         };
+        const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
+
+        function showUserInterface(userEmail) {
+    document.getElementById('authForms').style.display = 'none';
+    document.getElementById('nuevoPeritaje').style.display = 'block';
+    document.getElementById('logoutButton').style.display = 'block';
+    if (userEmail === adminEmail) {
+        document.getElementById('adminPanelButton').style.display = 'block';
+    }
+    showSection('nuevoPeritaje');
+}
+        window.register = function() {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            // Añadir el usuario a la colección de usuarios pendientes
+            addDoc(collection(db, 'pendingUsers'), {
+                email: user.email,
+                uid: user.uid,
+                createdAt: new Date()
+            });
+            alert("Registro exitoso. Espere la aprobación del administrador.");
+            showLoginForm();
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error);
+            alert("Error en el registro: " + error.message);
+        });
+}
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
