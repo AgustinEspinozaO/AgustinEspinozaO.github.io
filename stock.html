@@ -73,12 +73,8 @@
             <form id="registerForm" class="mt-8 space-y-6 hidden">
                 <div class="rounded-md shadow-sm -space-y-px">
                     <div>
-                        <label for="register-name" class="sr-only">Nombre</label>
-                        <input id="register-name" name="name" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Nombre">
-                    </div>
-                    <div>
                         <label for="register-email" class="sr-only">Correo electrónico</label>
-                        <input id="register-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Correo electrónico">
+                        <input id="register-email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Correo electrónico">
                     </div>
                     <div>
                         <label for="register-password" class="sr-only">Contraseña</label>
@@ -96,7 +92,106 @@
     </div>
 
     <div id="mainContent" class="hidden min-h-full">
-        <!-- ... (el resto del contenido principal se mantiene igual) ... -->
+        <nav class="bg-indigo-600">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <img class="h-8 w-8" src="https://tailwindui.com/img/logos/workflow-mark-indigo-300.svg" alt="Workflow">
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="#" id="stockListLink" class="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium">Lista de Stock</a>
+                                <a href="#" id="addCarLink" class="text-white hover:bg-indigo-500 hover:bg-opacity-75 px-3 py-2 rounded-md text-sm font-medium">Agregar Auto</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-4 flex items-center md:ml-6">
+                            <button id="logoutButton" class="bg-indigo-700 p-1 rounded-full text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-indigo-600 focus:ring-white">
+                                <span class="sr-only">Cerrar sesión</span>
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header class="bg-white shadow">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div id="stockList" class="px-4 py-6 sm:px-0">
+                <div class="border-4 border-dashed border-gray-200 rounded-lg h-96"></div>
+            </div>
+            <div id="addCarForm" class="hidden px-4 py-6 sm:px-0">
+                <form id="carForm" class="space-y-8 divide-y divide-gray-200">
+                    <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+                        <div>
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                    Agregar Nuevo Auto
+                                </h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                    Ingrese los detalles del nuevo auto.
+                                </p>
+                            </div>
+
+                            <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
+                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                    <label for="marca" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                                        Marca
+                                    </label>
+                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                        <input type="text" name="marca" id="marca" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                    <label for="modelo" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                                        Modelo
+                                    </label>
+                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                        <input type="text" name="modelo" id="modelo" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                    <label for="anio" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                                        Año
+                                    </label>
+                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                        <input type="number" name="anio" id="anio" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                                    <label for="precio" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                                        Precio
+                                    </label>
+                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                                        <input type="number" name="precio" id="precio" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-5">
+                        <div class="flex justify-end">
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
     </div>
 
     <div id="adminPanel" class="hidden min-h-full">
@@ -139,7 +234,7 @@
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Solicitudes de Registro Pendientes</h3>
                     </div>
                     <div class="border-t border-gray-200">
-                        <ul id="pendingRegistrations" class="divide-y divide-gray-200">
+                        <ul id="pendingUsersList" class="divide-y divide-gray-200">
                             <!-- Las solicitudes pendientes se cargarán aquí dinámicamente -->
                         </ul>
                     </div>
@@ -176,7 +271,10 @@
         // References to the database
         const stockRef = ref(database, 'stock');
         const usersRef = ref(database, 'users');
-        const pendingRegistrationsRef = ref(database, 'pendingRegistrations');
+        const pendingUsersRef = ref(database, 'pendingUsers');
+
+        // Admin email (replace with your admin email)
+        const adminEmail = "admin@example.com";
 
         // Auth screen tabs
         const loginTab = document.getElementById('loginTab');
@@ -221,52 +319,50 @@
         // Register form submission
         registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
             const password = document.getElementById('register-password').value;
             
-            // Add user to pending registrations
-            push(pendingRegistrationsRef, {
-                name: name,
-                email: email,
-                password: password,
-                timestamp: Date.now()
-            }).then(() => {
-                alert("Solicitud de registro enviada. Por favor, espere la aprobación del administrador.");
-                registerForm.reset();
-            }).catch((error) => {
-                console.error("Error al enviar solicitud de registro:", error);
-                alert("Error al enviar solicitud de registro: " + error.message);
-            });
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    set(ref(database, 'pendingUsers/' + user.uid), {
+                        email: user.email,
+                        createdAt: new Date().toISOString()
+                    });
+                    alert("Registro exitoso. Espere la aprobación del administrador.");
+                    registerForm.reset();
+                    loginTab.click();
+                })
+                .catch((error) => {
+                    console.error("Error en el registro:", error);
+                    alert("Error en el registro: " + error.message);
+                });
         });
 
         // Logout buttons
-        document.getElementById('logoutButton').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                console.log("Logout exitoso");
-                showAuthScreen();
-            }).catch((error) => {
-                console.error("Error de logout:", error);
-            });
-        });
+        document.getElementById('logoutButton').addEventListener('click', logout);
+        document.getElementById('adminLogoutButton').addEventListener('click', logout);
 
-        document.getElementById('adminLogoutButton').addEventListener('click', () => {
+        function logout() {
             signOut(auth).then(() => {
                 console.log("Logout exitoso");
                 showAuthScreen();
             }).catch((error) => {
                 console.error("Error de logout:", error);
             });
-        });
+        }
 
         // Check user role and show appropriate screen
         function checkUserRole(userId) {
             get(ref(database, 'users/' + userId)).then((snapshot) => {
                 const userData = snapshot.val();
-                if (userData && userData.role === 'admin') {
+                if (userData && userData.email === adminEmail) {
                     showAdminPanel();
-                } else {
+                } else if (userData && userData.approved) {
                     showMainContent();
+                } else {
+                    alert("Su cuenta aún no ha sido aprobada. Por favor, espere la aprobación del administrador.");
+                    signOut(auth);
                 }
             }).catch((error) => {
                 console.error("Error al obtener rol de usuario:", error);
@@ -285,78 +381,119 @@
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
-            initializeAppFunctions();
+            loadStockList();
         }
 
         function showAdminPanel() {
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.add('hidden');
             document.getElementById('adminPanel').classList.remove('hidden');
-            loadPendingRegistrations();
+            loadPendingUsers();
         }
 
         // Load pending registrations for admin panel
-        function loadPendingRegistrations() {
-            const pendingList = document.getElementById('pendingRegistrations');
-            onValue(pendingRegistrationsRef, (snapshot) => {
+        function loadPendingUsers() {
+            const pendingList = document.getElementById('pendingUsersList');
+            onValue(pendingUsersRef, (snapshot) => {
                 pendingList.innerHTML = '';
                 snapshot.forEach((childSnapshot) => {
-                    const registration = childSnapshot.val();
+                    const user = childSnapshot.val();
                     const listItem = document.createElement('li');
                     listItem.className = 'px-4 py-4 sm:px-6';
                     listItem.innerHTML = `
                         <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-indigo-600 truncate">${registration.name}</p>
+                            <p class="text-sm font-medium text-indigo-600 truncate">${user.email}</p>
                             <div class="ml-2 flex-shrink-0 flex">
-                                <button onclick="approveRegistration('${childSnapshot.key}')" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                <button onclick="approveUser('${childSnapshot.key}')" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     Aprobar
-                                </button>
-                                <button onclick="rejectRegistration('${childSnapshot.key}')" class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                    Rechazar
                                 </button>
                             </div>
                         </div>
-                        <p class="mt-1 text-sm text-gray-600">${registration.email}</p>
                     `;
                     pendingList.appendChild(listItem);
                 });
             });
         }
 
-        // Approve registration
-        window.approveRegistration = function(registrationId) {
-            get(ref(database, 'pendingRegistrations/' + registrationId)).then((snapshot) => {
-                const registration = snapshot.val();
-                createUserWithEmailAndPassword(auth, registration.email, registration.password)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        set(ref(database, 'users/' + user.uid), {
-                            name: registration.name,
-                            email: registration.email,
-                            role: 'user'
-                        }).then(() => {
-                            remove(ref(database, 'pendingRegistrations/' + registrationId));
-                            alert("Usuario aprobado y creado exitosamente");
-                        });
-                    })
-                    .catch((error) => {
-                        console.error("Error al crear usuario:", error);
-                        alert("Error al crear usuario: " + error.message);
+        // Approve user
+        window.approveUser = function(userId) {
+            get(ref(database, 'pendingUsers/' + userId)).then((snapshot) => {
+                const user = snapshot.val();
+                if (user) {
+                    set(ref(database, 'users/' + userId), {
+                        email: user.email,
+                        approved: true
+                    }).then(() => {
+                        remove(ref(database, 'pendingUsers/' + userId));
+                        alert('Usuario aprobado con éxito');
                     });
+                }
             });
         };
 
-        // Reject registration
-        window.rejectRegistration = function(registrationId) {
-            remove(ref(database, 'pendingRegistrations/' + registrationId))
-                .then(() => {
-                    alert("Solicitud de registro rechazada");
-                })
-                .catch((error) => {
-                    console.error("Error al rechazar solicitud:", error);
-                    alert("Error al rechazar solicitud: " + error.message);
+        // Load stock list
+        function loadStockList() {
+            const stockList = document.getElementById('stockList');
+            onValue(stockRef, (snapshot) => {
+                stockList.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const car = childSnapshot.val();
+                    const carElement = document.createElement('div');
+                    carElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg mb-4';
+                    carElement.innerHTML = `
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">${car.marca} ${car.modelo}</h3>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <dl>
+                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Año</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${car.anio}</dd>
+                                </div>
+                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Precio</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${car.precio}</dd>
+                                </div>
+                            </dl>
+                        </div>
+                    `;
+                    stockList.appendChild(carElement);
                 });
-        };
+            });
+        }
+
+        // Add car form submission
+        document.getElementById('carForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const anio = document.getElementById('anio').value;
+            const precio = document.getElementById('precio').value;
+
+            push(stockRef, {
+                marca,
+                modelo,
+                anio,
+                precio
+            }).then(() => {
+                alert('Auto agregado con éxito');
+                document.getElementById('carForm').reset();
+            }).catch((error) => {
+                console.error('Error al agregar auto:', error);
+                alert('Error al agregar auto: ' + error.message);
+            });
+        });
+
+        // Navigation
+        document.getElementById('stockListLink').addEventListener('click', () => {
+            document.getElementById('stockList').classList.remove('hidden');
+            document.getElementById('addCarForm').classList.add('hidden');
+        });
+
+        document.getElementById('addCarLink').addEventListener('click', () => {
+            document.getElementById('stockList').classList.add('hidden');
+            document.getElementById('addCarForm').classList.remove('hidden');
+        });
 
         // Listen for auth state changes
         onAuthStateChanged(auth, (user) => {
@@ -366,13 +503,6 @@
                 showAuthScreen();
             }
         });
-
-        function initializeAppFunctions() {
-            // ... (el resto de las funciones de la aplicación se mantienen igual) ...
-        }
-
-        // ... (el resto de las funciones de la aplicación se mantienen igual) ...
-
     </script>
 </body>
 </html>
