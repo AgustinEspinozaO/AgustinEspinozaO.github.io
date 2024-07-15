@@ -317,38 +317,33 @@
         });
 
         // Register form submission
-        registerForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+        function register() {
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
     
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            return get(ref(database, 'users')).then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // Si no hay usuarios, este será el primer administrador
-                    return set(ref(database, 'users/' + user.uid), {
-                        email: user.email,
-                        approved: true
-                    });
-                } else {
-                    // Si ya hay usuarios, añadir como usuario pendiente
-                    return set(ref(database, 'pendingUsers/' + user.uid), {
-                        email: user.email,
-                        createdAt: new Date().toISOString()
-                    });
-                }
+            // Todos los nuevos usuarios se agregan como pendientes
+            return set(ref(database, 'pendingUsers/' + user.uid), {
+                email: user.email,
+                createdAt: new Date().toISOString()
             });
         })
         .then(() => {
-            alert("Registro exitoso. Si es el primer usuario, ha sido aprobado automáticamente. De lo contrario, espere la aprobación del administrador.");
+            alert("Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.");
             document.getElementById('registerForm').reset();
         })
         .catch((error) => {
             console.error("Error en el registro:", error);
             alert("Error en el registro: " + error.message);
         });
+}
+
+// Asegúrate de que esta función esté vinculada al formulario de registro
+document.getElementById('registerForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    register();
 });
 
         // Logout buttons
