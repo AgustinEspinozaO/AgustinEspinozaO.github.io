@@ -317,27 +317,38 @@
         });
 
         // Register form submission
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    set(ref(database, 'pendingUsers/' + user.uid), {
+        function register() {
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            return get(ref(database, 'users')).then((snapshot) => {
+                if (!snapshot.exists()) {
+                    // Si no hay usuarios, este será el primer administrador
+                    return set(ref(database, 'users/' + user.uid), {
+                        email: user.email,
+                        approved: true
+                    });
+                } else {
+                    // Si ya hay usuarios, añadir como usuario pendiente
+                    return set(ref(database, 'pendingUsers/' + user.uid), {
                         email: user.email,
                         createdAt: new Date().toISOString()
                     });
-                    alert("Registro exitoso. Espere la aprobación del administrador.");
-                    registerForm.reset();
-                    loginTab.click();
-                })
-                .catch((error) => {
-                    console.error("Error en el registro:", error);
-                    alert("Error en el registro: " + error.message);
-                });
+                }
+            });
+        })
+        .then(() => {
+            alert("Registro exitoso. Si es el primer usuario, ha sido aprobado automáticamente. De lo contrario, espere la aprobación del administrador.");
+            document.getElementById('registerForm').reset();
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error);
+            alert("Error en el registro: " + error.message);
         });
+}
 
         // Logout buttons
         document.getElementById('logoutButton').addEventListener('click', logout);
@@ -354,12 +365,27 @@
 
         // Check user role and show appropriate screen
         function checkUserRole(userId) {
+    console.log("Checking role for user:", userId);
     get(ref(database, 'users/' + userId)).then((snapshot) => {
         const userData = snapshot.val();
-        if (userData && userData.email === adminEmail) {
+        console.log("User data:", userData);
+        
+        if (!userData) {
+            console.log("User not found in database. Adding as pending user.");
+            // Si el usuario no existe en la base de datos, lo añadimos como usuario pendiente
+            return set(ref(database, 'pendingUsers/' + userId), {
+                email: auth.currentUser.email,
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                alert("Su cuenta ha sido registrada y está pendiente de aprobación.");
+                signOut(auth);
+            });
+        }
+        
+        if (userData.email === adminEmail) {
             console.log("Admin login successful");
             showAdminPanel();
-        } else if (userData && userData.approved) {
+        } else if (userData.approved) {
             console.log("Approved user login successful");
             showMainContent();
         } else {
