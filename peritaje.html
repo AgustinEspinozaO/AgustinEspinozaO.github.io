@@ -211,23 +211,22 @@
     </nav>
 
     <div class="container">
-        <div id="loginForm" class="card">
-            <h2>Iniciar Sesión</h2>
-            <div class="form-group">
-                <label for="loginEmail">Email:</label>
-                <input type="email" id="loginEmail" required>
+        <div id="authForms" class="card">
+            <h2>Autenticación</h2>
+            <div id="loginForm">
+                <h3>Iniciar Sesión</h3>
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button onclick="login()">Iniciar Sesión</button>
             </div>
-            <div class="form-group">
-                <label for="loginPassword">Contraseña:</label>
-                <input type="password" id="loginPassword" required>
-            </div>
-            <button onclick="login()">Iniciar Sesión</button>
-        </div>
-
-        <div id="adminPanel" class="card" style="display: none;">
-            <h2>Panel de Administración</h2>
             <div id="registerForm">
-                <h3>Registrar Nuevo Usuario</h3>
+                <h3>Registro</h3>
                 <div class="form-group">
                     <label for="registerEmail">Email:</label>
                     <input type="email" id="registerEmail" required>
@@ -236,8 +235,14 @@
                     <label for="registerPassword">Contraseña:</label>
                     <input type="password" id="registerPassword" required>
                 </div>
-                <button onclick="registerNewUser()">Registrar Usuario</button>
+                <button onclick="register()">Registrarse</button>
             </div>
+        </div>
+
+        <div id="adminPanel" class="card" style="display: none;">
+            <h2>Panel de Administración</h2>
+            <h3>Usuarios Pendientes de Aprobación</h3>
+            <div id="pendingUsersList"></div>
         </div>
 
         <div id="nuevoPeritaje" class="card" style="display: none;">
@@ -305,7 +310,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
         const firebaseConfig = {
@@ -317,38 +322,6 @@
             appId: "1:749420033603:web:3c07290dd36322cb50c6f6",
             measurementId: "G-12KB1GDQDG"
         };
-        const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
-
-        function showUserInterface(userEmail) {
-    document.getElementById('authForms').style.display = 'none';
-    document.getElementById('nuevoPeritaje').style.display = 'block';
-    document.getElementById('logoutButton').style.display = 'block';
-    if (userEmail === adminEmail) {
-        document.getElementById('adminPanelButton').style.display = 'block';
-    }
-    showSection('nuevoPeritaje');
-}
-        window.register = function() {
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            // Añadir el usuario a la colección de usuarios pendientes
-            addDoc(collection(db, 'pendingUsers'), {
-                email: user.email,
-                uid: user.uid,
-                createdAt: new Date()
-            });
-            alert("Registro exitoso. Espere la aprobación del administrador.");
-            showLoginForm();
-        })
-        .catch((error) => {
-            console.error("Error en el registro:", error);
-            alert("Error en el registro: " + error.message);
-        });
-}
 
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
@@ -356,9 +329,9 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        const adminEmail = "tu-email-de-admin@example.com"; // Reemplaza esto con tu email de administrador
+        const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
 
-        window.login = function() {
+        function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             
@@ -373,19 +346,20 @@
                 });
         }
 
-        window.registerNewUser = function() {
-            if (auth.currentUser.email !== adminEmail) {
-                alert("Solo el administrador puede registrar nuevos usuarios.");
-                return;
-            }
-
+        function register() {
             const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
-                    console.log("Usuario registrado:", userCredential.user);
-                    alert("Usuario registrado con éxito");
+                    const user = userCredential.user;
+                    addDoc(collection(db, 'pendingUsers'), {
+                        email: user.email,
+                        uid: user.uid,
+                        createdAt: new Date()
+                    });
+                    alert("Registro exitoso. Espere la aprobación del administrador.");
+                    showLoginForm();
                 })
                 .catch((error) => {
                     console.error("Error en el registro:", error);
@@ -393,7 +367,7 @@
                 });
         }
 
-        window.logout = function() {
+        function logout() {
             signOut(auth).then(() => {
                 showLoginForm();
             }).catch((error) => {
@@ -402,17 +376,18 @@
         }
 
         function showUserInterface(userEmail) {
-            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('authForms').style.display = 'none';
             document.getElementById('nuevoPeritaje').style.display = 'block';
             document.getElementById('logoutButton').style.display = 'block';
             if (userEmail === adminEmail) {
                 document.getElementById('adminPanelButton').style.display = 'block';
+                loadPendingUsers();
             }
             showSection('nuevoPeritaje');
         }
 
         function showLoginForm() {
-            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authForms').style.display = 'block';
             document.getElementById('nuevoPeritaje').style.display = 'none';
             document.getElementById('historialPeritajes').style.display = 'none';
             document.getElementById('buscarPeritaje').style.display = 'none';
@@ -421,7 +396,7 @@
             document.getElementById('adminPanelButton').style.display = 'none';
         }
 
-        window.showSection = function(sectionId) {
+        function showSection(sectionId) {
             document.getElementById('nuevoPeritaje').style.display = 'none';
             document.getElementById('historialPeritajes').style.display = 'none';
             document.getElementById('buscarPeritaje').style.display = 'none';
@@ -433,15 +408,15 @@
             }
         }
 
-        window.guardarPeritaje = async function() {
-            if (!auth.currentUser) {
-                alert("Por favor, inicia sesión para guardar un peritaje.");
-                return;
-            }
+        async function guardarPeritaje() {
+        if (!auth.currentUser) {
+            alert("Por favor, inicia sesión para guardar un peritaje.");
+            return;
+        }
 
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const anio = document.getElementById('anio').value;
+        const marca = document.getElementById('marca').value;
+        const modelo = document.getElementById('modelo').value;
+        const anio = document.getElementById('anio').value;
         const kilometraje = document.getElementById('kilometraje').value;
         const comentario = document.getElementById('comentario').value;
         const imagenes = document.getElementById('imagenes').files;
@@ -454,16 +429,16 @@
             const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
 
             const peritaje = {
-    marca: marca.toLowerCase(),
-    modelo,
-    anio,
-    kilometraje,
-    comentario,
-    imagenesUrls,
-    adjuntosUrls,
-    fecha: new Date(),
-    userId: auth.currentUser.uid  // Asegúrate de incluir esto
-};
+                marca: marca.toLowerCase(),
+                modelo,
+                anio,
+                kilometraje,
+                comentario,
+                imagenesUrls,
+                adjuntosUrls,
+                fecha: new Date(),
+                userId: auth.currentUser.uid
+            };
 
             await addDoc(collection(db, 'peritajes'), peritaje);
             alert('Peritaje guardado con éxito');
@@ -528,7 +503,7 @@
         }
     }
 
-    window.buscarPeritajes = async function() {
+    async function buscarPeritajes() {
         const busqueda = document.getElementById('busqueda').value.toLowerCase();
         const resultadosBusqueda = document.getElementById('resultadosBusqueda');
         resultadosBusqueda.innerHTML = '';
@@ -564,7 +539,7 @@
         }
     }
 
-    window.mostrarImagenes = function(imagenes) {
+    function mostrarImagenes(imagenes) {
         const modal = document.getElementById('imageModal');
         const modalImages = document.getElementById('modalImages');
         modalImages.innerHTML = '';
@@ -577,7 +552,7 @@
         modal.style.display = 'block';
     }
 
-    window.mostrarAdjuntos = function(adjuntos) {
+    function mostrarAdjuntos(adjuntos) {
         const modal = document.getElementById('imageModal');
         const modalImages = document.getElementById('modalImages');
         modalImages.innerHTML = '';
@@ -600,7 +575,36 @@
         document.getElementById('loadingOverlay').style.display = 'none';
     }
 
-    // Previsualización de imágenes
+    async function loadPendingUsers() {
+        const pendingUsersList = document.getElementById('pendingUsersList');
+        pendingUsersList.innerHTML = '';
+
+        const q = query(collection(db, 'pendingUsers'));
+        const querySnapshot = await getDocs(q);
+
+        querySnapshot.forEach((doc) => {
+            const user = doc.data();
+            const userElement = document.createElement('div');
+            userElement.innerHTML = `
+                <p>${user.email}</p>
+                <button onclick="approveUser('${doc.id}', '${user.uid}')">Aprobar</button>
+            `;
+            pendingUsersList.appendChild(userElement);
+        });
+    }
+
+    async function approveUser(docId, uid) {
+        try {
+            await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
+            alert('Usuario aprobado');
+            loadPendingUsers();
+        } catch (error) {
+            console.error('Error al aprobar usuario:', error);
+            alert('Error al aprobar usuario: ' + error.message);
+        }
+    }
+
+    // Event Listeners
     document.getElementById('imagenes').addEventListener('change', function(event) {
         const imagePreview = document.getElementById('imagePreview');
         imagePreview.innerHTML = '';
@@ -642,8 +646,15 @@
     });
 
     // Hacer las funciones disponibles globalmente
-    window.showLoading = showLoading;
-    window.hideLoading = hideLoading;
+    window.login = login;
+    window.register = register;
+    window.logout = logout;
+    window.showSection = showSection;
+    window.guardarPeritaje = guardarPeritaje;
+    window.buscarPeritajes = buscarPeritajes;
+    window.mostrarImagenes = mostrarImagenes;
+    window.mostrarAdjuntos = mostrarAdjuntos;
+    window.approveUser = approveUser;
 </script>
 </body>
 </html>
