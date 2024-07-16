@@ -723,6 +723,7 @@
             precio: parseFloat(document.getElementById('precio').value) || 0,
             precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
             imagen: document.getElementById('imagen').value,
+            imagenEsExterna: !document.getElementById('imagen').value.startsWith('gs://') && !document.getElementById('imagen').value.includes('firebasestorage.googleapis.com'),
             linkQR: document.getElementById('linkQR').value,
             gastos: gastos,
             valorReal: parseFloat(document.getElementById('precioCompra').value) || 0,
@@ -810,40 +811,51 @@
     }
 
     // Global functions
-    window.eliminarAuto = function(key, userId) {
-        if (confirm('¿Está seguro de que desea eliminar este auto?')) {
-            const autoRef = ref(database, 'userStock/' + userId + '/' + key);
+window.eliminarAuto = function(key, userId) {
+    if (confirm('¿Está seguro de que desea eliminar este auto?')) {
+        const autoRef = ref(database, 'userStock/' + userId + '/' + key);
+        
+        // Primero, obtenemos los datos del auto
+        get(autoRef).then((snapshot) => {
+            const auto = snapshot.val();
             
-            // Primero, obtenemos los datos del auto
-            get(autoRef).then((snapshot) => {
-                const auto = snapshot.val();
-                
-                // Creamos un array de promesas para eliminar los archivos
-                const deletePromises = [];
-                
-                // Si hay una imagen, la eliminamos
-                if (auto.imagen) {
+            // Creamos un array de promesas para eliminar los archivos
+            const deletePromises = [];
+            
+            // Si hay una imagen, verificamos si es una URL de Storage o una URL externa
+            if (auto.imagen) {
+                if (auto.imagen.startsWith('gs://') || auto.imagen.includes('firebasestorage.googleapis.com')) {
+                    // Es una URL de Firebase Storage
                     const imageRef = storageRef(storage, auto.imagen);
                     deletePromises.push(deleteObject(imageRef));
+                } else {
+                    // Es una URL externa, no necesitamos eliminarla
+                    console.log('La imagen es una URL externa y no se eliminará:', auto.imagen);
                 }
-                
-                // Aquí puedes agregar más promesas para eliminar otros archivos si los hay
-                
-                // Eliminamos todos los archivos y luego el auto de la base de datos
-                Promise.all(deletePromises)
-                    .then(() => {
+            }
+            
+            // Aquí puedes agregar más promesas para eliminar otros archivos si los hay
+            
+            // Eliminamos todos los archivos de Storage (si los hay) y luego el auto de la base de datos
+            Promise.all(deletePromises)
+                .then(() => {
+                    return remove(autoRef);
+                })
+                .then(() => {
+                    console.log("Auto eliminado exitosamente");
+                })
+                .catch((error) => {
+                    console.error("Error al eliminar el auto o sus archivos: ", error);
+                    // Si el error es debido a que no se pudo eliminar la imagen, aún así eliminamos el auto
+                    if (error.code === 'storage/object-not-found') {
                         return remove(autoRef);
-                    })
-                    .then(() => {
-                        console.log("Auto y archivos asociados eliminados exitosamente");
-                    })
-                    .catch((error) => {
-                        console.error("Error al eliminar el auto o sus archivos: ", error);
+                    } else {
                         alert("Error al eliminar el auto o sus archivos: " + error.message);
-                    });
-            });
-        }
-    };
+                    }
+                });
+        });
+    }
+};
 
     window.marcarComoVendido = function(key, userId) {
         const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
