@@ -322,11 +322,11 @@
         </main>
     </div>
 
-    <script type="module">
+<script type="module">
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-    import { getDatabase, ref, push, onValue, remove, update, get, set } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, update, get, set, child } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
     import { getStorage, ref as storageRef, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
@@ -486,6 +486,7 @@
         document.getElementById('mainContent').classList.remove('hidden');
         document.getElementById('adminPanel').classList.add('hidden');
         loadStockList(userId);
+        initializeAppFunctions();
     }
 
     function showAdminPanel() {
@@ -534,6 +535,26 @@
             }
         });
     };
+
+    // Function to add or update a car
+    function agregarOActualizarAuto(auto, userId, key = null) {
+        const userStockRef = ref(database, 'userStock/' + userId);
+        
+        // Check if the image is an external URL
+        if (auto.imagen && !auto.imagen.startsWith('gs://') && !auto.imagen.includes('firebasestorage.googleapis.com')) {
+            auto.imagenEsExterna = true;
+        } else {
+            auto.imagenEsExterna = false;
+        }
+
+        if (key) {
+            // Update existing car
+            return update(child(userStockRef, key), auto);
+        } else {
+            // Add new car
+            return push(userStockRef, auto);
+        }
+    }
 
     // Load stock list for a specific user
     function loadStockList(userId) {
@@ -698,7 +719,6 @@
     document.getElementById('stockForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const userId = auth.currentUser.uid;
-        const userStockRef = ref(database, 'userStock/' + userId);
 
         let gastos = [];
         document.querySelectorAll('#gastosInputs > div').forEach(div => {
@@ -723,7 +743,6 @@
             precio: parseFloat(document.getElementById('precio').value) || 0,
             precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
             imagen: document.getElementById('imagen').value,
-            imagenEsExterna: !document.getElementById('imagen').value.startsWith('gs://') && !document.getElementById('imagen').value.includes('firebasestorage.googleapis.com'),
             linkQR: document.getElementById('linkQR').value,
             gastos: gastos,
             valorReal: parseFloat(document.getElementById('precioCompra').value) || 0,
@@ -733,7 +752,7 @@
 
         auto.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
 
-        push(userStockRef, auto)
+        agregarOActualizarAuto(auto, userId)
             .then(() => {
                 console.log("Auto agregado exitosamente");
                 document.getElementById('stockForm').reset();
@@ -745,113 +764,39 @@
             });
     });
 
-    // Add expense button
-    document.getElementById('addGasto').addEventListener('click', function() {
-        let nuevoGasto = document.createElement('div');
-        nuevoGasto.className = 'flex items-center space-x-2 mt-1';
-        nuevoGasto.innerHTML = `
-            <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                <option value="reparacion">Reparación</option>
-                <option value="mantenimiento">Mantenimiento</option>
-                <option value="impuestos">Impuestos</option>
-                <option value="otro">Otro</option>
-            </select>
-            <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-            <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-        `;
-        document.getElementById('gastosInputs').appendChild(nuevoGasto);
-    });
-
-    // Apply filter button
-    document.getElementById('applyFilter').addEventListener('click', function() {
-        const userId = auth.currentUser.uid;
-        const marca = document.getElementById('filterMarca').value.toLowerCase();
-        const modelo = document.getElementById('filterModelo').value.toLowerCase();
-        filterAndUpdateStockList(userId, marca, modelo);
-    });
-
-    function filterAndUpdateStockList(userId, marca, modelo) {
-        const userStockRef = ref(database, 'userStock/' + userId);
-        get(userStockRef).then((snapshot) => {
-            const data = snapshot.val();
-            const stockList = document.getElementById('stockList');
-            stockList.innerHTML = '';
-            if (data) {
-                Object.entries(data).forEach(([key, auto]) => {
-                    if (!auto.vendido &&
-                        (!marca || auto.marca.toLowerCase().includes(marca)) &&
-                        (!modelo || auto.modelo.toLowerCase().includes(modelo))) {
-                        const autoElement = createAutoElement(key, auto, userId);
-                        stockList.appendChild(autoElement);
-                    }
-                });
-                if (stockList.children.length === 0) {
-                    stockList.innerHTML = '<p class="text-center text-gray-500">No se encontraron autos que coincidan con los filtros.</p>';
-                }
-            } else {
-                stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
-            }
-        });
-    }
-
-    function resetGastosInputs() {
-        const gastosInputs = document.getElementById('gastosInputs');
-        gastosInputs.innerHTML = `
-            <div class="flex items-center space-x-2 mt-1">
-                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <option value="reparacion">Reparación</option>
-                    <option value="mantenimiento">Mantenimiento</option>
-                    <option value="impuestos">Impuestos</option>
-                    <option value="otro">Otro</option>
-                </select>
-                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-            </div>
-        `;
-    }
-
     // Global functions
-window.eliminarAuto = function(key, userId) {
-    if (confirm('¿Está seguro de que desea eliminar este auto?')) {
-        const autoRef = ref(database, 'userStock/' + userId + '/' + key);
-        
-        // Primero, obtenemos los datos del auto
-        get(autoRef).then((snapshot) => {
-            const auto = snapshot.val();
+    window.eliminarAuto = function(key, userId) {
+        if (confirm('¿Está seguro de que desea eliminar este auto?')) {
+            const autoRef = ref(database, 'userStock/' + userId + '/' + key);
             
-            // Creamos un array de promesas para eliminar los archivos
-            const deletePromises = [];
-            
-            // Aquí es donde colocamos el nuevo código para manejar la imagen
-            if (auto.imagen && !auto.imagenEsExterna) {
-                const imageRef = storageRef(storage, auto.imagen);
-                deletePromises.push(deleteObject(imageRef));
-            } else {
-                console.log('La imagen es una URL externa o no existe, no se eliminará.');
-            }
-            
-            // Aquí puedes agregar más promesas para eliminar otros archivos si los hay
-            
-            // Eliminamos todos los archivos de Storage (si los hay) y luego el auto de la base de datos
-            Promise.all(deletePromises)
-                .then(() => {
-                    return remove(autoRef);
-                })
-                .then(() => {
-                    console.log("Auto y archivos asociados eliminados exitosamente");
-                })
-                .catch((error) => {
-                    console.error("Error al eliminar el auto o sus archivos: ", error);
-                    // Si el error es debido a que no se pudo eliminar la imagen, aún así eliminamos el auto
-                    if (error.code === 'storage/object-not-found') {
-                        return remove(autoRef);
-                    } else {
-                        alert("Error al eliminar el auto o sus archivos: " + error.message);
+            get(autoRef).then((snapshot) => {
+                const auto = snapshot.val();
+                
+                const deletePromises = [];
+                
+                if (auto.imagen && !auto.imagenEsExterna) {
+                    try {
+                        const imageRef = storageRef(storage, auto.imagen);
+                        deletePromises.push(deleteObject(imageRef));
+                    } catch (error) {
+                        console.log('Error al intentar eliminar la imagen:', error);
                     }
-                });
-        });
-    }
-};
+                }
+                
+                deletePromises.push(remove(autoRef));
+                
+                Promise.all(deletePromises)
+                    .then(() => {
+                        console.log("Auto y archivos asociados eliminados exitosamente");
+                    })
+                    .catch((error) => {
+                        console.error("Error al eliminar el auto o sus archivos: ", error);
+                        alert("Error al eliminar el auto o sus archivos: " + error.message);
+                    });
+            });
+        }
+    };
+
     window.marcarComoVendido = function(key, userId) {
         const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
         if (precioVenta !== null && !isNaN(precioVenta)) {
@@ -935,7 +880,6 @@ window.eliminarAuto = function(key, userId) {
             matricula: document.getElementById('matricula').value,
             color: document.getElementById('color').value,
             precio: parseFloat(document.getElementById('precio').value) || 0,
-            precio: parseFloat(document.getElementById('precio').value) || 0,
             precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
             imagen: document.getElementById('imagen').value,
             linkQR: document.getElementById('linkQR').value,
@@ -945,7 +889,7 @@ window.eliminarAuto = function(key, userId) {
 
         autoActualizado.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
 
-        update(ref(database, 'userStock/' + userId + '/' + key), autoActualizado)
+        agregarOActualizarAuto(autoActualizado, userId, key)
             .then(() => {
                 console.log("Auto actualizado exitosamente");
                 document.getElementById('stockForm').reset();
@@ -958,6 +902,77 @@ window.eliminarAuto = function(key, userId) {
                 console.error("Error al actualizar el auto: ", error);
                 alert("Error al actualizar el auto: " + error.message);
             });
+    }
+
+    function resetGastosInputs() {
+        const gastosInputs = document.getElementById('gastosInputs');
+        gastosInputs.innerHTML = `
+            <div class="flex items-center space-x-2 mt-1">
+                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="reparacion">Reparación</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="impuestos">Impuestos</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+            </div>
+        `;
+    }
+
+    function initializeAppFunctions() {
+        const addGastoButton = document.getElementById('addGasto');
+        const applyFilterButton = document.getElementById('applyFilter');
+
+        if (addGastoButton) {
+            addGastoButton.addEventListener('click', function() {
+                let nuevoGasto = document.createElement('div');
+                nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+                nuevoGasto.innerHTML = `
+                    <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="reparacion">Reparación</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="impuestos">Impuestos</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+                `;
+                document.getElementById('gastosInputs').appendChild(nuevoGasto);
+            });
+        }
+
+        if (applyFilterButton) {
+            applyFilterButton.addEventListener('click', function() {
+                const marca = document.getElementById('filterMarca').value.toLowerCase();
+                const modelo = document.getElementById('filterModelo').value.toLowerCase();
+                filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
+            });
+        }
+    }
+
+    function filterAndUpdateStockList(userId, marca, modelo) {
+        const userStockRef = ref(database, 'userStock/' + userId);
+        get(userStockRef).then((snapshot) => {
+            const data = snapshot.val();
+            const stockList = document.getElementById('stockList');
+            stockList.innerHTML = '';
+            if (data) {
+                Object.entries(data).forEach(([key, auto]) => {
+                    if (!auto.vendido &&
+                        (!marca || auto.marca.toLowerCase().includes(marca)) &&
+                        (!modelo || auto.modelo.toLowerCase().includes(modelo))) {
+                        const autoElement = createAutoElement(key, auto, userId);
+                        stockList.appendChild(autoElement);
+                    }
+                });
+                if (stockList.children.length === 0) {
+                    stockList.innerHTML = '<p class="text-center text-gray-500">No se encontraron autos que coincidan con los filtros.</p>';
+                }
+            } else {
+                stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
+            }
+        });
     }
 
     // Listen for auth state changes
@@ -975,40 +990,13 @@ window.eliminarAuto = function(key, userId) {
         document.getElementById('addCarForm').classList.add('hidden');
     });
 
-    // Inicialización
-    function initializeAppFunctions() {
-    const addGastoButton = document.getElementById('addGasto');
-    const applyFilterButton = document.getElementById('applyFilter');
+    document.getElementById('addCarLink').addEventListener('click', () => {
+        document.getElementById('stockList').classList.add('hidden');
+        document.getElementById('addCarForm').classList.remove('hidden');
+    });
 
-    if (addGastoButton) {
-        addGastoButton.addEventListener('click', function() {
-            let nuevoGasto = document.createElement('div');
-            nuevoGasto.className = 'flex items-center space-x-2 mt-1';
-            nuevoGasto.innerHTML = `
-                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                    <option value="reparacion">Reparación</option>
-                    <option value="mantenimiento">Mantenimiento</option>
-                    <option value="impuestos">Impuestos</option>
-                    <option value="otro">Otro</option>
-                </select>
-                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-            `;
-            document.getElementById('gastosInputs').appendChild(nuevoGasto);
-        });
-    }
-
-    if (applyFilterButton) {
-        applyFilterButton.addEventListener('click', function() {
-            const marca = document.getElementById('filterMarca').value.toLowerCase();
-            const modelo = document.getElementById('filterModelo').value.toLowerCase();
-            filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
-        });
-    }
-}
-    // Llamada a la función de inicialización
+    // Initialize the app
     initializeAppFunctions();
-
 </script>
 </body>
 </html>
