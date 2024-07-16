@@ -969,39 +969,38 @@
     });
 
     // Inicialización
-    function initializeApp() {
-        const addGastoButton = document.getElementById('addGasto');
-        const applyFilterButton = document.getElementById('applyFilter');
+    function initializeAppFunctions() {
+    const addGastoButton = document.getElementById('addGasto');
+    const applyFilterButton = document.getElementById('applyFilter');
 
-        if (addGastoButton) {
-            addGastoButton.addEventListener('click', function() {
-                let nuevoGasto = document.createElement('div');
-                nuevoGasto.className = 'flex items-center space-x-2 mt-1';
-                nuevoGasto.innerHTML = `
-                    <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="reparacion">Reparación</option>
-                        <option value="mantenimiento">Mantenimiento</option>
-                        <option value="impuestos">Impuestos</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                    <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                    <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-                `;
-                document.getElementById('gastosInputs').appendChild(nuevoGasto);
-            });
-        }
-
-        if (applyFilterButton) {
-            applyFilterButton.addEventListener('click', function() {
-                const marca = document.getElementById('filterMarca').value.toLowerCase();
-                const modelo = document.getElementById('filterModelo').value.toLowerCase();
-                filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
-            });
-        }
+    if (addGastoButton) {
+        addGastoButton.addEventListener('click', function() {
+            let nuevoGasto = document.createElement('div');
+            nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+            nuevoGasto.innerHTML = `
+                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="reparacion">Reparación</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="impuestos">Impuestos</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+            `;
+            document.getElementById('gastosInputs').appendChild(nuevoGasto);
+        });
     }
 
+    if (applyFilterButton) {
+        applyFilterButton.addEventListener('click', function() {
+            const marca = document.getElementById('filterMarca').value.toLowerCase();
+            const modelo = document.getElementById('filterModelo').value.toLowerCase();
+            filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
+        });
+    }
+}
     // Llamada a la función de inicialización
-    initializeApp();
+    initializeAppFunctions();
 
 </script>
 </body>
