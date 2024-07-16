@@ -920,42 +920,68 @@
         `;
     }
 
-    function initializeAppFunctions() {
-        const addGastoButton = document.getElementById('addGasto');
-        const applyFilterButton = document.getElementById('applyFilter');
+function initializeAppFunctions() {
+    const addGastoButton = document.getElementById('addGasto');
+    const applyFilterButton = document.getElementById('applyFilter');
+    const stockListLink = document.getElementById('stockListLink');
+    const addCarLink = document.getElementById('addCarLink');
 
-        if (addGastoButton) {
-            addGastoButton.addEventListener('click', function() {
-                let nuevoGasto = document.createElement('div');
-                nuevoGasto.className = 'flex items-center space-x-2 mt-1';
-                nuevoGasto.innerHTML = `
-                    <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
-                        <option value="reparacion">Reparación</option>
-                        <option value="mantenimiento">Mantenimiento</option>
-                        <option value="impuestos">Impuestos</option>
-                        <option value="otro">Otro</option>
-                    </select>
-                    <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
-                    <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
-                `;
-                document.getElementById('gastosInputs').appendChild(nuevoGasto);
-            });
-        }
-
-        if (applyFilterButton) {
-            applyFilterButton.addEventListener('click', function() {
-                const marca = document.getElementById('filterMarca').value.toLowerCase();
-                const modelo = document.getElementById('filterModelo').value.toLowerCase();
-                filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
-            });
-        }
+    if (addGastoButton) {
+        addGastoButton.addEventListener('click', function() {
+            let nuevoGasto = document.createElement('div');
+            nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+            nuevoGasto.innerHTML = `
+                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="reparacion">Reparación</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="impuestos">Impuestos</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+            `;
+            const gastosInputs = document.getElementById('gastosInputs');
+            if (gastosInputs) {
+                gastosInputs.appendChild(nuevoGasto);
+            }
+        });
     }
 
-    function filterAndUpdateStockList(userId, marca, modelo) {
-        const userStockRef = ref(database, 'userStock/' + userId);
-        get(userStockRef).then((snapshot) => {
-            const data = snapshot.val();
+    if (applyFilterButton) {
+        applyFilterButton.addEventListener('click', function() {
+            const marca = document.getElementById('filterMarca')?.value.toLowerCase() || '';
+            const modelo = document.getElementById('filterModelo')?.value.toLowerCase() || '';
+            if (auth.currentUser) {
+                filterAndUpdateStockList(auth.currentUser.uid, marca, modelo);
+            }
+        });
+    }
+
+    if (stockListLink) {
+        stockListLink.addEventListener('click', () => {
             const stockList = document.getElementById('stockList');
+            const addCarForm = document.getElementById('addCarForm');
+            if (stockList) stockList.classList.remove('hidden');
+            if (addCarForm) addCarForm.classList.add('hidden');
+        });
+    }
+
+    if (addCarLink) {
+        addCarLink.addEventListener('click', () => {
+            const stockList = document.getElementById('stockList');
+            const addCarForm = document.getElementById('addCarForm');
+            if (stockList) stockList.classList.add('hidden');
+            if (addCarForm) addCarForm.classList.remove('hidden');
+        });
+    }
+}
+
+function filterAndUpdateStockList(userId, marca, modelo) {
+    const userStockRef = ref(database, 'userStock/' + userId);
+    get(userStockRef).then((snapshot) => {
+        const data = snapshot.val();
+        const stockList = document.getElementById('stockList');
+        if (stockList) {
             stockList.innerHTML = '';
             if (data) {
                 Object.entries(data).forEach(([key, auto]) => {
@@ -972,31 +998,46 @@
             } else {
                 stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
             }
-        });
-    }
-
-    // Listen for auth state changes
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            checkUserRole(user.uid);
-        } else {
-            showAuthScreen();
         }
+    }).catch(error => {
+        console.error("Error al obtener datos del stock:", error);
     });
+}
 
-    // Navigation
-    document.getElementById('stockListLink').addEventListener('click', () => {
-        document.getElementById('stockList').classList.remove('hidden');
-        document.getElementById('addCarForm').classList.add('hidden');
+// Listen for auth state changes
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        checkUserRole(user.uid);
+        initializeAppFunctions(); // Llamar aquí para asegurar que los listeners se configuren después del login
+    } else {
+        showAuthScreen();
+    }
+});
+
+// Navigation
+const stockListLink = document.getElementById('stockListLink');
+const addCarLink = document.getElementById('addCarLink');
+
+if (stockListLink) {
+    stockListLink.addEventListener('click', () => {
+        const stockList = document.getElementById('stockList');
+        const addCarForm = document.getElementById('addCarForm');
+        if (stockList) stockList.classList.remove('hidden');
+        if (addCarForm) addCarForm.classList.add('hidden');
     });
+}
 
-    document.getElementById('addCarLink').addEventListener('click', () => {
-        document.getElementById('stockList').classList.add('hidden');
-        document.getElementById('addCarForm').classList.remove('hidden');
+if (addCarLink) {
+    addCarLink.addEventListener('click', () => {
+        const stockList = document.getElementById('stockList');
+        const addCarForm = document.getElementById('addCarForm');
+        if (stockList) stockList.classList.add('hidden');
+        if (addCarForm) addCarForm.classList.remove('hidden');
     });
+}
 
-    // Initialize the app
-    initializeAppFunctions();
+// Initialize the app
+initializeAppFunctions();
 </script>
 </body>
 </html>
