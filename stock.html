@@ -126,70 +126,149 @@
             </div>
         </header>
         <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            <div id="stockList" class="px-4 py-6 sm:px-0">
-                <div class="border-4 border-dashed border-gray-200 rounded-lg h-96"></div>
+            <!-- Filtro -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Filtrar Vehículos</h3>
+                </div>
+                <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+                    <dl class="sm:divide-y sm:divide-gray-200">
+                        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Marca</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <input type="text" id="filterMarca" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </dd>
+                        </div>
+                        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Modelo</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                <input type="text" id="filterModelo" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+                <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                    <button id="applyFilter" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Aplicar Filtro
+                    </button>
+                </div>
             </div>
-            <div id="addCarForm" class="hidden px-4 py-6 sm:px-0">
-                <form id="carForm" class="space-y-8 divide-y divide-gray-200">
-                    <div class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
-                        <div>
-                            <div>
-                                <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                    Agregar Nuevo Auto
-                                </h3>
-                                <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                    Ingrese los detalles del nuevo auto.
-                                </p>
+
+            <!-- Inventario -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Inventario Actual</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="stockList" class="p-4">
+                        <!-- Los autos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehículos Vendidos -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Vehículos Vendidos</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="soldList" class="p-4">
+                        <!-- Los autos vendidos se cargarán aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Ventas -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-6 fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Resumen de Ventas y Estadísticas</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <div id="salesSummary" class="px-4 py-5 sm:p-6">
+                        <!-- El resumen se cargará aquí dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario para agregar nuevo vehículo -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg fade-in">
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Agregar Nuevo Vehículo</h3>
+                </div>
+                <div class="border-t border-gray-200">
+                    <form id="stockForm" class="px-4 py-5 sm:p-6">
+                        <div class="grid grid-cols-6 gap-6">
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="marca" class="block text-sm font-medium text-gray-700">Marca</label>
+                                <input type="text" name="marca" id="marca" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
                             </div>
 
-                            <div class="mt-6 sm:mt-5 space-y-6 sm:space-y-5">
-                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                                    <label for="marca" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                                        Marca
-                                    </label>
-                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                                        <input type="text" name="marca" id="marca" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                </div>
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
+                                <input type="text" name="modelo" id="modelo" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
 
-                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                                    <label for="modelo" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                                        Modelo
-                                    </label>
-                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                                        <input type="text" name="modelo" id="modelo" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                </div>
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
+                                <input type="number" name="anio" id="anio" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
 
-                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                                    <label for="anio" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                                        Año
-                                    </label>
-                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                                        <input type="number" name="anio" id="anio" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
-                                    </div>
-                                </div>
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
+                                <input type="text" name="matricula" id="matricula" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
 
-                                <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
-                                    <label for="precio" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                                        Precio
-                                    </label>
-                                    <div class="mt-1 sm:mt-0 sm:col-span-2">
-                                        <input type="number" name="precio" id="precio" class="max-w-lg block w-full shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:max-w-xs sm:text-sm border-gray-300 rounded-md">
+                            <div class="col-span-6 sm:col-span-2">
+                                <label for="color" class="block text-sm font-medium text-gray-700">Color</label>
+                                <input type="text" name="color" id="color" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="precio" class="block text-sm font-medium text-gray-700">Precio de Venta (CLP)</label>
+                                <input type="number" name="precio" id="precio" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="precioCompra" class="block text-sm font-medium text-gray-700">Precio de Compra (CLP)</label>
+                                <input type="number" name="precioCompra" id="precioCompra" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6">
+                                <label for="imagen" class="block text-sm font-medium text-gray-700">URL de la Imagen</label>
+                                <input type="text" name="imagen" id="imagen" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6">
+                                <label for="linkQR" class="block text-sm font-medium text-gray-700">Link para Código QR</label>
+                                <input type="url" name="linkQR" id="linkQR" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                            </div>
+
+                            <div class="col-span-6">
+                                <label class="block text-sm font-medium text-gray-700">Gastos</label>
+                                <div id="gastosInputs">
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                            <option value="reparacion">Reparación</option>
+                                            <option value="mantenimiento">Mantenimiento</option>
+                                            <option value="impuestos">Impuestos</option>
+                                            <option value="otro">Otro</option>
+                                        </select>
+                                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
                                     </div>
                                 </div>
+                                <button type="button" id="addGasto" class="mt-2 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Agregar otro gasto
+                                </button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="pt-5">
-                        <div class="flex justify-end">
-                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                Guardar
+                        <div class="mt-6">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Agregar al Stock
                             </button>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </main>
     </div>
@@ -269,7 +348,6 @@
         const auth = getAuth(app);
 
         // References to the database
-        const stockRef = ref(database, 'stock');
         const usersRef = ref(database, 'users');
         const pendingUsersRef = ref(database, 'pendingUsers');
 
@@ -317,34 +395,29 @@
         });
 
         // Register form submission
-        function register() {
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            // Todos los nuevos usuarios se agregan como pendientes
-            return set(ref(database, 'pendingUsers/' + user.uid), {
-                email: user.email,
-                createdAt: new Date().toISOString()
-            });
-        })
-        .then(() => {
-            alert("Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.");
-            document.getElementById('registerForm').reset();
-        })
-        .catch((error) => {
-            console.error("Error en el registro:", error);
-            alert("Error en el registro: " + error.message);
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // Todos los nuevos usuarios se agregan como pendientes
+                    return set(ref(database, 'pendingUsers/' + user.uid), {
+                        email: user.email,
+                        createdAt: new Date().toISOString()
+                    });
+                })
+                .then(() => {
+                    alert("Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.");
+                    document.getElementById('registerForm').reset();
+                })
+                .catch((error) => {
+                    console.error("Error en el registro:", error);
+                    alert("Error en el registro: " + error.message);
+                });
         });
-}
-
-// Asegúrate de que esta función esté vinculada al formulario de registro
-document.getElementById('registerForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    register();
-});
 
         // Logout buttons
         document.getElementById('logoutButton').addEventListener('click', logout);
@@ -361,43 +434,43 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
 
         // Check user role and show appropriate screen
         function checkUserRole(userId) {
-    console.log("Checking role for user:", userId);
-    get(ref(database, 'users/' + userId)).then((snapshot) => {
-        const userData = snapshot.val();
-        console.log("User data:", userData);
-        
-        if (!userData) {
-            // Si no está en 'users', verificar en 'pendingUsers'
-            return get(ref(database, 'pendingUsers/' + userId)).then((pendingSnapshot) => {
-                const pendingUserData = pendingSnapshot.val();
-                if (pendingUserData) {
-                    console.log("User is pending approval");
-                    alert("Su cuenta está pendiente de aprobación por un administrador.");
-                    signOut(auth);
+            console.log("Checking role for user:", userId);
+            get(ref(database, 'users/' + userId)).then((snapshot) => {
+                const userData = snapshot.val();
+                console.log("User data:", userData);
+                
+                if (!userData) {
+                    // Si no está en 'users', verificar en 'pendingUsers'
+                    return get(ref(database, 'pendingUsers/' + userId)).then((pendingSnapshot) => {
+                        const pendingUserData = pendingSnapshot.val();
+                        if (pendingUserData) {
+                            console.log("User is pending approval");
+                            alert("Su cuenta está pendiente de aprobación por un administrador.");
+                            signOut(auth);
+                        } else {
+                            console.log("User not found in database");
+                            alert("Error: Usuario no encontrado en la base de datos.");
+                            signOut(auth);
+                        }
+                    });
+                }
+                
+                if (userData.email === adminEmail) {
+                    console.log("Admin login successful");
+                    showAdminPanel();
+                } else if (userData.approved) {
+                    console.log("Approved user login successful");
+                    showMainContent(userId);
                 } else {
-                    console.log("User not found in database");
-                    alert("Error: Usuario no encontrado en la base de datos.");
+                    console.log("User not approved:", userData);
+                    alert("Su cuenta aún no ha sido aprobada. Por favor, espere la aprobación del administrador.");
                     signOut(auth);
                 }
+            }).catch((error) => {
+                console.error("Error al obtener rol de usuario:", error);
+                alert("Error al obtener rol de usuario: " + error.message);
             });
         }
-        
-        if (userData.email === adminEmail) {
-            console.log("Admin login successful");
-            showAdminPanel();
-        } else if (userData.approved) {
-            console.log("Approved user login successful");
-            showMainContent();
-        } else {
-            console.log("User not approved:", userData);
-            alert("Su cuenta aún no ha sido aprobada. Por favor, espere la aprobación del administrador.");
-            signOut(auth);
-        }
-    }).catch((error) => {
-        console.error("Error al obtener rol de usuario:", error);
-        alert("Error al obtener rol de usuario: " + error.message);
-    });
-}
 
         // Show appropriate screen
         function showAuthScreen() {
@@ -406,11 +479,11 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
             document.getElementById('adminPanel').classList.add('hidden');
         }
 
-        function showMainContent() {
+        function showMainContent(userId) {
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainContent').classList.remove('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
-            loadStockList();
+            loadStockList(userId);
         }
 
         function showAdminPanel() {
@@ -460,69 +533,400 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
             });
         };
 
-        // Load stock list
-        function loadStockList() {
+        // Load stock list for a specific user
+        function loadStockList(userId) {
+            const userStockRef = ref(database, 'userStock/' + userId);
             const stockList = document.getElementById('stockList');
-            onValue(stockRef, (snapshot) => {
+            onValue(userStockRef, (snapshot) => {
                 stockList.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const car = childSnapshot.val();
-                    const carElement = document.createElement('div');
-                    carElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg mb-4';
-                    carElement.innerHTML = `
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">${car.marca} ${car.modelo}</h3>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <dl>
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Año</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${car.anio}</dd>
-                                </div>
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Precio</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${car.precio}</dd>
-                                </div>
-                            </dl>
-                        </div>
-                    `;
-                    stockList.appendChild(carElement);
-                });
+                const data = snapshot.val();
+                if (data) {
+                    Object.entries(data).forEach(([key, auto]) => {
+                        if (!auto.vendido) {
+                            const autoElement = createAutoElement(key, auto, userId);
+                            stockList.appendChild(autoElement);
+                        }
+                    });
+                } else {
+                    stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
+                }
+                updateSoldList(userId);
+                updateSalesSummary(userId);
             });
         }
 
-        // Add car form submission
-        document.getElementById('carForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const anio = document.getElementById('anio').value;
-            const precio = document.getElementById('precio').value;
+        function createAutoElement(key, auto, userId) {
+            let autoElement = document.createElement('div');
+            autoElement.className = 'car-card p-4 mb-4 fade-in';
+            
+            let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
+                auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
+                '<li>No hay gastos registrados</li>';
+            
+            let qr = qrcode(0, 'L');
+            qr.addData(auto.linkQR || '');
+            qr.make();
+            let qrImage = qr.createDataURL(4);
+            
+            autoElement.innerHTML = `
+                <h3 class="text-lg font-semibold">${auto.marca} ${auto.modelo} (${auto.anio})</h3>
+                <p>Matrícula: ${auto.matricula}</p>
+                <p>Color: ${auto.color}</p>
+                <p>Precio de venta: ${formatearPrecioCLP(auto.precio)}</p>
+                <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                <p>Valor real: ${formatearPrecioCLP(auto.valorReal)}</p>
+                <img src="${auto.imagen}" alt="${auto.modelo}" class="w-full h-40 object-cover my-2 rounded">
+                <button class="toggle-details mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Ver detalles
+                </button>
+                <div class="details hidden mt-4">
+                    <h4 class="font-medium mt-2">Gastos:</h4>
+                    <ul class="list-disc pl-5">${gastosHTML}</ul>
+                    <img src="${qrImage}" alt="QR Code" class="my-2 w-32 h-32">
+                    <button onclick="editarAuto('${key}', '${userId}')" class="mt-2 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">
+                        Editar
+                    </button>
+                    <button onclick="marcarComoVendido('${key}', '${userId}')" class="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2">
+                        Marcar como Vendido
+                    </button>
+                    <button onclick="eliminarAuto('${key}', '${userId}')" class="mt-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Eliminar
+                    </button>
+                </div>
+            `;
 
-            push(stockRef, {
-                marca,
-                modelo,
-                anio,
-                precio
-            }).then(() => {
-                alert('Auto agregado con éxito');
-                document.getElementById('carForm').reset();
-            }).catch((error) => {
-                console.error('Error al agregar auto:', error);
-                alert('Error al agregar auto: ' + error.message);
+            autoElement.querySelector('.toggle-details').addEventListener('click', function() {
+                const details = this.nextElementSibling;
+                details.classList.toggle('hidden');
+                this.textContent = details.classList.contains('hidden') ? 'Ver detalles' : 'Ocultar detalles';
             });
+
+            return autoElement;
+        }
+
+        function updateSoldList(userId) {
+            const userStockRef = ref(database, 'userStock/' + userId);
+            const soldList = document.getElementById('soldList');
+            get(userStockRef).then((snapshot) => {
+                soldList.innerHTML = '';
+                const data = snapshot.val();
+                if (data) {
+                    const soldCars = Object.entries(data).filter(([key, auto]) => auto.vendido);
+                    if (soldCars.length === 0) {
+                        soldList.innerHTML = '<p class="text-center text-gray-500">No hay autos vendidos.</p>';
+                    } else {
+                        soldCars.forEach(([key, auto]) => {
+                            const autoElement = createSoldAutoElement(key, auto);
+                            soldList.appendChild(autoElement);
+                        });
+                    }
+                } else {
+                    soldList.innerHTML = '<p class="text-center text-gray-500">No hay autos vendidos.</p>';
+                }
+            });
+        }
+
+        function createSoldAutoElement(key, auto) {
+            let autoElement = document.createElement('div');
+            autoElement.className = 'car-card p-4 mb-4 fade-in';
+            
+            let gastosHTML = auto.gastos && Array.isArray(auto.gastos) ?
+                auto.gastos.map(gasto => `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`).join('') :
+                '<li>No hay gastos registrados</li>';
+            
+            autoElement.innerHTML = `
+                <h3 class="text-lg font-semibold">${auto.marca} ${auto.modelo} (${auto.anio})</h3>
+                <p>Matrícula: ${auto.matricula}</p>
+                <p>Color: ${auto.color}</p>
+                <p>Precio de venta: ${formatearPrecioCLP(auto.precioVenta)}</p>
+                <p>Precio de compra: ${formatearPrecioCLP(auto.precioCompra)}</p>
+                <p>Ganancia: ${formatearPrecioCLP(auto.precioVenta - auto.valorReal)}</p>
+                <button class="toggle-details mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Ver detalles
+                </button>
+                <div class="details hidden mt-4">
+                    <h4 class="font-medium mt-2">Gastos:</h4>
+                    <ul class="list-disc pl-5">${gastosHTML}</ul>
+                </div>
+            `;
+
+            autoElement.querySelector('.toggle-details').addEventListener('click', function() {
+                const details = this.nextElementSibling;
+                details.classList.toggle('hidden');
+                this.textContent = details.classList.contains('hidden') ? 'Ver detalles' : 'Ocultar detalles';
+            });
+
+            return autoElement;
+        }
+
+        function updateSalesSummary(userId) {
+            const userStockRef = ref(database, 'userStock/' + userId);
+            const salesSummary = document.getElementById('salesSummary');
+            get(userStockRef).then((snapshot) => {
+                const data = snapshot.val();
+                let totalVentas = 0;
+                let totalGanancia = 0;
+                let autosVendidos = 0;
+
+                if (data) {
+                    Object.values(data).forEach(auto => {
+                        if (auto.vendido) {
+                            autosVendidos++;
+                            let precioVenta = parseFloat(auto.precioVenta) || 0;
+                            let valorReal = parseFloat(auto.valorReal) || 0;
+                            totalVentas += precioVenta;
+                            totalGanancia += precioVenta - valorReal;
+                        }
+                    });
+                }
+
+                salesSummary.innerHTML = `
+                    <p class="text-lg"><strong>Total de autos vendidos:</strong> ${autosVendidos}</p>
+                    <p class="text-lg"><strong>Total de ventas:</strong> ${formatearPrecioCLP(totalVentas)}</p>
+                    <p class="text-lg"><strong>Ganancia total:</strong> ${formatearPrecioCLP(totalGanancia)}</p>
+                `;
+            });
+        }
+
+        function formatearPrecioCLP(precio) {
+            return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
+        }
+
+        // Add car form submission
+        document.getElementById('stockForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userId = auth.currentUser.uid;
+            const userStockRef = ref(database, 'userStock/' + userId);
+
+            let gastos = [];
+            document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                const tipoGasto = div.querySelector('.tipoGasto');
+                const montoGasto = div.querySelector('.montoGasto');
+                const detalleGasto = div.querySelector('.detalleGasto');
+                if (tipoGasto && montoGasto && detalleGasto) {
+                    gastos.push({
+                        tipo: tipoGasto.value,
+                        monto: parseFloat(montoGasto.value) || 0,
+                        detalle: detalleGasto.value
+                    });
+                }
+            });
+
+            let auto = {
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: parseInt(document.getElementById('anio').value) || 0,
+                matricula: document.getElementById('matricula').value,
+                color: document.getElementById('color').value,
+                precio: parseFloat(document.getElementById('precio').value) || 0,
+                precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
+                imagen: document.getElementById('imagen').value,
+                linkQR: document.getElementById('linkQR').value,
+                gastos: gastos,
+                valorReal: parseFloat(document.getElementById('precioCompra').value) || 0,
+                vendido: false,
+                precioVenta: 0
+            };
+
+            auto.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
+
+            push(userStockRef, auto)
+                .then(() => {
+                    console.log("Auto agregado exitosamente");
+                    document.getElementById('stockForm').reset();
+                    resetGastosInputs();
+                })
+                .catch((error) => {
+                    console.error("Error al agregar el auto: ", error);
+                    alert("Error al agregar el auto: " + error.message);
+                });
         });
 
-        // Navigation
-        document.getElementById('stockListLink').addEventListener('click', () => {
-            document.getElementById('stockList').classList.remove('hidden');
-            document.getElementById('addCarForm').classList.add('hidden');
+        // Add expense button
+        document.getElementById('addGasto').addEventListener('click', function() {
+            let nuevoGasto = document.createElement('div');
+            nuevoGasto.className = 'flex items-center space-x-2 mt-1';
+            nuevoGasto.innerHTML = `
+                <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <option value="reparacion">Reparación</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="impuestos">Impuestos</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+            `;
+            document.getElementById('gastosInputs').appendChild(nuevoGasto);
         });
 
-        document.getElementById('addCarLink').addEventListener('click', () => {
-            document.getElementById('stockList').classList.add('hidden');
-            document.getElementById('addCarForm').classList.remove('hidden');
+        // Apply filter button
+        document.getElementById('applyFilter').addEventListener('click', function() {
+            const userId = auth.currentUser.uid;
+            const marca = document.getElementById('filterMarca').value.toLowerCase();
+            const modelo = document.getElementById('filterModelo').value.toLowerCase();
+            filterAndUpdateStockList(userId, marca, modelo);
         });
+
+        function filterAndUpdateStockList(userId, marca, modelo) {
+            const userStockRef = ref(database, 'userStock/' + userId);
+            get(userStockRef).then((snapshot) => {
+                const data = snapshot.val();
+                const stockList = document.getElementById('stockList');
+                stockList.innerHTML = '';
+                if (data) {
+                    Object.entries(data).forEach(([key, auto]) => {
+                        if (!auto.vendido &&
+                            (!marca || auto.marca.toLowerCase().includes(marca)) &&
+                            (!modelo || auto.modelo.toLowerCase().includes(modelo))) {
+                            const autoElement = createAutoElement(key, auto, userId);
+                            stockList.appendChild(autoElement);
+                        }
+                    });
+                    if (stockList.children.length === 0) {
+                        stockList.innerHTML = '<p class="text-center text-gray-500">No se encontraron autos que coincidan con los filtros.</p>';
+                    }
+                } else {
+                    stockList.innerHTML = '<p class="text-center text-gray-500">No hay autos en el inventario.</p>';
+                }
+            });
+        }
+
+        function resetGastosInputs() {
+            const gastosInputs = document.getElementById('gastosInputs');
+            gastosInputs.innerHTML = `
+                <div class="flex items-center space-x-2 mt-1">
+                    <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                        <option value="reparacion">Reparación</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="impuestos">Impuestos</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                    <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)">
+                    <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto">
+                </div>
+            `;
+        }
+
+        // Global functions
+        window.eliminarAuto = function(key, userId) {
+            if (confirm('¿Está seguro de que desea eliminar este auto?')) {
+                remove(ref(database, 'userStock/' + userId + '/' + key))
+                    .then(() => {
+                        console.log("Auto eliminado exitosamente");
+                    })
+                    .catch((error) => {
+                        console.error("Error al eliminar el auto: ", error);
+                        alert("Error al eliminar el auto: " + error.message);
+                    });
+            }
+        };
+
+        window.marcarComoVendido = function(key, userId) {
+            const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
+            if (precioVenta !== null && !isNaN(precioVenta)) {
+                const precioVentaNum = parseFloat(precioVenta);
+                get(ref(database, 'userStock/' + userId + '/' + key)).then((snapshot) => {
+                    const auto = snapshot.val();
+                    const ganancia = precioVentaNum - (auto.valorReal || 0);
+                    update(ref(database, 'userStock/' + userId + '/' + key), {
+                        vendido: true,
+                        precioVenta: precioVentaNum,
+                        ganancia: ganancia
+                    }).then(() => {
+                        console.log("Auto marcado como vendido");
+                    }).catch((error) => {
+                        console.error("Error al marcar el auto como vendido: ", error);
+                        alert("Error al marcar el auto como vendido: " + error.message);
+                    });
+                });
+            }
+        };
+
+        window.editarAuto = function(key, userId) {
+            get(ref(database, 'userStock/' + userId + '/' + key)).then((snapshot) => {
+                const auto = snapshot.val();
+                document.getElementById('marca').value = auto.marca;
+                document.getElementById('modelo').value = auto.modelo;
+                document.getElementById('anio').value = auto.anio;
+                document.getElementById('matricula').value = auto.matricula;
+                document.getElementById('color').value = auto.color;
+                document.getElementById('precio').value = auto.precio;
+                document.getElementById('precioCompra').value = auto.precioCompra;
+                document.getElementById('imagen').value = auto.imagen;
+                document.getElementById('linkQR').value = auto.linkQR;
+
+                const gastosInputs = document.getElementById('gastosInputs');
+                gastosInputs.innerHTML = '';
+                auto.gastos.forEach(gasto => {
+                    let gastoElement = document.createElement('div');
+                    gastoElement.className = 'flex items-center space-x-2 mt-1';
+                    gastoElement.innerHTML = `
+                        <select class="tipoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="reparacion" ${gasto.tipo === 'reparacion' ? 'selected' : ''}>Reparación</option>
+                            <option value="mantenimiento" ${gasto.tipo === 'mantenimiento' ? 'selected' : ''}>Mantenimiento</option>
+                            <option value="impuestos" ${gasto.tipo === 'impuestos' ? 'selected' : ''}>Impuestos</option>
+                            <option value="otro" ${gasto.tipo === 'otro' ? 'selected' : ''}>Otro</option>
+                        </select>
+                        <input type="number" class="montoGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Monto del gasto (CLP)" value="${gasto.monto}">
+                        <input type="text" class="detalleGasto block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Detalle del gasto" value="${gasto.detalle}">
+                    `;
+                    gastosInputs.appendChild(gastoElement);
+                });
+
+                const submitButton = document.querySelector('#stockForm button[type="submit"]');
+                submitButton.textContent = 'Actualizar Auto';
+                submitButton.onclick = function(e) {
+                    e.preventDefault();
+                    actualizarAuto(key, userId);
+                };
+            });
+        };
+
+        function actualizarAuto(key, userId) {
+            let gastos = [];
+            document.querySelectorAll('#gastosInputs > div').forEach(div => {
+                const tipoGasto = div.querySelector('.tipoGasto');
+                const montoGasto = div.querySelector('.montoGasto');
+                const detalleGasto = div.querySelector('.detalleGasto');
+                if (tipoGasto && montoGasto && detalleGasto) {
+                    gastos.push({
+                        tipo: tipoGasto.value,
+                        monto: parseFloat(montoGasto.value) || 0,
+                        detalle: detalleGasto.value
+                    });
+                }
+            });
+            
+            let autoActualizado = {
+                marca: document.getElementById('marca').value,
+                modelo: document.getElementById('modelo').value,
+                anio: parseInt(document.getElementById('anio').value) || 0,
+                matricula: document.getElementById('matricula').value,
+                color: document.getElementById('color').value,
+                precio: parseFloat(document.getElementById('precio').value) || 0,
+                precioCompra: parseFloat(document.getElementById('precioCompra').value) || 0,
+                imagen: document.getElementById('imagen').value,
+                linkQR: document.getElementById('linkQR').value,
+                gastos: gastos,
+                valorReal: parseFloat(document.getElementById('precioCompra').value) || 0
+            };
+
+            autoActualizado.valorReal += gastos.reduce((total, gasto) => total + gasto.monto, 0);
+
+            update(ref(database, 'userStock/' + userId + '/' + key), autoActualizado)
+                .then(() => {
+                    console.log("Auto actualizado exitosamente");
+                    document.getElementById('stockForm').reset();
+                    resetGastosInputs();
+                    const submitButton = document.querySelector('#stockForm button[type="submit"]');
+                    submitButton.textContent = 'Agregar al Stock';
+                    submitButton.onclick = null;
+                })
+                .catch((error) => {
+                    console.error("Error al actualizar el auto: ", error);
+                    alert("Error al actualizar el auto: " + error.message);
+                });
+        }
 
         // Listen for auth state changes
         onAuthStateChanged(auth, (user) => {
@@ -532,6 +936,7 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
                 showAuthScreen();
             }
         });
+
     </script>
 </body>
 </html>
