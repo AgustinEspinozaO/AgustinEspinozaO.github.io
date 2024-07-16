@@ -822,16 +822,12 @@ window.eliminarAuto = function(key, userId) {
             // Creamos un array de promesas para eliminar los archivos
             const deletePromises = [];
             
-            // Si hay una imagen, verificamos si es una URL de Storage o una URL externa
-            if (auto.imagen) {
-                if (auto.imagen.startsWith('gs://') || auto.imagen.includes('firebasestorage.googleapis.com')) {
-                    // Es una URL de Firebase Storage
-                    const imageRef = storageRef(storage, auto.imagen);
-                    deletePromises.push(deleteObject(imageRef));
-                } else {
-                    // Es una URL externa, no necesitamos eliminarla
-                    console.log('La imagen es una URL externa y no se eliminará:', auto.imagen);
-                }
+            // Aquí es donde colocamos el nuevo código para manejar la imagen
+            if (auto.imagen && !auto.imagenEsExterna) {
+                const imageRef = storageRef(storage, auto.imagen);
+                deletePromises.push(deleteObject(imageRef));
+            } else {
+                console.log('La imagen es una URL externa o no existe, no se eliminará.');
             }
             
             // Aquí puedes agregar más promesas para eliminar otros archivos si los hay
@@ -842,7 +838,7 @@ window.eliminarAuto = function(key, userId) {
                     return remove(autoRef);
                 })
                 .then(() => {
-                    console.log("Auto eliminado exitosamente");
+                    console.log("Auto y archivos asociados eliminados exitosamente");
                 })
                 .catch((error) => {
                     console.error("Error al eliminar el auto o sus archivos: ", error);
@@ -856,7 +852,6 @@ window.eliminarAuto = function(key, userId) {
         });
     }
 };
-
     window.marcarComoVendido = function(key, userId) {
         const precioVenta = prompt("Ingrese el precio de venta del vehículo:");
         if (precioVenta !== null && !isNaN(precioVenta)) {
