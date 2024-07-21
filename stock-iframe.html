@@ -1,4 +1,3 @@
-<!-- Página HTML para el iframe (stock.html) -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -18,19 +17,16 @@
     <div id="stock-container"></div>
 
     <script>
-        // Configuración de Firebase (reemplaza con tus propias credenciales)
+        // Configuración de Firebase
         const firebaseConfig = {
-            // Tu configuración de Firebase aquí
-            const firebaseConfig = {
-    apiKey: "AIzaSyCWOc4NfmUWxM0D386fbQsmjwGIcCxjlPo",
-    authDomain: "control-stock-d1c59.firebaseapp.com",
-    databaseURL: "https://control-stock-d1c59-default-rtdb.firebaseio.com",
-    projectId: "control-stock-d1c59",
-    storageBucket: "control-stock-d1c59.appspot.com",
-    messagingSenderId: "298416047948",
-    appId: "1:298416047948:web:f8897acce0c87e373d31e9",
-    measurementId: "G-9R7FF95W92"
-};
+            apiKey: "AIzaSyCWOc4NfmUWxM0D386fbQsmjwGIcCxjlPo",
+            authDomain: "control-stock-d1c59.firebaseapp.com",
+            databaseURL: "https://control-stock-d1c59-default-rtdb.firebaseio.com",
+            projectId: "control-stock-d1c59",
+            storageBucket: "control-stock-d1c59.appspot.com",
+            messagingSenderId: "298416047948",
+            appId: "1:298416047948:web:f8897acce0c87e373d31e9",
+            measurementId: "G-9R7FF95W92"
         };
 
         // Inicializar Firebase
@@ -39,7 +35,15 @@
 
         function loadStock() {
             const stockContainer = document.getElementById('stock-container');
-            const userId = 'VWlAerU7ITg5OFDccqP6S7DmD4I2'; // Reemplaza con tu ID real
+            
+            // Obtener el ID de usuario de los parámetros de la URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('userId');
+
+            if (!userId) {
+                stockContainer.innerHTML = '<p>Error: ID de usuario no proporcionado.</p>';
+                return;
+            }
 
             const userStockRef = database.ref('userStock/' + userId);
             
