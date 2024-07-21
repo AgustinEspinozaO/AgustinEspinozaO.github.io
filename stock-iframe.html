@@ -4,19 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock de Vehículos</title>
-    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .auto-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
-        .auto-image { max-width: 100%; height: auto; }
-        .inquire-button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div id="stock-container"></div>
+    <!-- Cambia estos scripts por las versiones de módulos -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js';
 
-    <script>
         // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCWOc4NfmUWxM0D386fbQsmjwGIcCxjlPo",
@@ -30,8 +22,8 @@
         };
 
         // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
 
         function loadStock() {
             const stockContainer = document.getElementById('stock-container');
@@ -45,9 +37,9 @@
                 return;
             }
 
-            const userStockRef = database.ref('userStock/' + userId);
+            const userStockRef = ref(database, 'userStock/' + userId);
             
-            userStockRef.on('value', (snapshot) => {
+            onValue(userStockRef, (snapshot) => {
                 stockContainer.innerHTML = '';
                 const data = snapshot.val();
                 
@@ -92,5 +84,14 @@
 
         document.addEventListener('DOMContentLoaded', loadStock);
     </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .auto-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .auto-image { max-width: 100%; height: auto; }
+        .inquire-button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="stock-container"></div>
 </body>
 </html>
