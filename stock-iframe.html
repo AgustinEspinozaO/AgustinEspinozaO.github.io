@@ -4,7 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock de Vehículos</title>
-    <!-- Cambia estos scripts por las versiones de módulos -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+        #stock-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .auto-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .auto-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        .inquire-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .inquire-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="stock-container"></div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js';
         import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.12.3/firebase-database.js';
@@ -55,7 +100,7 @@
                 }
             }, (error) => {
                 console.error("Error al cargar el stock:", error);
-                stockContainer.innerHTML = '<p>Error al cargar el inventario. Por favor, intente más tarde.</p>';
+                stockContainer.innerHTML = `<p>Error al cargar el inventario: ${error.message}</p>`;
             });
         }
 
@@ -72,7 +117,7 @@
             `;
 
             autoElement.querySelector('.inquire-button').addEventListener('click', () => {
-                window.parent.postMessage({type: 'INQUIRE', autoId: key}, '*');
+                window.parent.postMessage({type: 'INQUIRE', autoId: key, autoDetails: auto}, '*');
             });
 
             return autoElement;
@@ -84,14 +129,29 @@
 
         document.addEventListener('DOMContentLoaded', loadStock);
     </script>
+</body>
+</html>
+<!--><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoStock Inventory</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .auto-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
-        .auto-image { max-width: 100%; height: auto; }
-        .inquire-button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
-    <div id="stock-container"></div>
+    <iframe src="https://tu-dominio.com/stock-iframe.html?userId=UID_DEL_CLIENTE" allowfullscreen></iframe>
 </body>
-</html>
+</html><-->
