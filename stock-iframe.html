@@ -105,23 +105,59 @@
         }
 
         function createAutoElement(auto, key) {
-            const autoElement = document.createElement('div');
-            autoElement.className = 'auto-card';
-            
-            autoElement.innerHTML = `
-                <img src="${auto.imagen}" alt="${auto.marca} ${auto.modelo}" class="auto-image">
-                <h3>${auto.marca} ${auto.modelo} (${auto.anio})</h3>
-                <p>Color: ${auto.color}</p>
-                <p>Precio: ${formatearPrecioCLP(auto.precio)}</p>
-                <button class="inquire-button" data-auto-id="${key}">Consultar</button>
-            `;
+    const autoElement = document.createElement('div');
+    autoElement.className = 'auto-card';
+    
+    // Número de WhatsApp al que se enviará el mensaje (reemplaza con tu número)
+    const whatsappNumber = '56964611542'; // Ejemplo: número de Chile
+    
+    // Crear el mensaje predefinido
+    const mensaje = encodeURIComponent(`Hola, estoy interesado en el vehículo ${auto.marca} ${auto.modelo} (${auto.anio}) con precio ${formatearPrecioCLP(auto.precio)}. ¿Podrían darme más información?`);
+    
+    // Crear el enlace de WhatsApp
+    const whatsappLink = `https://wa.me/${whatsappNumber}?text=${mensaje}`;
+    
+    // Construir el HTML del elemento
+    autoElement.innerHTML = `
+        <img src="${auto.imagen}" alt="${auto.marca} ${auto.modelo}" class="auto-image">
+        <h3>${auto.marca} ${auto.modelo} (${auto.anio})</h3>
+        <p>Color: ${auto.color}</p>
+        <p>Precio: ${formatearPrecioCLP(auto.precio)}</p>
+        <p>Matrícula: ${auto.matricula || 'No disponible'}</p>
+        ${auto.valorReal ? `<p>Valor Real: ${formatearPrecioCLP(auto.valorReal)}</p>` : ''}
+        <a href="${whatsappLink}" target="_blank" class="inquire-button" data-auto-id="${key}">Consultar por WhatsApp</a>
+    `;
 
-            autoElement.querySelector('.inquire-button').addEventListener('click', () => {
-                window.parent.postMessage({type: 'INQUIRE', autoId: key, autoDetails: auto}, '*');
-            });
+    // Agregar gastos si existen
+    if (auto.gastos && Array.isArray(auto.gastos) && auto.gastos.length > 0) {
+        const gastosContainer = document.createElement('div');
+        gastosContainer.className = 'gastos-container';
+        gastosContainer.innerHTML = '<h4>Gastos:</h4><ul>';
+        auto.gastos.forEach(gasto => {
+            gastosContainer.innerHTML += `<li>${gasto.tipo}: ${formatearPrecioCLP(gasto.monto)} - ${gasto.detalle}</li>`;
+        });
+        gastosContainer.innerHTML += '</ul>';
+        autoElement.appendChild(gastosContainer);
+    }
 
-            return autoElement;
-        }
+    // Agregar evento para notificar al padre (si es necesario)
+    autoElement.querySelector('.inquire-button').addEventListener('click', (e) => {
+        // Evitar que el evento de clic interfiera con la apertura del enlace
+        e.preventDefault();
+        
+        // Notificar al padre sobre la consulta
+        window.parent.postMessage({
+            type: 'INQUIRE',
+            autoId: key,
+            autoDetails: auto
+        }, '*');
+
+        // Abrir el enlace de WhatsApp
+        window.open(whatsappLink, '_blank');
+    });
+
+    return autoElement;
+}
 
         function formatearPrecioCLP(precio) {
             return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(precio);
