@@ -4,310 +4,323 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peritaje Vehicular Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        background: '#F3F4F6',
+                        text: '#1F2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2ecc71;
-            --background-color: #ecf0f1;
-            --text-color: #34495e;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        nav {
-            background-color: var(--primary-color);
-            padding: 15px 0;
-            box-shadow: var(--shadow);
-        }
-
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        nav ul li {
-            margin: 0 15px;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        nav ul li a:hover {
-            color: var(--secondary-color);
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #27ae60;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .peritaje-item {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        .image-preview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .image-preview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            display: none;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .modal-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            margin-bottom: 10px;
+        @layer utilities {
+            .shadow-custom {
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
         }
     </style>
 </head>
-<body>
-    <nav>
-        <ul>
-            <li><a href="#" id="nuevoPeritajeLink">Nuevo Peritaje</a></li>
-            <li><a href="#" id="historialPeritajesLink">Historial</a></li>
-            <li><a href="#" id="buscarPeritajeLink">Buscar</a></li>
-            <li><a href="#" id="adminPanelButton" style="display:none;">Panel Admin</a></li>
-            <li><a href="#" id="logoutButton" style="display:none;">Cerrar Sesión</a></li>
-        </ul>
+<body class="bg-background text-text font-sans">
+    <nav class="bg-primary shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="flex-shrink-0">
+                        <img class="h-8 w-8" src="/logo.svg" alt="Logo">
+                    </a>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#" id="nuevoPeritajeLink" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Nuevo Peritaje</a>
+                            <a href="#" id="historialPeritajesLink" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Historial</a>
+                            <a href="#" id="buscarPeritajeLink" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium">Buscar</a>
+                            <a href="#" id="adminPanelButton" class="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-sm font-medium hidden">Panel Admin</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <button id="logoutButton" class="bg-blue-600 p-1 rounded-full text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                            <span class="sr-only">Cerrar Sesión</span>
+                            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </nav>
 
-    <div class="container">
-        <div id="authForms" class="card">
-            <h2>Autenticación</h2>
-            <div id="loginForm">
-                <h3>Iniciar Sesión</h3>
-                <div class="form-group">
-                    <label for="loginEmail">Email:</label>
-                    <input type="email" id="loginEmail" required>
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Formularios de autenticación -->
+        <div id="authForms" class="mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-2 md:gap-6">
+                <div class="mt-5 md:mt-0 md:col-span-1">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <div class="px-4 py-5 bg-white sm:p-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Iniciar Sesión</h3>
+                            <div class="mt-5 space-y-6">
+                                <div>
+                                    <label for="loginEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="loginEmail" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label for="loginPassword" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                                    <input type="password" id="loginPassword" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <button id="loginButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        Iniciar Sesión
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="loginPassword">Contraseña:</label>
-                    <input type="password" id="loginPassword" required>
+                <div class="mt-5 md:mt-0 md:col-span-1">
+                    <div class="shadow overflow-hidden sm:rounded-md">
+                        <div class="px-4 py-5 bg-white sm:p-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Registro</h3>
+                            <div class="mt-5 space-y-6">
+                                <div>
+                                    <label for="registerEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="registerEmail" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <label for="registerPassword" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                                    <input type="password" id="registerPassword" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                </div>
+                                <div>
+                                    <button id="registerButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-secondary hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        Registrarse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button id="loginButton">Iniciar Sesión</button>
-            </div>
-            <div id="registerForm">
-                <h3>Registro</h3>
-                <div class="form-group">
-                    <label for="registerEmail">Email:</label>
-                    <input type="email" id="registerEmail" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Contraseña:</label>
-                    <input type="password" id="registerPassword" required>
-                </div>
-                <button id="registerButton">Registrarse</button>
             </div>
         </div>
 
-        <div id="adminPanel" class="card" style="display: none;">
-            <h2>Panel de Administración</h2>
-            <h3>Usuarios Pendientes de Aprobación</h3>
-            <div id="pendingUsersList"></div>
+        <!-- Panel de administración -->
+        <div id="adminPanel" class="hidden mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Panel de Administración</h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Gestiona los usuarios pendientes de aprobación.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <div class="shadow sm:rounded-md sm:overflow-hidden">
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            <div>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Usuarios Pendientes de Aprobación</h3>
+                                <div id="pendingUsersList" class="mt-5 border-t border-gray-200">
+                                    <!-- Lista de usuarios pendientes se insertará aquí -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="nuevoPeritaje" class="card" style="display: none;">
-            <h2>Nuevo Peritaje</h2>
-            <div class="form-group">
-                <label for="marca">Marca:</label>
-                <input type="text" id="marca" required>
+        <!-- Formulario de nuevo peritaje -->
+        <div id="nuevoPeritaje" class="hidden mt-10 sm:mt-0">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Nuevo Peritaje</h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Ingrese los detalles del vehículo para el nuevo peritaje.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <form action="#" method="POST">
+                        <div class="shadow sm:rounded-md sm:overflow-hidden">
+                            <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                                <div class="grid grid-cols-6 gap-6">
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="marca" class="block text-sm font-medium text-gray-700">Marca</label>
+                                        <input type="text" name="marca" id="marca" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo</label>
+                                        <input type="text" name="modelo" id="modelo" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="anio" class="block text-sm font-medium text-gray-700">Año</label>
+                                        <input type="number" name="anio" id="anio" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="kilometraje" class="block text-sm font-medium text-gray-700">Kilometraje</label>
+                                        <input type="number" name="kilometraje" id="kilometraje" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+
+                                    <div class="col-span-6 sm:col-span-3">
+                                        <label for="matricula" class="block text-sm font-medium text-gray-700">Matrícula</label>
+                                        <input type="text" name="matricula" id="matricula" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="comentario" class="block text-sm font-medium text-gray-700">
+                                        Comentario
+                                    </label>
+                                    <div class="mt-1">
+                                        <textarea id="comentario" name="comentario" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"></textarea>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        Imágenes
+                                    </label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-gray-600">
+                                                <label for="imagenes" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                                    <span>Subir imágenes</span>
+                                                    <input id="imagenes" name="imagenes" type="file" class="sr-only" multiple>
+                                                </label>
+                                                <p class="pl-1">o arrastrar y soltar</p>
+                                            </div>
+                                            <p class="text-xs text-gray-500">
+                                                PNG, JPG, GIF hasta 10MB
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div id="imagePreview" class="mt-2 grid grid-cols-3 gap-2"></div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">
+                                        Archivos Adjuntos
+                                    </label>
+                                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                        <div class="space-y-1 text-center">
+                                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                            <div class="flex text-sm text-gray-600">
+                                                <label for="adjuntos" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                                    <span>Subir archivos</span>
+                                                    <input id="adjuntos" name="adjuntos" type="file" class="sr-only" multiple>
+                                                </label>
+                                                <p class="pl-1">o arrastrar y soltar</p>
+                                            </div>
+                                            <p class="text-xs text-gray-500">
+                                                PDF, DOC, XLS hasta 10MB
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                                <button id="guardarPeritajeButton" type="button" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Guardar Peritaje
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="modelo">Modelo:</label>
-                <input type="text" id="modelo" required>
-            </div>
-            <div class="form-group">
-                <label for="anio">Año:</label>
-                <input type="number" id="anio" required>
-            </div>
-            <div class="form-group">
-                <label for="kilometraje">Kilometraje:</label>
-                <input type="number" id="kilometraje" required>
-            </div>
-            <div class="form-group">
-                <label for="matricula">Matrícula:</label>
-                <input type="text" id="matricula" required>
-            </div>
-            <div class="form-group">
-                <label for="comentario">Comentario:</label>
-                <textarea id="comentario"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="imagenes">Imágenes:</label>
-                <input type="file" id="imagenes" multiple accept="image/*">
-                <div id="imagePreview" class="image-preview"></div>
-            </div>
-            <div class="form-group">
-                <label for="adjuntos">Archivos Adjuntos:</label>
-                <input type="file" id="adjuntos" multiple>
-            </div>
-            <button id="guardarPeritajeButton">Guardar Peritaje</button>
         </div>
 
-        <div id="historialPeritajes" style="display: none;">
-            <h2>Historial de Peritajes</h2>
-            <div id="listaPeritajes" class="grid"></div>
+        <!-- Historial de Peritajes -->
+        <div id="historialPeritajes" class="hidden mt-10">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Historial de Peritajes</h2>
+            <div id="listaPeritajes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Los elementos del historial se insertarán aquí dinámicamente -->
+            </div>
         </div>
 
-        <div id="buscarPeritaje" class="card" style="display: none;">
-            <h2>Buscar Peritaje</h2>
-            <div class="form-group">
-                <label for="busqueda">Buscar por marca:</label>
-                <input type="text" id="busqueda">
+        <!-- Buscar Peritaje -->
+        <div id="buscarPeritaje" class="hidden mt-10">
+            <div class="md:grid md:grid-cols-3 md:gap-6">
+                <div class="md:col-span-1">
+                    <div class="px-4 sm:px-0">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">Buscar Peritaje</h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Busque peritajes por marca del vehículo.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-5 md:mt-0 md:col-span-2">
+                    <div class="shadow sm:rounded-md sm:overflow-hidden">
+                        <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+                            <div>
+                                <label for="busqueda" class="block text-sm font-medium text-gray-700">Buscar por marca:</label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <input type="text" name="busqueda" id="busqueda" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300">
+                                    <button id="buscarPeritajesButton" type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-r-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                        Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="resultadosBusqueda" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Los resultados de búsqueda se insertarán aquí dinámicamente -->
+                    </div>
+                </div>
             </div>
-            <button id="buscarPeritajesButton">Buscar</button>
-            <div id="resultadosBusqueda" class="grid"></div>
+        </div>
+    </main>
+
+    <!-- Modal para imágenes -->
+    <div id="imageModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Imágenes del Peritaje
+                            </h3>
+                            <div class="mt-2">
+                                <div id="modalImages" class="grid grid-cols-2 gap-4">
+                                    <!-- Las imágenes se insertarán aquí dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="document.getElementById('imageModal').classList.add('hidden')">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-    </div>
-
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modalImages"></div>
-        </div>
+    <!-- Overlay de carga -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 
     <script type="module">
@@ -380,301 +393,347 @@
         }
 
         function showUserInterface(userEmail) {
-            document.getElementById('authForms').style.display = 'none';
-            document.getElementById('nuevoPeritaje').style.display = 'block';
-            document.getElementById('logoutButton').style.display = 'block';
+            document.getElementById('authForms').classList.add('hidden');
+            document.getElementById('nuevoPeritaje').classList.remove('hidden');
+            document.getElementById('logoutButton').classList.remove('hidden');
             if (userEmail === adminEmail) {
-                document.getElementById('adminPanelButton').style.display = 'block';
+                document.getElementById('adminPanelButton').classList.remove('hidden');
                 loadPendingUsers();
             }
             showSection('nuevoPeritaje');
         }
 
         function showLoginForm() {
-            document.getElementById('authForms').style.display = 'block';
-            document.getElementById('nuevoPeritaje').style.display = 'none';
-            document.getElementById('historialPeritajes').style.display = 'none';
-            document.getElementById('buscarPeritaje').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('logoutButton').style.display = 'none';
-            document.getElementById('adminPanelButton').style.display = 'none';
+            document.getElementById('authForms').classList.remove('hidden');
+            document.getElementById('nuevoPeritaje').classList.add('hidden');
+            document.getElementById('historialPeritajes').classList.add('hidden');
+            document.getElementById('buscarPeritaje').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('logoutButton').classList.add('hidden');
+            document.getElementById('adminPanelButton').classList.add('hidden');
         }
 
         function showSection(sectionId) {
-            document.getElementById('nuevoPeritaje').style.display = 'none';
-            document.getElementById('historialPeritajes').style.display = 'none';
-            document.getElementById('buscarPeritaje').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById(sectionId).style.display = 'block';
+            document.getElementById('nuevoPeritaje').classList.add('hidden');
+            document.getElementById('historialPeritajes').classList.add('hidden');
+            document.getElementById('buscarPeritaje').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
 
             if (sectionId === 'historialPeritajes') {
                 cargarHistorialPeritajes();
             }
+        }
+
+        async function guardarPeritaje() {
+            if (!auth.currentUser) {
+                alert("Por favor, inicia sesión para guardar un peritaje.");
+                return;
             }
 
-    async function guardarPeritaje() {
-        if (!auth.currentUser) {
-            alert("Por favor, inicia sesión para guardar un peritaje.");
-            return;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const anio = document.getElementById('anio').value;
+            const kilometraje = document.getElementById('kilometraje').value;
+            const matricula = document.getElementById('matricula').value;
+            const comentario = document.getElementById('comentario').value;
+            const imagenes = document.getElementById('imagenes').files;
+            const adjuntos = document.getElementById('adjuntos').files;
+
+            showLoading();
+
+            try {
+                const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
+                const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
+
+                const peritaje = {
+                    marca: marca.toLowerCase(),
+                    modelo,
+                    anio,
+                    kilometraje,
+                    matricula,
+                    comentario,
+                    imagenesUrls,
+                    adjuntosUrls,
+                    fecha: new Date(),
+                    userId: auth.currentUser.uid
+                };
+
+                await addDoc(collection(db, 'peritajes'), peritaje);
+                alert('Peritaje guardado con éxito');
+                limpiarFormulario();
+            } catch (error) {
+                console.error('Error al guardar el peritaje:', error);
+                alert('Error al guardar el peritaje: ' + error.message);
+            } finally {
+                hideLoading();
+            }
         }
 
-        const marca = document.getElementById('marca').value;
-        const modelo = document.getElementById('modelo').value;
-        const anio = document.getElementById('anio').value;
-        const kilometraje = document.getElementById('kilometraje').value;
-        const matricula = document.getElementById('matricula').value;
-        const comentario = document.getElementById('comentario').value;
-        const imagenes = document.getElementById('imagenes').files;
-        const adjuntos = document.getElementById('adjuntos').files;
-
-        showLoading();
-
-        try {
-            const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
-            const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
-
-            const peritaje = {
-                marca: marca.toLowerCase(),
-                modelo,
-                anio,
-                kilometraje,
-                matricula,
-                comentario,
-                imagenesUrls,
-                adjuntosUrls,
-                fecha: new Date(),
-                userId: auth.currentUser.uid
-            };
-
-            await addDoc(collection(db, 'peritajes'), peritaje);
-            alert('Peritaje guardado con éxito');
-            limpiarFormulario();
-        } catch (error) {
-            console.error('Error al guardar el peritaje:', error);
-            alert('Error al guardar el peritaje: ' + error.message);
-        } finally {
-            hideLoading();
+        async function uploadFile(file) {
+            const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            return getDownloadURL(storageRef);
         }
-    }
 
-    async function uploadFile(file) {
-        const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
-        await uploadBytes(storageRef, file);
-        return getDownloadURL(storageRef);
-    }
-
-    function limpiarFormulario() {
-        document.getElementById('marca').value = '';
-        document.getElementById('modelo').value = '';
-        document.getElementById('anio').value = '';
-        document.getElementById('kilometraje').value = '';
-        document.getElementById('matricula').value = '';
-        document.getElementById('comentario').value = '';
-        document.getElementById('imagenes').value = '';
-        document.getElementById('adjuntos').value = '';
-        document.getElementById('imagePreview').innerHTML = '';
-    }
-
-   async function cargarHistorialPeritajes() {
-    showLoading();
-    const listaPeritajes = document.getElementById('listaPeritajes');
-    listaPeritajes.innerHTML = '';
-
-    try {
-        // Cambiamos la consulta para que no requiera el índice compuesto
-        const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
-        const querySnapshot = await getDocs(q);
-        
-        // Ordenamos los resultados en el cliente
-        const peritajes = [];
-        querySnapshot.forEach((doc) => {
-            peritajes.push({...doc.data(), id: doc.id});
-        });
-        peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
-
-        peritajes.forEach((peritaje) => {
-            const peritajeElement = document.createElement('div');
-            peritajeElement.className = 'peritaje-item';
-            peritajeElement.innerHTML = `
-                <h3>${peritaje.marca} ${peritaje.modelo}</h3>
-                <p>Año: ${peritaje.anio}</p>
-                <p>Kilometraje: ${peritaje.kilometraje}</p>
-                <p>Matrícula: ${peritaje.matricula}</p>
-                <p>Fecha: ${peritaje.fecha.toDate().toLocaleDateString()}</p>
-                ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                    `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
-                     <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
-                    : ''}
-                ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                    `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                     <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
-                    : ''}
-            `;
-            listaPeritajes.appendChild(peritajeElement);
-        });
-    } catch (error) {
-        console.error('Error al cargar el historial:', error);
-    } finally {
-        hideLoading();
-    }
-}
-
-    async function buscarPeritajes() {
-        const busqueda = document.getElementById('busqueda').value.toLowerCase();
-        const resultadosBusqueda = document.getElementById('resultadosBusqueda');
-        resultadosBusqueda.innerHTML = '';
-
-        showLoading();
-
-        try {
-            const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), where('marca', '==', busqueda));
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-                const peritaje = doc.data();
-                const peritajeElement = document.createElement('div');
-                peritajeElement.className = 'peritaje-item';
-                peritajeElement.innerHTML = `
-                    <h3>${peritaje.marca} ${peritaje.modelo}</h3>
-                    <p>Año: ${peritaje.anio}</p>
-                    <p>Kilometraje: ${peritaje.kilometraje}</p>
-                    <p>Matrícula: ${peritaje.matricula}</p>
-                    ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                        `<img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" style="width:100%;max-width:200px;">
-                         <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})'>Ver más imágenes</button>` 
-                        : ''}
-                    ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                        `<p>Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                         <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})'>Ver adjuntos</button>`
-                        : ''}
-                `;
-                resultadosBusqueda.appendChild(peritajeElement);
-            });
-        } catch (error) {
-            console.error('Error en la búsqueda:', error);
-        } finally {
-            hideLoading();
+        function limpiarFormulario() {
+            document.getElementById('marca').value = '';
+            document.getElementById('modelo').value = '';
+            document.getElementById('anio').value = '';
+            document.getElementById('kilometraje').value = '';
+            document.getElementById('matricula').value = '';
+            document.getElementById('comentario').value = '';
+            document.getElementById('imagenes').value = '';
+            document.getElementById('adjuntos').value = '';
+            document.getElementById('imagePreview').innerHTML = '';
         }
-    }
 
-    function mostrarImagenes(imagenes) {
-        const modal = document.getElementById('imageModal');
-        const modalImages = document.getElementById('modalImages');
-        modalImages.innerHTML = '';
-        imagenes.forEach(url => {
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'modal-image';
-            modalImages.appendChild(img);
-        });
-        modal.style.display = 'block';
-    }
+        async function cargarHistorialPeritajes() {
+            showLoading();
+            const listaPeritajes = document.getElementById('listaPeritajes');
+            listaPeritajes.innerHTML = '';
 
-    function mostrarAdjuntos(adjuntos) {
-        const modal = document.getElementById('imageModal');
-        const modalImages = document.getElementById('modalImages');
-        modalImages.innerHTML = '';
-        adjuntos.forEach(url => {
-            const link = document.createElement('a');
-            link.href = url;
-            link.textContent = url.split('/').pop();
-            link.className = 'adjunto-link';
-            link.target = '_blank';
-            modalImages.appendChild(link);
-        });
-        modal.style.display = 'block';
-    }
+            try {
+                const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
+                const querySnapshot = await getDocs(q);
+                
+                const peritajes = [];
+                querySnapshot.forEach((doc) => {
+                    peritajes.push({...doc.data(), id: doc.id});
+                });
+                peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
 
-    function showLoading() {
-        document.getElementById('loadingOverlay').style.display = 'flex';
-    }
-
-    function hideLoading() {
-        document.getElementById('loadingOverlay').style.display = 'none';
-    }
-
-    async function loadPendingUsers() {
-        const pendingUsersList = document.getElementById('pendingUsersList');
-        pendingUsersList.innerHTML = '';
-
-        const q = query(collection(db, 'pendingUsers'), where("approved", "==", false));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach((doc) => {
-            const user = doc.data();
-            const userElement = document.createElement('div');
-            userElement.innerHTML = `
-                <p>${user.email}</p>
-                <button onclick="approveUser('${doc.id}', '${user.uid}')">Aprobar</button>
-            `;
-            pendingUsersList.appendChild(userElement);
-        });
-    }
-
-    async function approveUser(docId, uid) {
-        try {
-            await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
-            await deleteDoc(doc(db, 'pendingUsers', docId));
-            alert('Usuario aprobado y removido de la lista de pendientes');
-            loadPendingUsers();
-        } catch (error) {
-            console.error('Error al aprobar usuario:', error);
-            alert('Error al aprobar usuario: ' + error.message);
+                peritajes.forEach((peritaje) => {
+                    const peritajeElement = document.createElement('div');
+                    peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
+                    peritajeElement.innerHTML = `
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <dl>
+                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
+                                </div>
+                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
+                                </div>
+                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Fecha</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.fecha.toDate().toLocaleDateString()}</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                            `<div class="px-4 py-5 sm:px-6">
+                                <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
+                                <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Ver más imágenes
+                                </button>
+                             </div>` 
+                            : ''}
+                        ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                            `<div class="px-4 py-5 sm:px-6">
+                                <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                                <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Ver adjuntos
+                                </button>
+                             </div>`
+                            : ''}
+                    `;
+                    listaPeritajes.appendChild(peritajeElement);
+                });
+            } catch (error) {
+                console.error('Error al cargar el historial:', error);
+            } finally {
+                hideLoading();
+            }
         }
-    }
 
-    // Event Listeners
-    document.getElementById('loginButton').addEventListener('click', login);
-    document.getElementById('registerButton').addEventListener('click', register);
-    document.getElementById('logoutButton').addEventListener('click', logout);
-    document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
-    document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
-    document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
-    document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
-    document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
-    document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
+        async function buscarPeritajes() {
+            const busqueda = document.getElementById('busqueda').value.toLowerCase();
+            const resultadosBusqueda = document.getElementById('resultadosBusqueda');
+            resultadosBusqueda.innerHTML = '';
 
-    document.getElementById('imagenes').addEventListener('change', function(event) {
-        const imagePreview = document.getElementById('imagePreview');
-        imagePreview.innerHTML = '';
-        const files = event.target.files;
+            showLoading();
 
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const reader = new FileReader();
+            try {
+                const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), where('marca', '==', busqueda));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => {
+                    const peritaje = doc.data();
+                    const peritajeElement = document.createElement('div');
+                    peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
+                    peritajeElement.innerHTML = `
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
+                        </div>
+                        <div class="border-t border-gray-200">
+                            <dl>
+                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
+                                </div>
+                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
+                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                            `<div class="px-4 py-5 sm:px-6">
+                                <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
+                                <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Ver más imágenes
+                                </button>
+                             </div>` 
+                            : ''}
+                        ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                            `<div class="px-4 py-5 sm:px-6">
+                                <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                                <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Ver adjuntos
+                                </button>
+                             </div>`
+                            : ''}
+                    `;
+                    resultadosBusqueda.appendChild(peritajeElement);
+                });
+            } catch (error) {
+                console.error('Error en la búsqueda:', error);
+            } finally {
+                hideLoading();
+            }
+        }
 
-            reader.onload = function(e) {
+        function mostrarImagenes(imagenes) {
+            const modal = document.getElementById('imageModal');
+            const modalImages = document.getElementById('modalImages');
+            modalImages.innerHTML = '';
+            imagenes.forEach(url => {
                 const img = document.createElement('img');
-                img.src = e.target.result;
-                imagePreview.appendChild(img);
+                img.src = url;
+                img.className = 'w-full h-auto rounded-md';
+                modalImages.appendChild(img);
+            });
+            modal.classList.remove('hidden');
+        }
+
+        function mostrarAdjuntos(adjuntos) {
+            const modal = document.getElementById('imageModal');
+            const modalImages = document.getElementById('modalImages');
+            modalImages.innerHTML = '';
+            adjuntos.forEach(url => {
+                const link = document.createElement('a');
+                link.href = url;
+                link.textContent = url.split('/').pop();
+                link.className = 'block p-2 text-blue-600 hover:text-blue-800';
+                link.target = '_blank';
+                modalImages.appendChild(link);
+            });
+            modal.classList.remove('hidden');
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }
+
+        async function loadPendingUsers() {
+            const pendingUsersList = document.getElementById('pendingUsersList');
+            pendingUsersList.innerHTML = '';
+
+            const q = query(collection(db, 'pendingUsers'), where("approved", "==", false));
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach((doc) => {
+                const user = doc.data();
+                const userElement = document.createElement('div');
+                userElement.className = 'py-4 flex items-center justify-between';
+                userElement.innerHTML = `
+                    <p class="text-sm font-medium text-gray-900">${user.email}</p>
+                    <button onclick="approveUser('${doc.id}', '${user.uid}')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Aprobar
+                    </button>
+                `;
+                pendingUsersList.appendChild(userElement);
+            });
+        }
+
+        async function approveUser(docId, uid) {
+            try {
+                await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
+                await deleteDoc(doc(db, 'pendingUsers', docId));
+                alert('Usuario aprobado y removido de la lista de pendientes');
+                loadPendingUsers();
+            } catch (error) {
+                console.error('Error al aprobar usuario:', error);
+                alert('Error al aprobar usuario: ' + error.message);
             }
-
-            reader.readAsDataURL(file);
         }
-    });
 
-    // Cerrar modal
-    const modal = document.getElementById('imageModal');
-    const span = document.getElementsByClassName('close')[0];
-    span.onclick = function() {
-        modal.style.display = 'none';
-    }
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
+        // Event Listeners
+        document.getElementById('loginButton').addEventListener('click', login);
+        document.getElementById('registerButton').addEventListener('click', register);
+        document.getElementById('logoutButton').addEventListener('click', logout);
+        document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
+        document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
+        document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
+        document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
+        document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
+        document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
+
+        document.getElementById('imagenes').addEventListener('change', function(event) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = '';
+            const files = event.target.files;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'w-full h-24 object-cover rounded-md';
+                    imagePreview.appendChild(img);}
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Cerrar modal
+        const modal = document.getElementById('imageModal');
+        const span = document.getElementsByClassName('close')[0];
+        span.onclick = function() {
+            modal.classList.add('hidden');
         }
-    }
-
-    // Verificar el estado de autenticación
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            showUserInterface(user.email);
-        } else {
-            showLoginForm();
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.classList.add('hidden');
+            }
         }
-    });
 
-    // Hacer las funciones disponibles globalmente
-    window.mostrarImagenes = mostrarImagenes;
-    window.mostrarAdjuntos = mostrarAdjuntos;
-    window.approveUser = approveUser;
-</script>
+        // Verificar el estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                showUserInterface(user.email);
+            } else {
+                showLoginForm();
+            }
+        });
+
+        // Hacer las funciones disponibles globalmente
+        window.mostrarImagenes = mostrarImagenes;
+        window.mostrarAdjuntos = mostrarAdjuntos;
+        window.approveUser = approveUser;
+    </script>
+</body>
+</html>
