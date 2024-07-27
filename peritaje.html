@@ -323,8 +323,8 @@
         <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
@@ -590,7 +590,14 @@ async function buscarPeritajes() {
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
                         </div>
                     </dl>
-                </div>` 
+                </div>
+                ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                    `<div class="px-4 py-5 sm:px-6">
+                        <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
+                        <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Ver más imágenes
+                        </button>
+                     </div>` 
                     : ''}
                 ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
                     `<div class="px-4 py-5 sm:px-6">
@@ -705,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 img.src = e.target.result;
                 img.className = 'w-full h-24 object-cover rounded-md';
                 imagePreview.appendChild(img);
-            }
+            };
 
             reader.readAsDataURL(file);
         }
@@ -718,13 +725,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (closeButton) {
             closeButton.onclick = function() {
                 modal.classList.add('hidden');
-            }
+            };
         }
         window.onclick = function(event) {
-            if (event.target == modal) {
+            if (event.target === modal) {
                 modal.classList.add('hidden');
             }
-        }
+        };
     }
 
     // Verificar el estado de autenticación
@@ -741,6 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.mostrarImagenes = mostrarImagenes;
 window.mostrarAdjuntos = mostrarAdjuntos;
 window.approveUser = approveUser;
-    </script>
+</script>
 </body>
 </html>
