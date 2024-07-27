@@ -325,415 +325,422 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-analytics.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-storage.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDm2FqhvJbzl-IDjpfo9o_yjBo-EsIFKkc",
-            authDomain: "peritaje-ef38c.firebaseapp.com",
-            projectId: "peritaje-ef38c",
-            storageBucket: "peritaje-ef38c.appspot.com",
-            messagingSenderId: "749420033603",
-            appId: "1:749420033603:web:3c07290dd36322cb50c6f6",
-            measurementId: "G-12KB1GDQDG"
+const firebaseConfig = {
+    apiKey: "AIzaSyDm2FqhvJbzl-IDjpfo9o_yjBo-EsIFKkc",
+    authDomain: "peritaje-ef38c.firebaseapp.com",
+    projectId: "peritaje-ef38c",
+    storageBucket: "peritaje-ef38c.appspot.com",
+    messagingSenderId: "749420033603",
+    appId: "1:749420033603:web:3c07290dd36322cb50c6f6",
+    measurementId: "G-12KB1GDQDG"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
+
+function login() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            console.log("Sesión iniciada:", userCredential.user);
+            showUserInterface(userCredential.user.email);
+        })
+        .catch((error) => {
+            console.error("Error en el inicio de sesión:", error);
+            alert("Error en el inicio de sesión: " + error.message);
+        });
+}
+
+function register() {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            addDoc(collection(db, 'pendingUsers'), {
+                email: user.email,
+                uid: user.uid,
+                createdAt: new Date()
+            });
+            alert("Registro exitoso. Espere la aprobación del administrador.");
+            showLoginForm();
+        })
+        .catch((error) => {
+            console.error("Error en el registro:", error);
+            alert("Error en el registro: " + error.message);
+        });
+}
+
+function logout() {
+    signOut(auth).then(() => {
+        showLoginForm();
+    }).catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+    });
+}
+
+function showUserInterface(userEmail) {
+    document.getElementById('authForms').classList.add('hidden');
+    document.getElementById('nuevoPeritaje').classList.remove('hidden');
+    
+    // Mostrar opciones de navegación
+    document.getElementById('navOptions').classList.remove('hidden');
+    document.getElementById('logoutButton').classList.remove('hidden');
+
+    if (userEmail === adminEmail) {
+        document.getElementById('adminPanelButton').classList.remove('hidden');
+        loadPendingUsers();
+    }
+    showSection('nuevoPeritaje');
+}
+
+function showLoginForm() {
+    document.getElementById('authForms').classList.remove('hidden');
+    document.getElementById('nuevoPeritaje').classList.add('hidden');
+    document.getElementById('historialPeritajes').classList.add('hidden');
+    document.getElementById('buscarPeritaje').classList.add('hidden');
+    document.getElementById('adminPanel').classList.add('hidden');
+    
+    // Ocultar opciones de navegación
+    document.getElementById('navOptions').classList.add('hidden');
+    document.getElementById('logoutButton').classList.add('hidden');
+    document.getElementById('adminPanelButton').classList.add('hidden');
+}
+
+function showSection(sectionId) {
+    document.getElementById('nuevoPeritaje').classList.add('hidden');
+    document.getElementById('historialPeritajes').classList.add('hidden');
+    document.getElementById('buscarPeritaje').classList.add('hidden');
+    document.getElementById('adminPanel').classList.add('hidden');
+    document.getElementById(sectionId).classList.remove('hidden');
+
+    if (sectionId === 'historialPeritajes') {
+        cargarHistorialPeritajes();
+    }
+}
+
+async function guardarPeritaje() {
+    if (!auth.currentUser) {
+        alert("Por favor, inicia sesión para guardar un peritaje.");
+        return;
+    }
+
+    const marca = document.getElementById('marca').value;
+    const modelo = document.getElementById('modelo').value;
+    const anio = document.getElementById('anio').value;
+    const kilometraje = document.getElementById('kilometraje').value;
+    const matricula = document.getElementById('matricula').value;
+    const comentario = document.getElementById('comentario').value;
+    const imagenes = document.getElementById('imagenes').files;
+    const adjuntos = document.getElementById('adjuntos').files;
+
+    showLoading();
+
+    try {
+        const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
+        const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
+
+        const peritaje = {
+            marca: marca.toLowerCase(),
+            modelo,
+            anio,
+            kilometraje,
+            matricula,
+            comentario,
+            imagenesUrls,
+            adjuntosUrls,
+            fecha: new Date(),
+            userId: auth.currentUser.uid
         };
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+        await addDoc(collection(db, 'peritajes'), peritaje);
+        alert('Peritaje guardado con éxito');
+        limpiarFormulario();
+    } catch (error) {
+        console.error('Error al guardar el peritaje:', error);
+        alert('Error al guardar el peritaje: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
 
-        const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
+async function uploadFile(file) {
+    const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
+    await uploadBytes(storageRef, file);
+    return getDownloadURL(storageRef);
+}
 
-        function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    console.log("Sesión iniciada:", userCredential.user);
-                    showUserInterface(userCredential.user.email);
-                })
-                .catch((error) => {
-                    console.error("Error en el inicio de sesión:", error);
-                    alert("Error en el inicio de sesión: " + error.message);
-                });
-        }
+function limpiarFormulario() {
+    document.getElementById('marca').value = '';
+    document.getElementById('modelo').value = '';
+    document.getElementById('anio').value = '';
+    document.getElementById('kilometraje').value = '';
+    document.getElementById('matricula').value = '';
+    document.getElementById('comentario').value = '';
+    document.getElementById('imagenes').value = '';
+    document.getElementById('adjuntos').value = '';
+    document.getElementById('imagePreview').innerHTML = '';
+}
 
-        function register() {
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    addDoc(collection(db, 'pendingUsers'), {
-                        email: user.email,
-                        uid: user.uid,
-                        createdAt: new Date()
-                    });
-                    alert("Registro exitoso. Espere la aprobación del administrador.");
-                    showLoginForm();
-                })
-                .catch((error) => {
-                    console.error("Error en el registro:", error);
-                    alert("Error en el registro: " + error.message);
-                });
-        }
+async function cargarHistorialPeritajes() {
+    showLoading();
+    const listaPeritajes = document.getElementById('listaPeritajes');
+    listaPeritajes.innerHTML = '';
 
-        function logout() {
-            signOut(auth).then(() => {
-                showLoginForm();
-            }).catch((error) => {
-                console.error("Error al cerrar sesión:", error);
-            });
-        }
-
-        function showUserInterface(userEmail) {
-            document.getElementById('authForms').classList.add('hidden');
-            document.getElementById('nuevoPeritaje').classList.remove('hidden');
-            document.getElementById('logoutButton').classList.remove('hidden');
-            if (userEmail === adminEmail) {
-                document.getElementById('adminPanelButton').classList.remove('hidden');
-                loadPendingUsers();
-            }
-            showSection('nuevoPeritaje');
-        }
-
-        function showLoginForm() {
-            document.getElementById('authForms').classList.remove('hidden');
-            document.getElementById('nuevoPeritaje').classList.add('hidden');
-            document.getElementById('historialPeritajes').classList.add('hidden');
-            document.getElementById('buscarPeritaje').classList.add('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.getElementById('logoutButton').classList.add('hidden');
-            document.getElementById('adminPanelButton').classList.add('hidden');
-        }
-
-        function showSection(sectionId) {
-            document.getElementById('nuevoPeritaje').classList.add('hidden');
-            document.getElementById('historialPeritajes').classList.add('hidden');
-            document.getElementById('buscarPeritaje').classList.add('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.getElementById(sectionId).classList.remove('hidden');
-
-            if (sectionId === 'historialPeritajes') {
-                cargarHistorialPeritajes();
-            }
-        }
-
-        async function guardarPeritaje() {
-            if (!auth.currentUser) {
-                alert("Por favor, inicia sesión para guardar un peritaje.");
-                return;
-            }
-
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const anio = document.getElementById('anio').value;
-            const kilometraje = document.getElementById('kilometraje').value;
-            const matricula = document.getElementById('matricula').value;
-            const comentario = document.getElementById('comentario').value;
-            const imagenes = document.getElementById('imagenes').files;
-            const adjuntos = document.getElementById('adjuntos').files;
-
-            showLoading();
-
-            try {
-                const imagenesUrls = await Promise.all(Array.from(imagenes).map(uploadFile));
-                const adjuntosUrls = await Promise.all(Array.from(adjuntos).map(uploadFile));
-
-                const peritaje = {
-                    marca: marca.toLowerCase(),
-                    modelo,
-                    anio,
-                    kilometraje,
-                    matricula,
-                    comentario,
-                    imagenesUrls,
-                    adjuntosUrls,
-                    fecha: new Date(),
-                    userId: auth.currentUser.uid
-                };
-
-                await addDoc(collection(db, 'peritajes'), peritaje);
-                alert('Peritaje guardado con éxito');
-                limpiarFormulario();
-            } catch (error) {
-                console.error('Error al guardar el peritaje:', error);
-                alert('Error al guardar el peritaje: ' + error.message);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function uploadFile(file) {
-            const storageRef = ref(storage, `peritajes/${auth.currentUser.uid}/${Date.now()}_${file.name}`);
-            await uploadBytes(storageRef, file);
-            return getDownloadURL(storageRef);
-        }
-
-        function limpiarFormulario() {
-            document.getElementById('marca').value = '';
-            document.getElementById('modelo').value = '';
-            document.getElementById('anio').value = '';
-            document.getElementById('kilometraje').value = '';
-            document.getElementById('matricula').value = '';
-            document.getElementById('comentario').value = '';
-            document.getElementById('imagenes').value = '';
-            document.getElementById('adjuntos').value = '';
-            document.getElementById('imagePreview').innerHTML = '';
-        }
-
-        async function cargarHistorialPeritajes() {
-            showLoading();
-            const listaPeritajes = document.getElementById('listaPeritajes');
-            listaPeritajes.innerHTML = '';
-
-            try {
-                const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
-                const querySnapshot = await getDocs(q);
-                
-                const peritajes = [];
-                querySnapshot.forEach((doc) => {
-                    peritajes.push({...doc.data(), id: doc.id});
-                });
-                peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
-
-                peritajes.forEach((peritaje) => {
-                    const peritajeElement = document.createElement('div');
-                    peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
-                    peritajeElement.innerHTML = `
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <dl>
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
-                                </div>
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
-                                </div>
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Fecha</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.fecha.toDate().toLocaleDateString()}</dd>
-                                </div>
-                            </dl>
-                        </div>
-                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                            `<div class="px-4 py-5 sm:px-6">
-                                <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
-                                <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Ver más imágenes
-                                </button>
-                             </div>` 
-                            : ''}
-                        ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                            `<div class="px-4 py-5 sm:px-6">
-                                <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                                <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Ver adjuntos
-                                </button>
-                             </div>`
-                            : ''}
-                    `;
-                    listaPeritajes.appendChild(peritajeElement);
-                });
-            } catch (error) {
-                console.error('Error al cargar el historial:', error);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        async function buscarPeritajes() {
-            const busqueda = document.getElementById('busqueda').value.toLowerCase();
-            const resultadosBusqueda = document.getElementById('resultadosBusqueda');
-            resultadosBusqueda.innerHTML = '';
-
-            showLoading();
-
-            try {
-                const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), where('marca', '==', busqueda));
-                const querySnapshot = await getDocs(q);
-                querySnapshot.forEach((doc) => {
-                    const peritaje = doc.data();
-                    const peritajeElement = document.createElement('div');
-                    peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
-                    peritajeElement.innerHTML = `
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
-                        </div>
-                        <div class="border-t border-gray-200">
-                            <dl>
-                                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
-                                </div>
-                                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
-                                </div>
-                            </dl>
-                        </div>
-                        ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
-                            `<div class="px-4 py-5 sm:px-6">
-                                <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
-                                <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Ver más imágenes
-                                </button>
-                             </div>` 
-                            : ''}
-                        ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
-                            `<div class="px-4 py-5 sm:px-6">
-                                <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
-                                <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Ver adjuntos
-                                </button>
-                             </div>`
-                            : ''}
-                    `;
-                    resultadosBusqueda.appendChild(peritajeElement);
-                });
-            } catch (error) {
-                console.error('Error en la búsqueda:', error);
-            } finally {
-                hideLoading();
-            }
-        }
-
-        function mostrarImagenes(imagenes) {
-            const modal = document.getElementById('imageModal');
-            const modalImages = document.getElementById('modalImages');
-            modalImages.innerHTML = '';
-            imagenes.forEach(url => {
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = 'w-full h-auto rounded-md';
-                modalImages.appendChild(img);
-            });
-            modal.classList.remove('hidden');
-        }
-
-        function mostrarAdjuntos(adjuntos) {
-            const modal = document.getElementById('imageModal');
-            const modalImages = document.getElementById('modalImages');
-            modalImages.innerHTML = '';
-            adjuntos.forEach(url => {
-                const link = document.createElement('a');
-                link.href = url;
-                link.textContent = url.split('/').pop();
-                link.className = 'block p-2 text-blue-600 hover:text-blue-800';
-                link.target = '_blank';
-                modalImages.appendChild(link);
-            });
-            modal.classList.remove('hidden');
-        }
-
-        function showLoading() {
-            document.getElementById('loadingOverlay').classList.remove('hidden');
-        }
-
-        function hideLoading() {
-            document.getElementById('loadingOverlay').classList.add('hidden');
-        }
-
-        async function loadPendingUsers() {
-            const pendingUsersList = document.getElementById('pendingUsersList');
-            pendingUsersList.innerHTML = '';
-
-            const q = query(collection(db, 'pendingUsers'), where("approved", "==", false));
-            const querySnapshot = await getDocs(q);
-
-            querySnapshot.forEach((doc) => {
-                const user = doc.data();
-                const userElement = document.createElement('div');
-                userElement.className = 'py-4 flex items-center justify-between';
-                userElement.innerHTML = `
-                    <p class="text-sm font-medium text-gray-900">${user.email}</p>
-                    <button onclick="approveUser('${doc.id}', '${user.uid}')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Aprobar
-                    </button>
-                `;
-                pendingUsersList.appendChild(userElement);
-            });
-        }
-
-        async function approveUser(docId, uid) {
-            try {
-                await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
-                await deleteDoc(doc(db, 'pendingUsers', docId));
-                alert('Usuario aprobado y removido de la lista de pendientes');
-                loadPendingUsers();
-            } catch (error) {
-                console.error('Error al aprobar usuario:', error);
-                alert('Error al aprobar usuario: ' + error.message);
-            }
-        }
-
-        // Event Listeners
-        document.getElementById('loginButton').addEventListener('click', login);
-        document.getElementById('registerButton').addEventListener('click', register);
-        document.getElementById('logoutButton').addEventListener('click', logout);
-        document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
-        document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
-        document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
-        document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
-        document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
-        document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
-
-        document.getElementById('imagenes').addEventListener('change', function(event) {
-            const imagePreview = document.getElementById('imagePreview');
-            imagePreview.innerHTML = '';
-            const files = event.target.files;
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'w-full h-24 object-cover rounded-md';
-                    imagePreview.appendChild(img);}
-
-                reader.readAsDataURL(file);
-            }
+    try {
+        const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        
+        const peritajes = [];
+        querySnapshot.forEach((doc) => {
+            peritajes.push({...doc.data(), id: doc.id});
         });
+        peritajes.sort((a, b) => b.fecha.toDate() - a.fecha.toDate());
 
-        // Cerrar modal
-        const modal = document.getElementById('imageModal');
-        const span = document.getElementsByClassName('close')[0];
-        span.onclick = function() {
-            modal.classList.add('hidden');
+        peritajes.forEach((peritaje) => {
+            const peritajeElement = document.createElement('div');
+            peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
+            peritajeElement.innerHTML = `
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
+                </div>
+                <div class="border-t border-gray-200">
+                    <dl>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
+                        </div>
+                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
+                        </div>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Fecha</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.fecha.toDate().toLocaleDateString()}</dd>
+                        </div>
+                    </dl>
+                </div>
+                ${peritaje.imagenesUrls && peritaje.imagenesUrls.length > 0 ? 
+                    `<div class="px-4 py-5 sm:px-6">
+                        <img src="${peritaje.imagenesUrls[0]}" alt="Imagen del vehículo" class="w-full h-48 object-cover rounded-md">
+                        <button onclick='mostrarImagenes(${JSON.stringify(peritaje.imagenesUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Ver más imágenes
+                        </button>
+                     </div>` 
+                    : ''}
+                ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                    `<div class="px-4 py-5 sm:px-6">
+                        <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                        <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Ver adjuntos
+                        </button>
+                     </div>`
+                    : ''}
+            `;
+            listaPeritajes.appendChild(peritajeElement);
+        });
+    } catch (error) {
+        console.error('Error al cargar el historial:', error);
+    } finally {
+        hideLoading();
+    }
+}
+
+async function buscarPeritajes() {
+    const busqueda = document.getElementById('busqueda').value.toLowerCase();
+    const resultadosBusqueda = document.getElementById('resultadosBusqueda');
+    resultadosBusqueda.innerHTML = '';
+
+    showLoading();
+
+    try {
+        const q = query(collection(db, 'peritajes'), where("userId", "==", auth.currentUser.uid), where('marca', '==', busqueda));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            const peritaje = doc.data();
+            const peritajeElement = document.createElement('div');
+            peritajeElement.className = 'bg-white shadow overflow-hidden sm:rounded-lg';
+            peritajeElement.innerHTML = `
+                <div class="px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">${peritaje.marca} ${peritaje.modelo}</h3>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Año: ${peritaje.anio}</p>
+                </div>
+                <div class="border-t border-gray-200">
+                    <dl>
+                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Kilometraje</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.kilometraje}</dd>
+                        </div>
+                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                            <dt class="text-sm font-medium text-gray-500">Matrícula</dt>
+                            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${peritaje.matricula}</dd>
+                        </div>
+                    </dl>
+                </div>` 
+                    : ''}
+                ${peritaje.adjuntosUrls && peritaje.adjuntosUrls.length > 0 ?
+                    `<div class="px-4 py-5 sm:px-6">
+                        <p class="text-sm font-medium text-gray-500">Adjuntos: ${peritaje.adjuntosUrls.length}</p>
+                        <button onclick='mostrarAdjuntos(${JSON.stringify(peritaje.adjuntosUrls)})' class="mt-2 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Ver adjuntos
+                        </button>
+                     </div>`
+                    : ''}
+            `;
+            resultadosBusqueda.appendChild(peritajeElement);
+        });
+    } catch (error) {
+        console.error('Error en la búsqueda:', error);
+    } finally {
+        hideLoading();
+    }
+}
+
+function mostrarImagenes(imagenes) {
+    const modal = document.getElementById('imageModal');
+    const modalImages = document.getElementById('modalImages');
+    modalImages.innerHTML = '';
+    imagenes.forEach(url => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.className = 'w-full h-auto rounded-md';
+        modalImages.appendChild(img);
+    });
+    modal.classList.remove('hidden');
+}
+
+function mostrarAdjuntos(adjuntos) {
+    const modal = document.getElementById('imageModal');
+    const modalImages = document.getElementById('modalImages');
+    modalImages.innerHTML = '';
+    adjuntos.forEach(url => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = url.split('/').pop();
+        link.className = 'block p-2 text-blue-600 hover:text-blue-800';
+        link.target = '_blank';
+        modalImages.appendChild(link);
+    });
+    modal.classList.remove('hidden');
+}
+
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.remove('hidden');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').classList.add('hidden');
+}
+
+async function loadPendingUsers() {
+    const pendingUsersList = document.getElementById('pendingUsersList');
+    pendingUsersList.innerHTML = '';
+
+    const q = query(collection(db, 'pendingUsers'), where("approved", "==", false));
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+        const user = doc.data();
+        const userElement = document.createElement('div');
+        userElement.className = 'py-4 flex items-center justify-between';
+        userElement.innerHTML = `
+            <p class="text-sm font-medium text-gray-900">${user.email}</p>
+            <button onclick="approveUser('${doc.id}', '${user.uid}')" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Aprobar
+            </button>
+        `;
+        pendingUsersList.appendChild(userElement);
+    });
+}
+
+async function approveUser(docId, uid) {
+    try {
+        await updateDoc(doc(db, 'pendingUsers', docId), { approved: true });
+        await deleteDoc(doc(db, 'pendingUsers', docId));
+        alert('Usuario aprobado y removido de la lista de pendientes');
+        loadPendingUsers();
+    } catch (error) {
+        console.error('Error al aprobar usuario:', error);
+        alert('Error al aprobar usuario: ' + error.message);
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loginButton').addEventListener('click', login);
+    document.getElementById('registerButton').addEventListener('click', register);
+    document.getElementById('logoutButton').addEventListener('click', logout);
+    document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
+    document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
+    document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
+    document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
+    document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
+    document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
+
+    document.getElementById('imagenes').addEventListener('change', function(event) {
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.innerHTML = '';
+        const files = event.target.files;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-24 object-cover rounded-md';
+                imagePreview.appendChild(img);
+            }
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Cerrar modal
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        const closeButton = modal.querySelector('.close');
+        if (closeButton) {
+            closeButton.onclick = function() {
+                modal.classList.add('hidden');
+            }
         }
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.classList.add('hidden');
             }
         }
+    }
 
-        // Verificar el estado de autenticación
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                showUserInterface(user.email);
-            } else {
-                showLoginForm();
-            }
-        });
+    // Verificar el estado de autenticación
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            showUserInterface(user.email);
+        } else {
+            showLoginForm();
+        }
+    });
+});
 
-        // Hacer las funciones disponibles globalmente
-        window.mostrarImagenes = mostrarImagenes;
-        window.mostrarAdjuntos = mostrarAdjuntos;
-        window.approveUser = approveUser;
+// Hacer las funciones disponibles globalmente
+window.mostrarImagenes = mostrarImagenes;
+window.mostrarAdjuntos = mostrarAdjuntos;
+window.approveUser = approveUser;
     </script>
 </body>
 </html>
