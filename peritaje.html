@@ -354,15 +354,14 @@ function login() {
     
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            console.log("Sesión iniciada:", userCredential.user);
+            console.log("Sesión iniciada correctamente");
             showUserInterface(userCredential.user.email);
         })
         .catch((error) => {
-            console.error("Error en el inicio de sesión:", error);
+            console.error("Error en el inicio de sesión:", error.message);
             alert("Error en el inicio de sesión: " + error.message);
         });
 }
-
 function register() {
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
