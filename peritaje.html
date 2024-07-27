@@ -438,14 +438,30 @@ async function guardarPeritaje() {
         return;
     }
 
-    const marca = document.getElementById('marca').value;
-    const modelo = document.getElementById('modelo').value;
-    const anio = document.getElementById('anio').value;
-    const kilometraje = document.getElementById('kilometraje').value;
-    const matricula = document.getElementById('matricula').value;
-    const comentario = document.getElementById('comentario').value;
+    const marca = document.getElementById('marca').value.trim();
+    const modelo = document.getElementById('modelo').value.trim();
+    const anio = document.getElementById('anio').value.trim();
+    const kilometraje = document.getElementById('kilometraje').value.trim();
+    const matricula = document.getElementById('matricula').value.trim();
+    const comentario = document.getElementById('comentario').value.trim();
     const imagenes = document.getElementById('imagenes').files;
     const adjuntos = document.getElementById('adjuntos').files;
+
+    // Validaciones
+    if (!marca || !modelo || !anio || !kilometraje || !matricula) {
+        alert("Por favor, completa todos los campos obligatorios.");
+        return;
+    }
+
+    if (isNaN(anio) || anio < 1900 || anio > new Date().getFullYear()) {
+        alert("Por favor, ingresa un año válido.");
+        return;
+    }
+
+    if (isNaN(kilometraje) || kilometraje < 0) {
+        alert("Por favor, ingresa un kilometraje válido.");
+        return;
+    }
 
     showLoading();
 
@@ -456,8 +472,8 @@ async function guardarPeritaje() {
         const peritaje = {
             marca: marca.toLowerCase(),
             modelo,
-            anio,
-            kilometraje,
+            anio: parseInt(anio),
+            kilometraje: parseInt(kilometraje),
             matricula,
             comentario,
             imagenesUrls,
@@ -466,7 +482,8 @@ async function guardarPeritaje() {
             userId: auth.currentUser.uid
         };
 
-        await addDoc(collection(db, 'peritajes'), peritaje);
+        const docRef = await addDoc(collection(db, 'peritajes'), peritaje);
+        console.log("Peritaje guardado con ID: ", docRef.id);
         alert('Peritaje guardado con éxito');
         limpiarFormulario();
     } catch (error) {
