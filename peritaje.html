@@ -353,8 +353,6 @@ const storage = getStorage(app);
 
 const adminEmail = "agus.espinoza.oett@gmail.com"; // Reemplaza esto con tu email real
 
-
-
 function login(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
@@ -371,7 +369,9 @@ function login(e) {
             alert("Error en el inicio de sesión: " + error.message);
         });
 }
-function register() {
+
+function register(e) {
+    e.preventDefault();
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     
@@ -715,15 +715,33 @@ async function approveUser(docId, uid) {
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.addEventListener('submit', login);
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            login();
+        });
     }
-    document.getElementById('loginButton').addEventListener('click', login);
+
+    // Navegación
+    document.getElementById('nuevoPeritajeLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection('nuevoPeritaje');
+    });
+    document.getElementById('historialPeritajesLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection('historialPeritajes');
+    });
+    document.getElementById('buscarPeritajeLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection('buscarPeritaje');
+    });
+    document.getElementById('adminPanelButton').addEventListener('click', function(e) {
+        e.preventDefault();
+        showSection('adminPanel');
+    });
+
+    // Otros botones
     document.getElementById('registerButton').addEventListener('click', register);
     document.getElementById('logoutButton').addEventListener('click', logout);
-    document.getElementById('nuevoPeritajeLink').addEventListener('click', () => showSection('nuevoPeritaje'));
-    document.getElementById('historialPeritajesLink').addEventListener('click', () => showSection('historialPeritajes'));
-    document.getElementById('buscarPeritajeLink').addEventListener('click', () => showSection('buscarPeritaje'));
-    document.getElementById('adminPanelButton').addEventListener('click', () => showSection('adminPanel'));
     document.getElementById('guardarPeritajeButton').addEventListener('click', guardarPeritaje);
     document.getElementById('buscarPeritajesButton').addEventListener('click', buscarPeritajes);
 
