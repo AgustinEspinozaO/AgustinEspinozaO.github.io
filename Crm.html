@@ -9,14 +9,12 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
             --primary-color: #3498db;
             --secondary-color: #2ecc71;
-            --background-color: #ecf0f1;
-            --text-color: #34495e;
-            --sidebar-width: 250px;
+            --background-color: #f0f0f0;
+            --text-color: #333;
         }
 
         * {
@@ -29,47 +27,89 @@
             font-family: 'Roboto', sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            display: flex;
-            min-height: 100vh;
         }
 
-        #sidebar {
-            width: var(--sidebar-width);
+        .header {
             background-color: var(--primary-color);
             color: white;
-            padding: 20px;
-            transition: all 0.3s ease;
-            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
         }
 
-        #main-content {
-            flex-grow: 1;
-            padding: 20px;
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: white;
+            transition: 0.3s;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1001;
             overflow-y: auto;
+            padding-top: 60px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+        .logout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
         }
 
         .card {
             background-color: white;
             border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        h1, h2, h3 {
-            margin-bottom: 20px;
-            color: var(--primary-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
         }
 
         th, td {
-            padding: 12px;
             text-align: left;
+            padding: 8px;
             border-bottom: 1px solid #ddd;
         }
 
@@ -78,207 +118,89 @@
             color: white;
         }
 
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 5px;
-            font-weight: 500;
         }
 
-        input, select, textarea {
+        .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 16px;
         }
 
-        button {
-            background-color: var(--secondary-color);
+        .btn {
+            background-color: var(--primary-color);
             color: white;
-            padding: 10px 20px;
             border: none;
+            padding: 10px 15px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #27ae60;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .pipeline {
-            display: flex;
-            overflow-x: auto;
-            padding-bottom: 20px;
-        }
-
-        .pipeline-stage {
-            min-width: 250px;
-            background-color: #f1f1f1;
-            margin-right: 20px;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .pipeline-card {
-            background-color: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 50%;
-            max-width: 500px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #000;
-        }
-
-        .tag {
-            display: inline-block;
-            background-color: #e0e0e0;
-            padding: 5px 10px;
-            border-radius: 20px;
-            margin-right: 5px;
-            margin-bottom: 5px;
-            font-size: 14px;
         }
 
         @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-
-            #sidebar {
+            .sidebar {
                 width: 100%;
-                height: auto;
-            }
-
-            #main-content {
-                width: 100%;
-            }
-
-            .modal-content {
-                width: 90%;
-            }
-
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-
-            .pipeline {
-                flex-direction: column;
-            }
-
-            .pipeline-stage {
-                width: 100%;
-                margin-right: 0;
-                margin-bottom: 20px;
+                left: -100%;
             }
         }
     </style>
 </head>
 <body>
-    <div id="sidebar">
-        <h2>AutoCRM Pro v2</h2>
-        <nav>
-            <ul>
-                <li><a href="#" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="#" onclick="showSection('inventory')"><i class="fas fa-car"></i> Inventario</a></li>
-                <li><a href="#" onclick="showSection('clients')"><i class="fas fa-users"></i> Clientes</a></li>
-                <li><a href="#" onclick="showSection('sales')"><i class="fas fa-dollar-sign"></i> Ventas</a></li>
-                <li><a href="#" onclick="showSection('services')"><i class="fas fa-tools"></i> Servicios</a></li>
-                <li><a href="#" onclick="showSection('pipelines')"><i class="fas fa-project-diagram"></i> Pipelines</a></li>
-                <li><a href="#" onclick="showSection('employees')"><i class="fas fa-user-tie"></i> Empleados</a></li>
-                <li><a href="#" onclick="showSection('tags')"><i class="fas fa-tags"></i> Etiquetas</a></li>
-            </ul>
-        </nav>
-        <button onclick="logout()" style="margin-top: 20px; width: 100%;">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
+    <div class="header">
+        <span class="menu-icon" onclick="toggleSidebar()">☰</span>
+        <h1>AutoCRM Pro</h1>
     </div>
-    <div id="main-content"></div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modal-body"></div>
-        </div>
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="#" onclick="showSection('dashboard')">📊 Dashboard</a></li>
+            <li><a href="#" onclick="showSection('inventory')">🚗 Inventario</a></li>
+            <li><a href="#" onclick="showSection('clients')">👥 Clientes</a></li>
+            <li><a href="#" onclick="showSection('sales')">💰 Ventas</a></li>
+            <li><a href="#" onclick="showSection('services')">🔧 Servicios</a></li>
+            <li><a href="#" onclick="showSection('pipelines')">📈 Pipelines</a></li>
+            <li><a href="#" onclick="showSection('employees')">👨‍💼 Empleados</a></li>
+            <li><a href="#" onclick="showSection('tags')">🏷️ Etiquetas</a></li>
+        </ul>
+        <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+    </div>
+
+    <div class="main-content" id="main-content">
+        <!-- El contenido principal se cargará aquí dinámicamente -->
     </div>
 
     <script>
-        // Firebase configuration
+        // Configuración de Firebase
         const firebaseConfig = {
+            // Reemplaza esto con tu configuración real de Firebase
             apiKey: "YOUR_API_KEY",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project",
-            storageBucket: "your-project.appspot.com",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
             messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
             appId: "YOUR_APP_ID"
         };
 
-        // Initialize Firebase
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Collections
-        const inventoryCollection = db.collection('inventory');
-        const clientsCollection = db.collection('clients');
-        const salesCollection = db.collection('sales');
-        const servicesCollection = db.collection('services');
-        const pipelinesCollection = db.collection('pipelines');
-        const employeesCollection = db.collection('employees');
-        const tagsCollection = db.collection('tags');
+        // Función para alternar la visibilidad del sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
 
-        // Global Variables
-        let currentUser;
-
-        // Utility functions
+        // Función para mostrar diferentes secciones
         function showSection(section) {
             const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = '';
-
+            mainContent.innerHTML = `<h2>${section.charAt(0).toUpperCase() + section.slice(1)}</h2>`;
+            
             switch(section) {
                 case 'dashboard':
                     showDashboard();
@@ -305,904 +227,871 @@
                     showTags();
                     break;
             }
+
+            toggleSidebar();
         }
 
-        function showModal(content) {
-            const modal = document.getElementById('modal');
-            const modalBody = document.getElementById('modal-body');
-            modalBody.innerHTML = content;
-            modal.style.display = 'block';
-
-            const span = document.getElementsByClassName('close')[0];
-            span.onclick = function() {
-                modal.style.display = 'none';
-            }
-
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            }
-        }
-
-        // Dashboard
+        // Función para mostrar el dashboard
         async function showDashboard() {
             const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Dashboard</h1>
-                <div class="dashboard">
-                    <div class="card">
-                        <h2>Resumen de Ventas</h2>
-                        <canvas id="salesChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Inventario</h2>
-                        <canvas id="inventoryChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Clientes Nuevos</h2>
-                        <canvas id="clientsChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Resumen de Pipeline</h2>
-                        <canvas id="pipelineChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Rendimiento de Vendedores</h2>
-                        <canvas id="employeePerformanceChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Servicios Programados</h2>
-                        <ul id="scheduledServices"></ul>
-                    </div>
+            mainContent.innerHTML += `
+                <div class="card">
+                    <h3>Resumen de Ventas</h3>
+                    <canvas id="salesChart"></canvas>
+                </div>
+                <div class="card">
+                    <h3>Clientes Nuevos</h3>
+                    <canvas id="clientsChart"></canvas>
                 </div>
             `;
 
-            const sales = await getSales();
-            const inventory = await getInventory();
-            const clients = await getClients();
-            const pipelines = await getPipelines();
-            const employees = await getEmployees();
-            const services = await getServices();
+            try {
+                const salesData = await getSalesData();
+                const clientsData = await getClientsData();
 
-            createSalesChart(sales);
-            createInventoryChart(inventory);
-            createClientsChart(clients);
-            createPipelineChart(pipelines);
-            createEmployeePerformanceChart(employees, sales);
-            displayScheduledServices(services);
+                createChart('salesChart', 'Ventas Mensuales', salesData);
+                createChart('clientsChart', 'Nuevos Clientes', clientsData);
+            } catch (error) {
+                console.error("Error al cargar datos del dashboard:", error);
+                mainContent.innerHTML += `<p>Error al cargar los datos. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
         }
 
-        function createSalesChart(sales) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            const monthlySales = sales.reduce((acc, sale) => {
-                const month = new Date(sale.date.toDate()).getMonth();
-                acc[month] = (acc[month] || 0) + sale.amount;
-                return acc;
-            }, {});
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                    datasets: [{
-                        label: 'Ventas Mensuales',
-                        data: Array.from({length: 12}, (_, i) => monthlySales[i] || 0),
-                        backgroundColor: 'rgba(52, 152, 219, 0.6)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value, index, values) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createInventoryChart(inventory) {
-            const ctx = document.getElementById('inventoryChart').getContext('2d');
-            const statusCounts = inventory.reduce((acc, vehicle) => {
-                acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
-                return acc;
-            }, {});
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(statusCounts),
-                    datasets: [{
-                        data: Object.values(statusCounts),
-                        backgroundColor: ['rgba(46, 204, 113, 0.6)', 'rgba(231, 76, 60, 0.6)', 'rgba(241, 196, 15, 0.6)'],
-                        borderColor: ['rgba(46, 204, 113, 1)', 'rgba(231, 76, 60, 1)', 'rgba(241, 196, 15, 1)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Estado del Inventario'
-                        }
-                    }
-                }
-            });
-        }
-         function createClientsChart(clients) {
-            const ctx = document.getElementById('clientsChart').getContext('2d');
-            const clientsPerMonth = clients.reduce((acc, client) => {
-                const month = new Date(client.createdAt.toDate()).getMonth();
-                acc[month] = (acc[month] || 0) + 1;
-                return acc;
-            }, {});
-
+        // Función para crear gráficos
+        function createChart(canvasId, label, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
                     datasets: [{
-                        label: 'Nuevos Clientes',
-                        data: Array.from({length: 12}, (_, i) => clientsPerMonth[i] || 0),
-                        borderColor: 'rgb(52, 152, 219)',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createPipelineChart(pipelines) {
-            const ctx = document.getElementById('pipelineChart').getContext('2d');
-            const pipelineData = pipelines.reduce((acc, pipeline) => {
-                pipeline.stages.forEach(stage => {
-                    acc[stage.name] = (acc[stage.name] || 0) + stage.opportunities.length;
-                });
-                return acc;
-            }, {});
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(pipelineData),
-                    datasets: [{
-                        label: 'Oportunidades por Etapa',
-                        data: Object.values(pipelineData),
-                        backgroundColor: 'rgba(52, 152, 219, 0.6)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createEmployeePerformanceChart(employees, sales) {
-            const ctx = document.getElementById('employeePerformanceChart').getContext('2d');
-            const employeePerformance = employees.map(employee => {
-                const employeeSales = sales.filter(sale => sale.employeeId === employee.id);
-                const totalSales = employeeSales.reduce((sum, sale) => sum + sale.amount, 0);
-                return {
-                    name: employee.name,
-                    totalSales: totalSales
-                };
-            }).sort((a, b) => b.totalSales - a.totalSales).slice(0, 5);  // Top 5 empleados
-
-            new Chart(ctx, {
-                type: 'horizontalBar',
-                data: {
-                    labels: employeePerformance.map(emp => emp.name),
-                    datasets: [{
-                        label: 'Ventas Totales',
-                        data: employeePerformance.map(emp => emp.totalSales),
-                        backgroundColor: 'rgba(46, 204, 113, 0.6)',
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value, index, values) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function displayScheduledServices(services) {
-            const servicesList = document.getElementById('scheduledServices');
-            services.filter(service => service.status === 'Programado')
-                    .sort((a, b) => a.date.toDate() - b.date.toDate())
-                    .slice(0, 5)  // Mostrar solo los próximos 5 servicios
-                    .forEach(service => {
-                        const li = document.createElement('li');
-                        li.textContent = `${service.date.toDate().toLocaleDateString()}: ${service.description}`;
-                        servicesList.appendChild(li);
-                    });
-        }
-
-        // Pipelines
-        async function showPipelines() {
-            const mainContent = document.getElementById('main-content');
-            const pipelines = await getPipelines();
-
-            let pipelinesHTML = `
-                <h1>Pipelines</h1>
-                <button onclick="showAddPipelineForm()">Crear Nueva Pipeline</button>
-                <div id="pipelines-container">
-            `;
-
-            pipelines.forEach(pipeline => {
-                pipelinesHTML += `
-                    <div class="card">
-                        <h2>${pipeline.name}</h2>
-                        <button onclick="showPipeline('${pipeline.id}')">Ver Pipeline</button>
-                        <button onclick="editPipeline('${pipeline.id}')">Editar</button>
-                        <button onclick="deletePipeline('${pipeline.id}')">Eliminar</button>
-                    </div>
-                `;
-            });
-
-            pipelinesHTML += '</div>';
-            mainContent.innerHTML = pipelinesHTML;
-        }
-
-        async function showPipeline(pipelineId) {
-            const pipeline = await getPipeline(pipelineId);
-            const mainContent = document.getElementById('main-content');
-
-            let pipelineHTML = `
-                <h1>${pipeline.name}</h1>
-                <button onclick="showAddOpportunityForm('${pipelineId}')">Agregar Oportunidad</button>
-                <div class="pipeline">
-            `;
-
-            pipeline.stages.forEach(stage => {
-                pipelineHTML += `
-                    <div class="pipeline-stage" id="${stage.id}">
-                        <h3>${stage.name}</h3>
-                `;
-
-                stage.opportunities.forEach(opportunity => {
-                    pipelineHTML += `
-                        <div class="pipeline-card" draggable="true" ondragstart="drag(event)" id="${opportunity.id}">
-                            <h4>${opportunity.clientName}</h4>
-                            <p>${opportunity.description}</p>
-                            <p>Valor: $${opportunity.value.toLocaleString()}</p>
-                            <button onclick="editOpportunity('${pipelineId}', '${opportunity.id}')">Editar</button>
-                            <button onclick="deleteOpportunity('${pipelineId}', '${opportunity.id}')">Eliminar</button>
-                        </div>
-                    `;
-                });
-
-                pipelineHTML += `</div>`;
-            });
-
-            pipelineHTML += `</div>`;
-            mainContent.innerHTML = pipelineHTML;
-
-            // Añadir funcionalidad de arrastrar y soltar
-            const stages = document.querySelectorAll('.pipeline-stage');
-            stages.forEach(stage => {
-                stage.addEventListener('dragover', allowDrop);
-                stage.addEventListener('drop', drop);
-            });
-        }
-
-        function drag(ev) {
-            ev.dataTransfer.setData("text", ev.target.id);
-        }
-
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
-
-        async function drop(ev) {
-            ev.preventDefault();
-            const opportunityId = ev.dataTransfer.getData("text");
-            const newStageId = ev.target.closest('.pipeline-stage').id;
-            const pipelineId = document.querySelector('.pipeline').id;
-
-            await updateOpportunityStage(pipelineId, opportunityId, newStageId);
-            showPipeline(pipelineId);
-        }
-
-        function showAddPipelineForm() {
-            const formHTML = `
-                <h2>Crear Nueva Pipeline</h2>
-                <form id="addPipelineForm">
-                    <div class="form-group">
-                        <label for="name">Nombre de la Pipeline:</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div id="stages">
-                        <div class="form-group">
-                            <label for="stage1">Etapa 1:</label>
-                            <input type="text" id="stage1" required>
-                        </div>
-                    </div>
-                    <button type="button" onclick="addStageField()">Añadir Etapa</button>
-                    <button type="submit">Crear Pipeline</button>
-                </form>
-            `;
-            showModal(formHTML);
-
-            document.getElementById('addPipelineForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('name').value;
-                const stages = Array.from(document.querySelectorAll('#stages input')).map(input => ({
-                    name: input.value,
-                    opportunities: []
-                }));
-                await addPipeline({ name, stages });
-                document.getElementById('modal').style.display = 'none';
-                showPipelines();
-            });
-        }
-
-        function addStageField() {
-            const stagesContainer = document.getElementById('stages');
-            const stageCount = stagesContainer.children.length + 1;
-            const newStage = document.createElement('div');
-            newStage.className = 'form-group';
-            newStage.innerHTML = `
-                <label for="stage${stageCount}">Etapa ${stageCount}:</label>
-                <input type="text" id="stage${stageCount}" required>
-            `;
-            stagesContainer.appendChild(newStage);
-        }
-
-        function showAddOpportunityForm(pipelineId) {
-            const formHTML = `
-                <h2>Agregar Oportunidad</h2>
-                <form id="addOpportunityForm">
-                    <div class="form-group">
-                        <label for="clientName">Nombre del Cliente:</label>
-                        <input type="text" id="clientName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Descripción:</label>
-                        <textarea id="description" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="value">Valor:</label>
-                        <input type="number" id="value" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="employeeId">Empleado Asignado:</label>
-                        <select id="employeeId" required>
-                            ${await getEmployeeOptionsHTML()}
-                        </select>
-                    </div>
-                    <button type="submit">Agregar Oportunidad</button>
-                </form>
-            `;
-            showModal(formHTML);
-
-            document.getElementById('addOpportunityForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const opportunity = {
-                    clientName: document.getElementById('clientName').value,
-                    description: document.getElementById('description').value,
-                    value: parseFloat(document.getElementById('value').value),
-                    employeeId: document.getElementById('employeeId').value,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                await addOpportunity(pipelineId, opportunity);
-                document.getElementById('modal').style.display = 'none';
-                showPipeline(pipelineId);
-            });
-        }
-
-        async function getEmployeeOptionsHTML() {
-            const employees = await getEmployees();
-            return employees.map(employee => `<option value="${employee.id}">${employee.name}</option>`).join('');
-        }
-
-        // Employees
-        async function showEmployees() {
-            const mainContent = document.getElementById('main-content');
-            const employees = await getEmployees();
-
-            let employeesHTML = `
-                <h1>Empleados</h1>
-                <button onclick="showAddEmployeeForm()">Agregar Empleado</button>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Email</th>
-                            <th>Rol</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            employees.forEach(employee => {
-                employeesHTML += `
-                    <tr>
-                        <td>${employee.name}</td>
-                        <td>${employee.email}</td>
-                        <td>${employee.role}</td>
-                        <td>
-                            <button onclick="editEmployee('${employee.id}')">Editar</button>
-                            <button onclick="deleteEmployee('${employee.id}')">Eliminar</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            employeesHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            mainContent.innerHTML = employeesHTML;
-        }
-
-        function showAddEmployeeForm() {
-            const formHTML = `
-                <h2>Agregar Empleado</h2>
-                <form id="addEmployeeForm">
-                    <div class="form-group">
-                        <label for="name">Nombre:</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Rol:</label>
-                        <select id="role" required>
-                            <option value="vendedor">Vendedor</option>
-                            <option value="gerente">Gerente</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                    <button type="submit">Agregar Empleado</button>
-                </form>
-            `;
-            showModal(formHTML);
-
-            document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const employee = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    role: document.getElementById('role').value
-                };
-                await addEmployee(employee);
-                document.getElementById('modal').style.display = 'none';
-                showEmployees();
-            });
-        }
-
-        // Tags
-        async function showTags() {
-            const mainContent = document.getElementById('main-content');
-            const tags = await getTags();
-
-            let tagsHTML = `
-                <h1>Etiquetas</h1>
-                <button onclick="showAddTagForm()">Agregar Etiqueta</button>
-                <div id="tags-container">
-            `;
-
-            tags.forEach(tag => {
-                tagsHTML += `
-                    <div class="tag">
-                        ${tag.name}
-                        <button onclick="editTag('${tag.id}')">Editar</button>
-                        <button onclick="deleteTag('${tag.id}')">Eliminar</button>
-                    </div>
-                `;
-            });
-
-            tagsHTML += `
-                </div>
-            `;
-
-            mainContent.innerHTML = tagsHTML;
-        }
-
-        function showAddTagForm() {
-            const formHTML = `
-                <h2>Agregar Etiqueta</h2>
-                <form id="addTagForm">
-                    <div class="form-group">
-                        <label for="name">Nombre de la Etiqueta:</label>
-                        <input type="text" id="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="color">Color:</label>
-                        <input type="color" id="color" required>
-                    </div>
-                    <button type="submit">Agregar Etiqueta</button>
-                </form>
-            `;
-            showModal(formHTML);
-
-            document.getElementById('addTagForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const tag = {
-                    name: document.getElementById('name').value,
-                    color: document.getElementById('color').value
-                };
-                await addTag(tag);
-                document.getElementById('modal').style.display = 'none';
-                showTags();
-            });
-        }
-
-        // Reportes Avanzados
-        async function showAdvancedReports() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Reportes Avanzados</h1>
-                <div class="dashboard">
-                    <div class="card">
-                        <h2>Rendimiento de Ventas por Empleado</h2>
-                        <canvas id="employeeSalesChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Conversión de Pipeline</h2>
-                        <canvas id="pipelineConversionChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Análisis de Clientes</h2>
-                        <canvas id="customerAnalysisChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h2>Pronóstico de Ventas</h2>
-                        <canvas id="salesForecastChart"></canvas>
-                    </div>
-                </div>
-            `;
-
-            const sales = await getSales();
-            const employees = await getEmployees();
-            const pipelines = await getPipelines();
-            const clients = await getClients();
-
-            createEmployeeSalesChart(sales, employees);
-            createPipelineConversionChart(pipelines);
-            createCustomerAnalysisChart(clients, sales);
-            createSalesForecastChart(sales);
-        }
-
-        function createEmployeeSalesChart(sales, employees) {
-            const ctx = document.getElementById('employeeSalesChart').getContext('2d');
-            const employeeSales = employees.map(employee => {
-                const totalSales = sales
-                    .filter(sale => sale.employeeId === employee.id)
-                    .reduce((sum, sale) => sum + sale.amount, 0);
-                return { name: employee.name, sales: totalSales };
-            }).sort((a, b) => b.sales - a.sales);
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: employeeSales.map(emp => emp.name),
-                    datasets: [{
-                        label: 'Ventas Totales',
-                        data: employeeSales.map(emp => emp.sales),
-                        backgroundColor: 'rgba(52, 152, 219, 0.6)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createPipelineConversionChart(pipelines) {
-            const ctx = document.getElementById('pipelineConversionChart').getContext('2d');
-            const stageConversions = pipelines.flatMap(pipeline => {
-                const stageData = pipeline.stages.map((stage, index, stages) => {
-                    const currentCount = stage.opportunities.length;
-                    const nextCount = index < stages.length - 1 ? stages[index + 1].opportunities.length : 0;
-                    const conversionRate = nextCount > 0 ? (nextCount / currentCount) * 100 : 0;
-                    return { name: stage.name, conversionRate };
-                });
-                return stageData.slice(0, -1); // Excluir la última etapa
-            });
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: stageConversions.map(stage => stage.name),
-                    datasets: [{
-                        label: 'Tasa de Conversión (%)',
-                        data: stageConversions.map(stage => stage.conversionRate),
+                        label: label,
+                        data: data,
                         borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1,
-                        fill: false
+                        tension: 0.1
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createCustomerAnalysisChart(clients, sales) {
-            const ctx = document.getElementById('customerAnalysisChart').getContext('2d');
-            const customerData = clients.map(client => {
-                const clientSales = sales.filter(sale => sale.clientId === client.id);
-                const totalPurchases = clientSales.reduce((sum, sale) => sum + sale.amount, 0);
-                const frequency = clientSales.length;
-                return { name: client.name, totalPurchases, frequency };
-            }).sort((a, b) => b.totalPurchases - a.totalPurchases).slice(0, 10); // Top 10 clientes
-
-            new Chart(ctx, {
-                type: 'bubble',
-                data: {
-                    datasets: [{
-                        label: 'Análisis de Clientes',
-                        data: customerData.map(customer => ({
-                            x: customer.totalPurchases,
-                            y: customer.frequency,
-                            r: Math.sqrt(customer.totalPurchases) / 100, // Tamaño de la burbuja basado en compras totales
-                            name: customer.name
-                        })),
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Compras Totales ($)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Frecuencia de Compra'
-                            },
                             beginAtZero: true
                         }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const data = context.dataset.data[context.dataIndex];
-                                    return `${data.name}: $${data.x.toLocaleString()} (${data.y} compras)`;
-                                }
-                            }
-                        }
                     }
                 }
             });
         }
 
-        function createSalesForecastChart(sales) {
-            const ctx = document.getElementById('salesForecastChart').getContext('2d');
-            const monthlySales = sales.reduce((acc, sale) => {
-                const month = new Date(sale.date.toDate()).getMonth();
-                acc[month] = (acc[month] || 0) + sale.amount;
-                return acc;
-            }, {});
+        // Función para mostrar el inventario
+        async function showInventory() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML += `
+                <div class="card">
+                    <h3>Inventario de Vehículos</h3>
+                    <button class="btn" onclick="showAddVehicleForm()">Agregar Vehículo</button>
+                    <table id="inventoryTable">
+                        <thead>
+                            <tr>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Año</th>
+                                <th>Precio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
 
-            const monthlyData = Array.from({ length: 12 }, (_, i) => monthlySales[i] || 0);
-            const forecast = calculateForecast(monthlyData);
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                    datasets: [
-                        {
-                            label: 'Ventas Reales',
-                            data: monthlyData,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1,
-                            fill: false
-                        },
-                        {
-                            label: 'Pronóstico',
-                            data: forecast,
-                            borderColor: 'rgb(255, 99, 132)',
-                            borderDash: [5, 5],
-                            tension: 0.1,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function calculateForecast(data) {
-            // Implementar un algoritmo de pronóstico simple (por ejemplo, promedio móvil)
-            const windowSize = 3;
-            return data.map((_, index, array) => {
-                if (index < windowSize - 1) return null;
-                const window = array.slice(index - windowSize + 1, index + 1);
-                return window.reduce((sum, value) => sum + value, 0) / windowSize;
-            });
-        }
-
-        // Automatización
-        async function setupAutomations() {
-            // Configurar listeners para eventos que desencadenan automatizaciones
-            db.collection('clients').onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        const newClient = { id: change.doc.id, ...change.doc.data() };
-                        handleNewClientAutomation(newClient);
-                    }
+            try {
+                const inventory = await getInventoryData();
+                const tableBody = document.querySelector('#inventoryTable tbody');
+                inventory.forEach(car => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${car.brand}</td>
+                        <td>${car.model}</td>
+                        <td>${car.year}</td>
+                        <td>$${car.price.toLocaleString()}</td>
+                        <td>
+                            <button onclick="editVehicle('${car.id}')">Editar</button>
+                            <button onclick="deleteVehicle('${car.id}')">Eliminar</button>
+                        </td>
+                    `;
                 });
-            });
-
-            db.collection('sales').onSnapshot(snapshot => {
-                snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        const newSale = { id: change.doc.id, ...change.doc.data() };
-                        handleNewSaleAutomation(newSale);
-                    }
-                });
-            });
-
-            // Más listeners para otros eventos relevantes...
-        }
-
-        async function handleNewClientAutomation(client) {
-            // Ejemplo: Asignar automáticamente un vendedor al nuevo cliente
-            const employees = await getEmployees();
-            const salesEmployees = employees.filter(emp => emp.role === 'vendedor');
-            const assignedEmployee = salesEmployees[Math.floor(Math.random() * salesEmployees.length)];
-
-            await updateClient(client.id, { assignedEmployeeId: assignedEmployee.id });
-
-            // Enviar notificación al empleado asignado (simulado)
-            console.log(`Notificación: Nuevo cliente ${client.name} asignado a ${assignedEmployee.name}`);
-        }
-
-        async function handleNewSaleAutomation(sale) {
-            // Ejemplo: Actualizar automáticamente el estado de la oportunidad relacionada
-            const pipelines = await getPipelines();
-            for (const pipeline of pipelines) {
-                for (const stage of pipeline.stages) {
-                    const opportunity = stage.opportunities.find(opp => opp.clientId === sale.clientId);
-                    if (opportunity) {
-                        await updateOpportunityStage(pipeline.id, opportunity.id, 'closed');
-                        console.log(`Oportunidad ${opportunity.id} cerrada automáticamente debido a la venta ${sale.id}`);
-                        return;
-                    }
-                }
+            } catch (error) {
+                console.error("Error al cargar el inventario:", error);
+                mainContent.innerHTML += `<p>Error al cargar el inventario. Por favor, inténtelo de nuevo más tarde.</p>`;
             }
-
-            // Enviar notificación de venta al gerente (simulado)
-            console.log(`Notificación: Nueva venta registrada por un valor de $${sale.amount}`);
         }
 
-        // Funciones de utilidad adicionales
-        function showErrorMessage(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.textContent = message;
-            document.body.appendChild(errorDiv);
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
+        // Función para mostrar el formulario de agregar vehículo
+        function showAddVehicleForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Agregar Vehículo</h3>
+                    <form id="addVehicleForm">
+                        <div class="form-group">
+                            <label for="brand">Marca:</label>
+                            <input type="text" id="brand" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="model">Modelo:</label>
+                            <input type="text" id="model" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Año:</label>
+                            <input type="number" id="year" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Precio:</label>
+                            <input type="number" id="price" required>
+                        </div>
+                        <button type="submit" class="btn">Agregar Vehículo</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('addVehicleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const vehicleData = {
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    year: parseInt(document.getElementById('year').value),
+                    price: parseFloat(document.getElementById('price').value)
+                };
+                try {
+                    await addVehicle(vehicleData);
+                    alert('Vehículo agregado con éxito');
+                    showInventory();
+                } catch (error) {
+                    console.error("Error al agregar vehículo:", error);
+                    alert('Error al agregar vehículo. Por favor, inténtelo de nuevo.');
+                }
+            });
         }
 
-        function showSuccessMessage(message) {
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message';
-            successDiv.textContent = message;
-            document.body.appendChild(successDiv);
-            setTimeout(() => {
-                successDiv.remove();
-            }, 3000);
+        // Funciones para obtener datos (simularemos la obtención de datos)
+        async function getSalesData() {
+            // Simular obtención de datos de ventas
+            return [10000, 15000, 13000, 17000, 20000, 18000];
+        }
+
+        async function getClientsData() {
+            // Simular obtención de datos de clientes
+            return [5, 7, 3, 8, 4, 6];
+        }
+
+        async function getInventoryData() {
+            // Simular obtención de datos de inventario
+            return [
+                { id: '1', brand: 'Toyota', model: 'Corolla', year: 2022, price: 25000 },
+                { id: '2', brand: 'Honda', model: 'Civic', year: 2021, price: 23000 },
+                { id: '3', brand: 'Ford', model: 'Mustang', year: 2023, price: 45000 }
+            ];
+        }
+
+        // Funciones CRUD para vehículos (simuladas)
+        async function addVehicle(vehicleData) {
+            // Simular agregar vehículo a la base de datos
+            console.log("Vehículo agregado:", vehicleData);
+        }
+
+        async function editVehicle(id) {
+            // Implementar lógica para editar vehículo
+            console.log("Editando vehículo con ID:", id);
+        }
+
+        async function deleteVehicle(id) {
+            // Implementar lógica para eliminar vehículo
+            console.log("Eliminando vehículo con ID:", id);
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                alert('Has cerrado sesión correctamente');
+                // Redirigir a la página de inicio de sesión
+                // window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error('Error al cerrar sesión:', error);
+            });
         }
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
             firebase.auth().onAuthStateChanged(function(user) {
                 if (user) {
-                    currentUser = user;
                     showDashboard();
-                    setupAutomations();
                 } else {
                     showLoginForm();
                 }
             });
         });
 
-        // Manejo global de errores
+        function showLoginForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit" class="btn">Iniciar Sesión</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    showDashboard();
+                } catch (error) {
+                    console.error("Error de autenticación:", error);
+                    alert('Error al iniciar sesión. Verifique sus credenciales.');
+                }
+            });
+        }
+
+        async function showClients() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Clientes</h3>
+                    <button class="btn" onclick="showAddClientForm()">Agregar Cliente</button>
+                    <table id="clientsTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
+
+            try {
+                const clients = await getClientsData();
+                const tableBody = document.querySelector('#clientsTable tbody');
+                clients.forEach(client => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${client.name}</td>
+                        <td>${client.email}</td>
+                        <td>${client.phone}</td>
+                        <td>
+                            <button onclick="editClient('${client.id}')">Editar</button>
+                            <button onclick="deleteClient('${client.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar clientes:", error);
+                mainContent.innerHTML += `<p>Error al cargar los clientes. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddClientForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Agregar Cliente</h3>
+                    <form id="addClientForm">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                        <button type="submit" class="btn">Agregar Cliente</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('addClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const clientData = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                try {
+                    await addClient(clientData);
+                    alert('Cliente agregado con éxito');
+                    showClients();
+                } catch (error) {
+                    console.error("Error al agregar cliente:", error);
+                    alert('Error al agregar cliente. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        async function showSales() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Ventas</h3>
+                    <button class="btn" onclick="showAddSaleForm()">Registrar Venta</button>
+                    <table id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Vehículo</th>
+                                <th>Monto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
+
+            try {
+                const sales = await getSalesData();
+                const tableBody = document.querySelector('#salesTable tbody');
+                sales.forEach(sale => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${new Date(sale.date).toLocaleDateString()}</td>
+                        <td>${sale.clientName}</td>
+                        <td>${sale.vehicleName}</td>
+                        <td>$${sale.amount.toLocaleString()}</td>
+                        <td>
+                            <button onclick="editSale('${sale.id}')">Editar</button>
+                            <button onclick="deleteSale('${sale.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar ventas:", error);
+                mainContent.innerHTML += `<p>Error al cargar las ventas. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddSaleForm() {
+            // Implementar formulario para agregar venta
+        }
+
+        async function showServices() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Servicios</h3>
+                    <button class="btn" onclick="showAddServiceForm()">Programar Servicio</button>
+                    <table id="servicesTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Vehículo</th>
+                                <th>Tipo de Servicio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
+
+            try {
+                const services = await getServicesData();
+                const tableBody = document.querySelector('#servicesTable tbody');
+                services.forEach(service => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${new Date(service.date).toLocaleDateString()}</td>
+                        <td>${service.clientName}</td>
+                        <td>${service.vehicleName}</td>
+                        <td>${service.type}</td>
+                        <td>${service.status}</td>
+                        <td>
+                            <button onclick="editService('${service.id}')">Editar</button>
+                            <button onclick="deleteService('${service.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar servicios:", error);
+                mainContent.innerHTML += `<p>Error al cargar los servicios. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddServiceForm() {
+            // Implementar formulario para agregar servicio
+        }
+
+        async function showPipelines() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Pipelines de Ventas</h3>
+                    <div id="pipelinesContainer"></div>
+                </div>
+            `;
+
+            try {
+                const pipelines = await getPipelinesData();
+                const pipelinesContainer = document.getElementById('pipelinesContainer');
+                pipelines.forEach(pipeline => {
+                    const pipelineElement = document.createElement('div');
+                    pipelineElement.className = 'pipeline';
+                    pipelineElement.innerHTML = `
+                        <h4>${pipeline.name}</h4>
+                        <div class="pipeline-stages">
+                            ${pipeline.stages.map(stage => `
+                                <div class="pipeline-stage">
+                                    <h5>${stage.name}</h5>
+                                    <ul>
+                                        ${stage.opportunities.map(opp => `
+                                            <li>${opp.name} - $${opp.value}</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    pipelinesContainer.appendChild(pipelineElement);
+                });
+            } catch (error) {
+                console.error("Error al cargar pipelines:", error);
+                mainContent.innerHTML += `<p>Error al cargar los pipelines. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        async function showEmployees() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Empleados</h3>
+                    <button class="btn" onclick="showAddEmployeeForm()">Agregar Empleado</button>
+                    <table id="employeesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cargo</th>
+                                <th>Email</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
+
+            try {
+                const employees = await getEmployeesData();
+                const tableBody = document.querySelector('#employeesTable tbody');
+                employees.forEach(employee => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${employee.name}</td>
+                        <td>${employee.position}</td>
+                        <td>${employee.email}</td>
+                        <td>
+                            <button onclick="editEmployee('${employee.id}')">Editar</button>
+                            <button onclick="deleteEmployee('${employee.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar empleados:", error);
+                mainContent.innerHTML += `<p>Error al cargar los empleados. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddEmployeeForm() {
+            // Implementar formulario para agregar empleado
+        }
+
+        async function showTags() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Etiquetas</h3>
+                    <button class="btn" onclick="showAddTagForm()">Agregar Etiqueta</button>
+                    <div id="tagsContainer"></div>
+                </div>
+            `;
+
+            try {
+                const tags = await getTagsData();
+                const tagsContainer = document.getElementById('tagsContainer');
+                tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag';
+                    tagElement.style.backgroundColor = tag.color;
+                    tagElement.textContent = tag.name;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } catch (error) {
+                console.error("Error al cargar etiquetas:", error);
+                mainContent.innerHTML += `<p>Error al cargar las etiquetas. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddTagForm() {
+            // Implementar formulario para agregar etiqueta
+        }
+
+        // Funciones simuladas para obtener datos
+        async function getClientsData() {
+            // Simular obtención de datos de clientes desde Firebase
+            return [
+                { id: '1', name: 'Juan Pérez', email: 'juan@example.com', phone: '123-456-7890' },
+                { id: '2', name: 'María García', email: 'maria@example.com', phone: '098-765-4321' }
+            ];
+        }
+
+        async function getSalesData() {
+            // Simular obtención de datos de ventas desde Firebase
+            return [
+                { id: '1', date: '2023-01-15', clientName: 'Juan Pérez', vehicleName: 'Toyota Corolla', amount: 25000 },
+                { id: '2', date: '2023-02-20', clientName: 'María García', vehicleName: 'Honda Civic', amount: 23000 }
+            ];
+        }
+
+        async function getServicesData() {
+            // Simular obtención de datos de servicios desde Firebase
+            return [
+                { id: '1', date: '2023-03-10', clientName: 'Juan Pérez', vehicleName: 'Toyota Corolla', type: 'Mantenimiento', status: 'Completado' },
+                { id: '2', date: '2023-04-05', clientName: 'María García', vehicleName: 'Honda Civic', type: 'Reparación', status: 'En progreso' }
+            ];
+        }
+
+        async function getPipelinesData() {
+            // Simular obtención de datos de pipelines desde Firebase
+            return [
+                {
+                    name: 'Pipeline de Ventas',
+                    stages: [
+                        { name: 'Contacto Inicial', opportunities: [{ name: 'Opp 1', value: 10000 }] },
+                        { name: 'Negociación', opportunities: [{ name: 'Opp 2', value: 15000 }] },
+                        { name: 'Cierre', opportunities: [] }
+                    ]
+                }
+            ];
+        }
+
+        async function getEmployeesData() {
+            // Simular obtención de datos de empleados desde Firebase
+            return [
+                { id: '1', name: 'Carlos Rodríguez', position: 'Vendedor', email: 'carlos@example.com' },
+                { id: '2', name: 'Ana Martínez', position: 'Gerente de Ventas', email: 'ana@example.com' }
+            ];
+        }
+
+        async function getTagsData() {
+            // Simular obtención de datos de etiquetas desde Firebase
+            return [
+                { id: '1', name: 'VIP', color: '#FFD700' },
+                { id: '2', name: 'Nuevo Cliente', color: '#90EE90' }
+            ];
+        }
+
+        // Funciones CRUD simuladas
+        async function addClient(clientData) {
+            // Simular agregar cliente a Firebase
+            console.log("Cliente agregado:", clientData);
+        }
+        // Funciones CRUD simuladas (continuación)
+        async function editClient(id) {
+            try {
+                const client = await getClientById(id);
+                showEditClientForm(client);
+            } catch (error) {
+                console.error("Error al obtener datos del cliente:", error);
+                alert('Error al cargar los datos del cliente. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        async function deleteClient(id) {
+            if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
+                try {
+                    await deleteClientFromDB(id);
+                    alert('Cliente eliminado con éxito');
+                    showClients();
+                } catch (error) {
+                    console.error("Error al eliminar cliente:", error);
+                    alert('Error al eliminar el cliente. Por favor, inténtelo de nuevo.');
+                }
+            }
+        }
+
+        function showEditClientForm(client) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Cliente</h3>
+                    <form id="editClientForm">
+                        <input type="hidden" id="clientId" value="${client.id}">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name" value="${client.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" value="${client.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" value="${client.phone}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Cliente</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedClientData = {
+                    id: document.getElementById('clientId').value,
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                try {
+                    await updateClient(updatedClientData);
+                    alert('Cliente actualizado con éxito');
+                    showClients();
+                } catch (error) {
+                    console.error("Error al actualizar cliente:", error);
+                    alert('Error al actualizar el cliente. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        async function addSale(saleData) {
+            try {
+                await addSaleToDB(saleData);
+                alert('Venta registrada con éxito');
+                showSales();
+            } catch (error) {
+                console.error("Error al registrar venta:", error);
+                alert('Error al registrar la venta. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        function showAddSaleForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Registrar Nueva Venta</h3>
+                    <form id="addSaleForm">
+                        <div class="form-group">
+                            <label for="clientId">Cliente:</label>
+                            <select id="clientId" required>
+                                <option value="">Seleccione un cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleId">Vehículo:</label>
+                            <select id="vehicleId" required>
+                                <option value="">Seleccione un vehículo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Monto:</label>
+                            <input type="number" id="amount" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Fecha:</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <button type="submit" class="btn">Registrar Venta</button>
+                    </form>
+                </div>
+            `;
+
+            // Cargar clientes y vehículos en los selectores
+            loadClientsIntoSelect();
+            loadVehiclesIntoSelect();
+
+            document.getElementById('addSaleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const saleData = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    amount: parseFloat(document.getElementById('amount').value),
+                    date: document.getElementById('date').value
+                };
+                await addSale(saleData);
+            });
+        }
+
+        async function loadClientsIntoSelect() {
+            try {
+                const clients = await getClientsData();
+                const select = document.getElementById('clientId');
+                clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = client.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error al cargar clientes:", error);
+                alert('Error al cargar la lista de clientes. Por favor, recargue la página.');
+            }
+        }
+
+        async function loadVehiclesIntoSelect() {
+            try {
+                const vehicles = await getInventoryData();
+                const select = document.getElementById('vehicleId');
+                vehicles.forEach(vehicle => {
+                    const option = document.createElement('option');
+                    option.value = vehicle.id;
+                    option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year})`;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error al cargar vehículos:", error);
+                alert('Error al cargar la lista de vehículos. Por favor, recargue la página.');
+            }
+        }
+
+        async function addService(serviceData) {
+            try {
+                await addServiceToDB(serviceData);
+                alert('Servicio programado con éxito');
+                showServices();
+            } catch (error) {
+                console.error("Error al programar servicio:", error);
+                alert('Error al programar el servicio. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        function showAddServiceForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Programar Nuevo Servicio</h3>
+                    <form id="addServiceForm">
+                        <div class="form-group">
+                            <label for="clientId">Cliente:</label>
+                            <select id="clientId" required>
+                                <option value="">Seleccione un cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleId">Vehículo:</label>
+                            <select id="vehicleId" required>
+                                <option value="">Seleccione un vehículo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">Tipo de Servicio:</label>
+                            <input type="text" id="serviceType" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Fecha:</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Estado:</label>
+                            <select id="status" required>
+                                <option value="Programado">Programado</option>
+                                <option value="En Progreso">En Progreso</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Programar Servicio</button>
+                    </form>
+                </div>
+            `;
+
+            // Cargar clientes y vehículos en los selectores
+            loadClientsIntoSelect();
+            loadVehiclesIntoSelect();
+
+            document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const serviceData = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    serviceType: document.getElementById('serviceType').value,
+                    date: document.getElementById('date').value,
+                    status: document.getElementById('status').value
+                };
+                await addService(serviceData);
+            });
+        }
+
+        // Funciones simuladas de interacción con la base de datos
+        async function getClientById(id) {
+            // Simular obtención de cliente por ID desde Firebase
+            return { id: id, name: 'Cliente Ejemplo', email: 'ejemplo@email.com', phone: '123-456-7890' };
+        }
+
+        async function deleteClientFromDB(id) {
+            // Simular eliminación de cliente en Firebase
+            console.log(`Cliente con ID ${id} eliminado`);
+        }
+
+        async function updateClient(clientData) {
+            // Simular actualización de cliente en Firebase
+            console.log('Cliente actualizado:', clientData);
+        }
+
+        async function addSaleToDB(saleData) {
+            // Simular agregar venta a Firebase
+            console.log('Venta registrada:', saleData);
+        }
+
+        async function addServiceToDB(serviceData) {
+            // Simular agregar servicio a Firebase
+            console.log('Servicio programado:', serviceData);
+        }
+
+        // Inicialización y manejo de errores globales
         window.onerror = function(message, source, lineno, colno, error) {
             console.error("Error no capturado:", error);
-            showErrorMessage("Ha ocurrido un error inesperado. Por favor, recargue la página e intente de nuevo.");
+            alert("Ha ocurrido un error inesperado. Por favor, recargue la página e inténtelo de nuevo.");
             return true;
         };
 
+        // Asegurar que Firebase esté inicializado antes de usar sus servicios
+        if (!firebase.apps.length) {
+            try {
+                firebase.initializeApp(firebaseConfig);
+            } catch (error) {
+                console.error("Error al inicializar Firebase:", error);
+                alert("Error al inicializar la aplicación. Por favor, recargue la página.");
+            }
+        }
+
+        // Iniciar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    showDashboard();
+                } else {
+                    showLoginForm();
+                }
+            });
+        });
     </script>
 </body>
 </html>
-      
