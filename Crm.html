@@ -3,93 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Automotora</title>
+    <title>AutoCRM Pro</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --sidebar-width: 250px;
+        }
+
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
         }
+
         #sidebar {
-            width: 200px;
-            background-color: #f0f0f0;
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
             padding: 20px;
+            transition: all 0.3s ease;
         }
+
+        #sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #sidebar ul {
+            list-style-type: none;
+        }
+
+        #sidebar ul li {
+            margin-bottom: 15px;
+        }
+
+        #sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
         #main-content {
             flex-grow: 1;
-            padding: 20px;
+            padding: 30px;
             overflow-y: auto;
         }
-        .hidden {
-            display: none;
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
+
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: var(--primary-color);
+            color: white;
         }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: 500;
         }
-        input, select {
+
+        input, select, textarea {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
         }
+
         button {
-            background-color: #4CAF50;
+            background-color: var(--secondary-color);
             color: white;
-            padding: 10px 15px;
+            padding: 10px 20px;
             border: none;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: #27ae60;
         }
+
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
         }
-        .card {
-            background-color: white;
+
+        .pipeline {
+            display: flex;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .pipeline-stage {
+            min-width: 250px;
+            background-color: #f1f1f1;
+            margin-right: 20px;
+            padding: 15px;
             border-radius: 8px;
+        }
+
+        .pipeline-card {
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            width: 50%;
+            max-width: 500px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
         }
     </style>
 </head>
 <body>
     <div id="sidebar">
-        <h2>CRM Automotora</h2>
+        <h2>AutoCRM Pro</h2>
         <nav>
             <ul>
-                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
-                <li><a href="#" onclick="showSection('inventory')">Inventario</a></li>
-                <li><a href="#" onclick="showSection('clients')">Clientes</a></li>
-                <li><a href="#" onclick="showSection('sales')">Ventas</a></li>
-                <li><a href="#" onclick="showSection('services')">Servicios</a></li>
+                <li><a href="#" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showSection('inventory')"><i class="fas fa-car"></i> Inventario</a></li>
+                <li><a href="#" onclick="showSection('clients')"><i class="fas fa-users"></i> Clientes</a></li>
+                <li><a href="#" onclick="showSection('sales')"><i class="fas fa-dollar-sign"></i> Ventas</a></li>
+                <li><a href="#" onclick="showSection('services')"><i class="fas fa-tools"></i> Servicios</a></li>
+                <li><a href="#" onclick="showSection('pipeline')"><i class="fas fa-project-diagram"></i> Pipeline</a></li>
             </ul>
         </nav>
+        <button onclick="logout()" style="margin-top: 20px; width: 100%;">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        </button>
     </div>
     <div id="main-content"></div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
 
     <script>
         // Firebase configuration
@@ -111,11 +270,12 @@
         const clientsCollection = db.collection('clients');
         const salesCollection = db.collection('sales');
         const servicesCollection = db.collection('services');
+        const pipelineCollection = db.collection('pipeline');
 
         // Utility functions
         function showSection(section) {
             const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = ''; // Clear current content
+            mainContent.innerHTML = '';
 
             switch(section) {
                 case 'dashboard':
@@ -133,6 +293,27 @@
                 case 'services':
                     showServices();
                     break;
+                case 'pipeline':
+                    showPipeline();
+                    break;
+            }
+        }
+
+        function showModal(content) {
+            const modal = document.getElementById('modal');
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = content;
+            modal.style.display = 'block';
+
+            const span = document.getElementsByClassName('close')[0];
+            span.onclick = function() {
+                modal.style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
             }
         }
 
@@ -174,22 +355,33 @@
 
         function createSalesChart(sales) {
             const ctx = document.getElementById('salesChart').getContext('2d');
+            const monthlySales = sales.reduce((acc, sale) => {
+                const month = new Date(sale.date.toDate()).getMonth();
+                acc[month] = (acc[month] || 0) + sale.amount;
+                return acc;
+            }, {});
+
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: sales.map(sale => sale.date),
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
                     datasets: [{
-                        label: 'Ventas',
-                        data: sales.map(sale => sale.amount),
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        label: 'Ventas Mensuales',
+                        data: Array.from({length: 12}, (_, i) => monthlySales[i] || 0),
+                        backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
                         }
                     }
                 }
@@ -204,15 +396,27 @@
             }, {});
 
             new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: Object.keys(statusCounts),
                     datasets: [{
                         data: Object.values(statusCounts),
-                        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
-                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                        backgroundColor: ['rgba(46, 204, 113, 0.6)', 'rgba(231, 76, 60, 0.6)', 'rgba(241, 196, 15, 0.6)'],
+                        borderColor: ['rgba(46, 204, 113, 1)', 'rgba(231, 76, 60, 1)', 'rgba(241, 196, 15, 1)'],
                         borderWidth: 1
                     }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado del Inventario'
+                        }
+                    }
                 }
             });
         }
@@ -220,7 +424,7 @@
         function createClientsChart(clients) {
             const ctx = document.getElementById('clientsChart').getContext('2d');
             const clientsPerMonth = clients.reduce((acc, client) => {
-                const month = new Date(client.createdAt).getMonth();
+                const month = new Date(client.createdAt.toDate()).getMonth();
                 acc[month] = (acc[month] || 0) + 1;
                 return acc;
             }, {});
@@ -232,9 +436,20 @@
                     datasets: [{
                         label: 'Nuevos Clientes',
                         data: Array.from({length: 12}, (_, i) => clientsPerMonth[i] || 0),
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
+                        borderColor: 'rgb(52, 152, 219)',
+                        tension: 0.1,
+                        fill: false
                     }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -242,9 +457,11 @@
         function displayScheduledServices(services) {
             const servicesList = document.getElementById('scheduledServices');
             services.filter(service => service.status === 'Programado')
+                    .sort((a, b) => a.date.toDate() - b.date.toDate())
+                    .slice(0, 5)  // Mostrar solo los próximos 5 servicios
                     .forEach(service => {
                         const li = document.createElement('li');
-                        li.textContent = `${service.date}: ${service.description}`;
+                        li.textContent = `${service.date.toDate().toLocaleDateString()}: ${service.description}`;
                         servicesList.appendChild(li);
                     });
         }
@@ -278,7 +495,7 @@
                     <td>${vehicle.brand}</td>
                     <td>${vehicle.model}</td>
                     <td>${vehicle.year}</td>
-                    <td>$${vehicle.price}</td>
+                    <td>$${vehicle.price.toLocaleString()}</td>
                     <td>${vehicle.status}</td>
                     <td>
                         <button onclick="editVehicle('${vehicle.id}')">Editar</button>
@@ -289,9 +506,8 @@
         }
 
         function showAddVehicleForm() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Agregar Vehículo</h1>
+            const formHTML = `
+                <h2>Agregar Vehículo</h2>
                 <form id="addVehicleForm">
                     <div class="form-group">
                         <label for="brand">Marca:</label>
@@ -320,6 +536,7 @@
                     <button type="submit">Agregar Vehículo</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('addVehicleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -331,15 +548,15 @@
                     status: document.getElementById('status').value
                 };
                 await addVehicle(vehicle);
+                document.getElementById('modal').style.display = 'none';
                 showInventory();
             });
         }
 
         async function editVehicle(id) {
             const vehicle = await getVehicle(id);
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Editar Vehículo</h1>
+            const formHTML = `
+                <h2>Editar Vehículo</h2>
                 <form id="editVehicleForm">
                     <div class="form-group">
                         <label for="brand">Marca:</label>
@@ -368,6 +585,7 @@
                     <button type="submit">Actualizar Vehículo</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('editVehicleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -379,6 +597,7 @@
                     status: document.getElementById('status').value
                 };
                 await updateVehicle(id, updatedVehicle);
+                document.getElementById('modal').style.display = 'none';
                 showInventory();
             });
         }
@@ -426,9 +645,8 @@
         }
 
         function showAddClientForm() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Agregar Cliente</h1>
+            const formHTML = `
+                <h2>Agregar Cliente</h2>
                 <form id="addClientForm">
                     <div class="form-group">
                         <label for="name">Nombre:</label>
@@ -445,6 +663,7 @@
                     <button type="submit">Agregar Cliente</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('addClientForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -455,15 +674,15 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 await addClient(client);
+                document.getElementById('modal').style.display = 'none';
                 showClients();
             });
         }
 
         async function editClient(id) {
             const client = await getClient(id);
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Editar Cliente</h1>
+            const formHTML = `
+                <h2>Editar Cliente</h2>
                 <form id="editClientForm">
                     <div class="form-group">
                         <label for="name">Nombre:</label>
@@ -480,6 +699,7 @@
                     <button type="submit">Actualizar Cliente</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('editClientForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -489,6 +709,7 @@
                     phone: document.getElementById('phone').value
                 };
                 await updateClient(id, updatedClient);
+                document.getElementById('modal').style.display = 'none';
                 showClients();
             });
         }
@@ -530,7 +751,7 @@
                     <td>${new Date(sale.date.toDate()).toLocaleDateString()}</td>
                     <td>${client.name}</td>
                     <td>${vehicle.brand} ${vehicle.model}</td>
-                    <td>$${sale.amount}</td>
+                    <td>$${sale.amount.toLocaleString()}</td>
                     <td>
                         <button onclick="editSale('${sale.id}')">Editar</button>
                         <button onclick="deleteSale('${sale.id}')">Eliminar</button>
@@ -540,12 +761,10 @@
         }
 
         async function showAddSaleForm() {
-            const mainContent = document.getElementById('main-content');
             const clients = await getClients();
             const vehicles = await getInventory();
-
-            mainContent.innerHTML = `
-                <h1>Registrar Venta</h1>
+            const formHTML = `
+                <h2>Registrar Venta</h2>
                 <form id="addSaleForm">
                     <div class="form-group">
                         <label for="clientId">Cliente:</label>
@@ -566,6 +785,7 @@
                     <button type="submit">Registrar Venta</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('addSaleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -577,6 +797,7 @@
                 };
                 await addSale(sale);
                 await updateVehicle(sale.vehicleId, { status: 'Vendido' });
+                document.getElementById('modal').style.display = 'none';
                 showSales();
             });
         }
@@ -585,15 +806,14 @@
             const sale = await getSale(id);
             const clients = await getClients();
             const vehicles = await getInventory();
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Editar Venta</h1>
+            const formHTML = `
+                <h2>Editar Venta</h2>
                 <form id="editSaleForm">
                     <div class="form-group">
                         <label for="clientId">Cliente:</label>
                         <select id="clientId" required>
                             ${clients.map(client => `<option value="${client.id}" ${client.id === sale.clientId ? 'selected' : ''}>${client.name}</option>`).join('')}
-                        </select>
+                            </select>
                     </div>
                     <div class="form-group">
                         <label for="vehicleId">Vehículo:</label>
@@ -608,6 +828,7 @@
                     <button type="submit">Actualizar Venta</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('editSaleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -617,6 +838,7 @@
                     amount: parseFloat(document.getElementById('amount').value)
                 };
                 await updateSale(id, updatedSale);
+                document.getElementById('modal').style.display = 'none';
                 showSales();
             });
         }
@@ -672,12 +894,10 @@
         }
 
         async function showAddServiceForm() {
-            const mainContent = document.getElementById('main-content');
             const clients = await getClients();
             const vehicles = await getInventory();
-
-            mainContent.innerHTML = `
-                <h1>Programar Servicio</h1>
+            const formHTML = `
+                <h2>Programar Servicio</h2>
                 <form id="addServiceForm">
                     <div class="form-group">
                         <label for="clientId">Cliente:</label>
@@ -710,6 +930,7 @@
                     <button type="submit">Programar Servicio</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -721,6 +942,7 @@
                     status: document.getElementById('status').value
                 };
                 await addService(service);
+                document.getElementById('modal').style.display = 'none';
                 showServices();
             });
         }
@@ -729,9 +951,8 @@
             const service = await getService(id);
             const clients = await getClients();
             const vehicles = await getInventory();
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <h1>Editar Servicio</h1>
+            const formHTML = `
+                <h2>Editar Servicio</h2>
                 <form id="editServiceForm">
                     <div class="form-group">
                         <label for="clientId">Cliente:</label>
@@ -764,6 +985,7 @@
                     <button type="submit">Actualizar Servicio</button>
                 </form>
             `;
+            showModal(formHTML);
 
             document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -775,6 +997,7 @@
                     status: document.getElementById('status').value
                 };
                 await updateService(id, updatedService);
+                document.getElementById('modal').style.display = 'none';
                 showServices();
             });
         }
@@ -786,23 +1009,166 @@
             }
         }
 
-        // CRUD Operations
+        // Pipeline
+        async function showPipeline() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Pipeline de Ventas</h1>
+                <button onclick="showAddPipelineItemForm()">Agregar Oportunidad</button>
+                <div class="pipeline">
+                    <div class="pipeline-stage" id="lead">
+                        <h3>Lead</h3>
+                    </div>
+                    <div class="pipeline-stage" id="qualified">
+                        <h3>Calificado</h3>
+                    </div>
+                    <div class="pipeline-stage" id="proposition">
+                        <h3>Propuesta</h3>
+                    </div>
+                    <div class="pipeline-stage" id="negotiation">
+                        <h3>Negociación</h3>
+                    </div>
+                    <div class="pipeline-stage" id="closed">
+                        <h3>Cerrado</h3>
+                    </div>
+                </div>
+            `;
+
+            const pipelineItems = await getPipelineItems();
+            pipelineItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'pipeline-card';
+                itemElement.innerHTML = `
+                    <h4>${item.clientName}</h4>
+                    <p>${item.vehicleName}</p>
+                    <p>$${item.amount.toLocaleString()}</p>
+                    <button onclick="editPipelineItem('${item.id}')">Editar</button>
+                    <button onclick="deletePipelineItem('${item.id}')">Eliminar</button>
+                `;
+                document.getElementById(item.stage).appendChild(itemElement);
+            });
+        }
+
+        function showAddPipelineItemForm() {
+            const formHTML = `
+                <h2>Agregar Oportunidad</h2>
+                <form id="addPipelineItemForm">
+                    <div class="form-group">
+                        <label for="clientName">Nombre del Cliente:</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleName">Vehículo:</label>
+                        <input type="text" id="vehicleName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Monto:</label>
+                        <input type="number" id="amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stage">Etapa:</label>
+                        <select id="stage">
+                            <option value="lead">Lead</option>
+                            <option value="qualified">Calificado</option>
+                            <option value="proposition">Propuesta</option>
+                            <option value="negotiation">Negociación</option>
+                            <option value="closed">Cerrado</option>
+                        </select>
+                    </div>
+                    <button type="submit">Agregar Oportunidad</button>
+                </form>
+            `;
+            showModal(formHTML);
+
+            document.getElementById('addPipelineItemForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const pipelineItem = {
+                    clientName: document.getElementById('clientName').value,
+                    vehicleName: document.getElementById('vehicleName').value,
+                    amount: parseFloat(document.getElementById('amount').value),
+                    stage: document.getElementById('stage').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await addPipelineItem(pipelineItem);
+                document.getElementById('modal').style.display = 'none';
+                showPipeline();
+            });
+        }
+
+        async function editPipelineItem(id) {
+            const item = await getPipelineItem(id);
+            const formHTML = `
+                <h2>Editar Oportunidad</h2>
+                <form id="editPipelineItemForm">
+                    <div class="form-group">
+                        <label for="clientName">Nombre del Cliente:</label>
+                        <input type="text" id="clientName" value="${item.clientName}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleName">Vehículo:</label>
+                        <input type="text" id="vehicleName" value="${item.vehicleName}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Monto:</label>
+                        <input type="number" id="amount" value="${item.amount}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stage">Etapa:</label>
+                        <select id="stage">
+                            <option value="lead" ${item.stage === 'lead' ? 'selected' : ''}>Lead</option>
+                            <option value="qualified" ${item.stage === 'qualified' ? 'selected' : ''}>Calificado</option>
+                            <option value="proposition" ${item.stage === 'proposition' ? 'selected' : ''}>Propuesta</option>
+                            <option value="negotiation" ${item.stage === 'negotiation' ? 'selected' : ''}>Negociación</option>
+                            <option value="closed" ${item.stage === 'closed' ? 'selected' : ''}>Cerrado</option>
+                        </select>
+                    </div>
+                    <button type="submit">Actualizar Oportunidad</button>
+                </form>
+            `;
+            showModal(formHTML);
+
+            document.getElementById('editPipelineItemForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedItem = {
+                    clientName: document.getElementById('clientName').value,
+                    vehicleName: document.getElementById('vehicleName').value,
+                    amount: parseFloat(document.getElementById('amount').value),
+                    stage: document.getElementById('stage').value
+                };
+                await updatePipelineItem(id, updatedItem);
+                document.getElementById('modal').style.display = 'none';
+                showPipeline();
+            });
+        }
+
+        async function deletePipelineItem(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta oportunidad?')) {
+                await pipelineCollection.doc(id).delete();
+                showPipeline();
+            }
+        }
+// CRUD Operations
         async function addVehicle(vehicle) {
             try {
-                await inventoryCollection.add(vehicle);
+                const docRef = await inventoryCollection.add(vehicle);
+                console.log("Vehículo añadido con ID: ", docRef.id);
+                return docRef.id;
             } catch (error) {
-                console.error("Error adding vehicle: ", error);
-                alert("Error al agregar vehículo. Por favor, intente de nuevo.");
+                console.error("Error al añadir vehículo: ", error);
+                throw error;
             }
         }
 
         async function getVehicle(id) {
             try {
                 const doc = await inventoryCollection.doc(id).get();
+                if (!doc.exists) {
+                    throw new Error('Vehículo no encontrado');
+                }
                 return { id: doc.id, ...doc.data() };
             } catch (error) {
-                console.error("Error getting vehicle: ", error);
-                alert("Error al obtener información del vehículo. Por favor, intente de nuevo.");
+                console.error("Error al obtener vehículo: ", error);
+                throw error;
             }
         }
 
@@ -811,37 +1177,42 @@
                 const snapshot = await inventoryCollection.get();
                 return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             } catch (error) {
-                console.error("Error getting inventory: ", error);
-                alert("Error al obtener el inventario. Por favor, intente de nuevo.");
-                return [];
+                console.error("Error al obtener inventario: ", error);
+                throw error;
             }
         }
 
         async function updateVehicle(id, vehicle) {
             try {
                 await inventoryCollection.doc(id).update(vehicle);
+                console.log("Vehículo actualizado con éxito");
             } catch (error) {
-                console.error("Error updating vehicle: ", error);
-                alert("Error al actualizar vehículo. Por favor, intente de nuevo.");
+                console.error("Error al actualizar vehículo: ", error);
+                throw error;
             }
         }
 
         async function addClient(client) {
             try {
-                await clientsCollection.add(client);
+                const docRef = await clientsCollection.add(client);
+                console.log("Cliente añadido con ID: ", docRef.id);
+                return docRef.id;
             } catch (error) {
-                console.error("Error adding client: ", error);
-                alert("Error al agregar cliente. Por favor, intente de nuevo.");
+                console.error("Error al añadir cliente: ", error);
+                throw error;
             }
         }
 
         async function getClient(id) {
             try {
                 const doc = await clientsCollection.doc(id).get();
+                if (!doc.exists) {
+                    throw new Error('Cliente no encontrado');
+                }
                 return { id: doc.id, ...doc.data() };
             } catch (error) {
-                console.error("Error getting client: ", error);
-                alert("Error al obtener información del cliente. Por favor, intente de nuevo.");
+                console.error("Error al obtener cliente: ", error);
+                throw error;
             }
         }
 
@@ -850,37 +1221,42 @@
                 const snapshot = await clientsCollection.get();
                 return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             } catch (error) {
-                console.error("Error getting clients: ", error);
-                alert("Error al obtener la lista de clientes. Por favor, intente de nuevo.");
-                return [];
+                console.error("Error al obtener clientes: ", error);
+                throw error;
             }
         }
 
         async function updateClient(id, client) {
             try {
                 await clientsCollection.doc(id).update(client);
+                console.log("Cliente actualizado con éxito");
             } catch (error) {
-                console.error("Error updating client: ", error);
-                alert("Error al actualizar cliente. Por favor, intente de nuevo.");
+                console.error("Error al actualizar cliente: ", error);
+                throw error;
             }
         }
 
         async function addSale(sale) {
             try {
-                await salesCollection.add(sale);
+                const docRef = await salesCollection.add(sale);
+                console.log("Venta añadida con ID: ", docRef.id);
+                return docRef.id;
             } catch (error) {
-                console.error("Error adding sale: ", error);
-                alert("Error al registrar venta. Por favor, intente de nuevo.");
+                console.error("Error al añadir venta: ", error);
+                throw error;
             }
         }
 
         async function getSale(id) {
             try {
                 const doc = await salesCollection.doc(id).get();
+                if (!doc.exists) {
+                    throw new Error('Venta no encontrada');
+                }
                 return { id: doc.id, ...doc.data() };
             } catch (error) {
-                console.error("Error getting sale: ", error);
-                alert("Error al obtener información de la venta. Por favor, intente de nuevo.");
+                console.error("Error al obtener venta: ", error);
+                throw error;
             }
         }
 
@@ -889,37 +1265,42 @@
                 const snapshot = await salesCollection.get();
                 return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             } catch (error) {
-                console.error("Error getting sales: ", error);
-                alert("Error al obtener la lista de ventas. Por favor, intente de nuevo.");
-                return [];
+                console.error("Error al obtener ventas: ", error);
+                throw error;
             }
         }
 
         async function updateSale(id, sale) {
             try {
                 await salesCollection.doc(id).update(sale);
+                console.log("Venta actualizada con éxito");
             } catch (error) {
-                console.error("Error updating sale: ", error);
-                alert("Error al actualizar venta. Por favor, intente de nuevo.");
+                console.error("Error al actualizar venta: ", error);
+                throw error;
             }
         }
 
         async function addService(service) {
             try {
-                await servicesCollection.add(service);
+                const docRef = await servicesCollection.add(service);
+                console.log("Servicio añadido con ID: ", docRef.id);
+                return docRef.id;
             } catch (error) {
-                console.error("Error adding service: ", error);
-                alert("Error al programar servicio. Por favor, intente de nuevo.");
+                console.error("Error al añadir servicio: ", error);
+                throw error;
             }
         }
 
         async function getService(id) {
             try {
                 const doc = await servicesCollection.doc(id).get();
+                if (!doc.exists) {
+                    throw new Error('Servicio no encontrado');
+                }
                 return { id: doc.id, ...doc.data() };
             } catch (error) {
-                console.error("Error getting service: ", error);
-                alert("Error al obtener información del servicio. Por favor, intente de nuevo.");
+                console.error("Error al obtener servicio: ", error);
+                throw error;
             }
         }
 
@@ -928,47 +1309,94 @@
                 const snapshot = await servicesCollection.get();
                 return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             } catch (error) {
-                console.error("Error getting services: ", error);
-                alert("Error al obtener la lista de servicios. Por favor, intente de nuevo.");
-                return [];
+                console.error("Error al obtener servicios: ", error);
+                throw error;
             }
         }
 
         async function updateService(id, service) {
             try {
                 await servicesCollection.doc(id).update(service);
+                console.log("Servicio actualizado con éxito");
             } catch (error) {
-                console.error("Error updating service: ", error);
-                alert("Error al actualizar servicio. Por favor, intente de nuevo.");
+                console.error("Error al actualizar servicio: ", error);
+                throw error;
             }
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    showDashboard();
-                } else {
-                    showLoginForm();
-                }
-            });
-        });
+        async function addPipelineItem(item) {
+            try {
+                const docRef = await pipelineCollection.add(item);
+                console.log("Item de pipeline añadido con ID: ", docRef.id);
+                return docRef.id;
+            } catch (error) {
+                console.error("Error al añadir item de pipeline: ", error);
+                throw error;
+            }
+        }
 
+        async function getPipelineItem(id) {
+            try {
+                const doc = await pipelineCollection.doc(id).get();
+                if (!doc.exists) {
+                    throw new Error('Item de pipeline no encontrado');
+                }
+                return { id: doc.id, ...doc.data() };
+            } catch (error) {
+                console.error("Error al obtener item de pipeline: ", error);
+                throw error;
+            }
+        }
+
+        async function getPipelineItems() {
+            try {
+                const snapshot = await pipelineCollection.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error al obtener items de pipeline: ", error);
+                throw error;
+            }
+        }
+
+        async function updatePipelineItem(id, item) {
+            try {
+                await pipelineCollection.doc(id).update(item);
+                console.log("Item de pipeline actualizado con éxito");
+            } catch (error) {
+                console.error("Error al actualizar item de pipeline: ", error);
+                throw error;
+            }
+        }
+
+        // Utility Functions
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // Authentication
         function showLoginForm() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
-                <h1>Iniciar Sesión</h1>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Contraseña:</label>
-                        <input type="password" id="password" required>
-                    </div>
-                    <button type="submit">Iniciar Sesión</button>
-                </form>
+                <div class="login-container">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
+                </div>
             `;
 
             document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -979,25 +1407,39 @@
                     await firebase.auth().signInWithEmailAndPassword(email, password);
                 } catch (error) {
                     console.error("Error de autenticación: ", error);
-                    alert("Error al iniciar sesión. Por favor, verifique sus credenciales e intente de nuevo.");
+                    showErrorMessage("Error al iniciar sesión. Por favor, verifique sus credenciales e intente de nuevo.");
                 }
             });
         }
 
-        // Función para cerrar sesión
         function logout() {
             firebase.auth().signOut().then(() => {
                 showLoginForm();
             }).catch((error) => {
                 console.error("Error al cerrar sesión: ", error);
-                alert("Error al cerrar sesión. Por favor, intente de nuevo.");
+                showErrorMessage("Error al cerrar sesión. Por favor, intente de nuevo.");
             });
         }
 
-        // Añadir botón de cierre de sesión al sidebar
-        document.querySelector('.sidebar').innerHTML += `
-            <button onclick="logout()" style="margin-top: 20px;">Cerrar Sesión</button>
-        `;
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    showDashboard();
+                } else {
+                    showLoginForm();
+                }
+            });
+        });
+
+        // Error Handling
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Error no capturado:", error);
+            showErrorMessage("Ha ocurrido un error inesperado. Por favor, recargue la página e intente de nuevo.");
+            return true;
+        };
+
     </script>
 </body>
 </html>
+        
