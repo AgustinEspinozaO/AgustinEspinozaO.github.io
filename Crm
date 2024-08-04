@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Automotora</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+        #sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        #main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h2>CRM Automotora</h2>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="showSection('dashboard')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('inventory')">Inventario</a></li>
+                <li><a href="#" onclick="showSection('clients')">Clientes</a></li>
+                <li><a href="#" onclick="showSection('sales')">Ventas</a></li>
+                <li><a href="#" onclick="showSection('services')">Servicios</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div id="main-content"></div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Collections
+        const inventoryCollection = db.collection('inventory');
+        const clientsCollection = db.collection('clients');
+        const salesCollection = db.collection('sales');
+        const servicesCollection = db.collection('services');
+
+        // Utility functions
+        function showSection(section) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = ''; // Clear current content
+
+            switch(section) {
+                case 'dashboard':
+                    showDashboard();
+                    break;
+                case 'inventory':
+                    showInventory();
+                    break;
+                case 'clients':
+                    showClients();
+                    break;
+                case 'sales':
+                    showSales();
+                    break;
+                case 'services':
+                    showServices();
+                    break;
+            }
+        }
+
+        // Dashboard
+        async function showDashboard() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Dashboard</h1>
+                <div class="dashboard">
+                    <div class="card">
+                        <h2>Resumen de Ventas</h2>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h2>Inventario</h2>
+                        <canvas id="inventoryChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h2>Clientes Nuevos</h2>
+                        <canvas id="clientsChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h2>Servicios Programados</h2>
+                        <ul id="scheduledServices"></ul>
+                    </div>
+                </div>
+            `;
+
+            const sales = await getSales();
+            const inventory = await getInventory();
+            const clients = await getClients();
+            const services = await getServices();
+
+            createSalesChart(sales);
+            createInventoryChart(inventory);
+            createClientsChart(clients);
+            displayScheduledServices(services);
+        }
+
+        function createSalesChart(sales) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sales.map(sale => sale.date),
+                    datasets: [{
+                        label: 'Ventas',
+                        data: sales.map(sale => sale.amount),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createInventoryChart(inventory) {
+            const ctx = document.getElementById('inventoryChart').getContext('2d');
+            const statusCounts = inventory.reduce((acc, vehicle) => {
+                acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(statusCounts),
+                    datasets: [{
+                        data: Object.values(statusCounts),
+                        backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+                        borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                        borderWidth: 1
+                    }]
+                }
+            });
+        }
+
+        function createClientsChart(clients) {
+            const ctx = document.getElementById('clientsChart').getContext('2d');
+            const clientsPerMonth = clients.reduce((acc, client) => {
+                const month = new Date(client.createdAt).getMonth();
+                acc[month] = (acc[month] || 0) + 1;
+                return acc;
+            }, {});
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    datasets: [{
+                        label: 'Nuevos Clientes',
+                        data: Array.from({length: 12}, (_, i) => clientsPerMonth[i] || 0),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        }
+
+        function displayScheduledServices(services) {
+            const servicesList = document.getElementById('scheduledServices');
+            services.filter(service => service.status === 'Programado')
+                    .forEach(service => {
+                        const li = document.createElement('li');
+                        li.textContent = `${service.date}: ${service.description}`;
+                        servicesList.appendChild(li);
+                    });
+        }
+
+        // Inventory
+        async function showInventory() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Inventario</h1>
+                <button onclick="showAddVehicleForm()">Agregar Vehículo</button>
+                <table id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Año</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `;
+
+            const inventory = await getInventory();
+            const tableBody = document.querySelector('#inventoryTable tbody');
+            inventory.forEach(vehicle => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${vehicle.brand}</td>
+                    <td>${vehicle.model}</td>
+                    <td>${vehicle.year}</td>
+                    <td>$${vehicle.price}</td>
+                    <td>${vehicle.status}</td>
+                    <td>
+                        <button onclick="editVehicle('${vehicle.id}')">Editar</button>
+                        <button onclick="deleteVehicle('${vehicle.id}')">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+
+        function showAddVehicleForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Agregar Vehículo</h1>
+                <form id="addVehicleForm">
+                    <div class="form-group">
+                        <label for="brand">Marca:</label>
+                        <input type="text" id="brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Modelo:</label>
+                        <input type="text" id="model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Año:</label>
+                        <input type="number" id="year" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Precio:</label>
+                        <input type="number" id="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado:</label>
+                        <select id="status">
+                            <option value="Disponible">Disponible</option>
+                            <option value="Vendido">Vendido</option>
+                            <option value="En reparación">En reparación</option>
+                        </select>
+                    </div>
+                    <button type="submit">Agregar Vehículo</button>
+                </form>
+            `;
+
+            document.getElementById('addVehicleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const vehicle = {
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    year: parseInt(document.getElementById('year').value),
+                    price: parseFloat(document.getElementById('price').value),
+                    status: document.getElementById('status').value
+                };
+                await addVehicle(vehicle);
+                showInventory();
+            });
+        }
+
+        async function editVehicle(id) {
+            const vehicle = await getVehicle(id);
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Editar Vehículo</h1>
+                <form id="editVehicleForm">
+                    <div class="form-group">
+                        <label for="brand">Marca:</label>
+                        <input type="text" id="brand" value="${vehicle.brand}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Modelo:</label>
+                        <input type="text" id="model" value="${vehicle.model}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Año:</label>
+                        <input type="number" id="year" value="${vehicle.year}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Precio:</label>
+                        <input type="number" id="price" value="${vehicle.price}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado:</label>
+                        <select id="status">
+                            <option value="Disponible" ${vehicle.status === 'Disponible' ? 'selected' : ''}>Disponible</option>
+                            <option value="Vendido" ${vehicle.status === 'Vendido' ? 'selected' : ''}>Vendido</option>
+                            <option value="En reparación" ${vehicle.status === 'En reparación' ? 'selected' : ''}>En reparación</option>
+                        </select>
+                    </div>
+                    <button type="submit">Actualizar Vehículo</button>
+                </form>
+            `;
+
+            document.getElementById('editVehicleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedVehicle = {
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    year: parseInt(document.getElementById('year').value),
+                    price: parseFloat(document.getElementById('price').value),
+                    status: document.getElementById('status').value
+                };
+                await updateVehicle(id, updatedVehicle);
+                showInventory();
+            });
+        }
+
+        async function deleteVehicle(id) {
+            if (confirm('¿Está seguro de que desea eliminar este vehículo?')) {
+                await inventoryCollection.doc(id).delete();
+                showInventory();
+            }
+        }
+
+        // Clients
+        async function showClients() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Clientes</h1>
+                <button onclick="showAddClientForm()">Agregar Cliente</button>
+                <table id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `;
+
+            const clients = await getClients();
+            const tableBody = document.querySelector('#clientsTable tbody');
+            clients.forEach(client => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${client.name}</td>
+                    <td>${client.email}</td>
+                    <td>${client.phone}</td>
+                    <td>
+                        <button onclick="editClient('${client.id}')">Editar</button>
+                        <button onclick="deleteClient('${client.id}')">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+
+        function showAddClientForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Agregar Cliente</h1>
+                <form id="addClientForm">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono:</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <button type="submit">Agregar Cliente</button>
+                </form>
+            `;
+
+            document.getElementById('addClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const client = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await addClient(client);
+                showClients();
+            });
+        }
+
+        async function editClient(id) {
+            const client = await getClient(id);
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Editar Cliente</h1>
+                <form id="editClientForm">
+                    <div class="form-group">
+                        <label for="name">Nombre:</label>
+                        <input type="text" id="name" value="${client.name}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" value="${client.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Teléfono:</label>
+                        <input type="tel" id="phone" value="${client.phone}" required>
+                    </div>
+                    <button type="submit">Actualizar Cliente</button>
+                </form>
+            `;
+
+            document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedClient = {
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                await updateClient(id, updatedClient);
+                showClients();
+            });
+        }
+
+        async function deleteClient(id) {
+            if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
+                await clientsCollection.doc(id).delete();
+                showClients();
+            }
+        }
+
+        // Sales
+        async function showSales() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Ventas</h1>
+                <button onclick="showAddSaleForm()">Registrar Venta</button>
+                <table id="salesTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Vehículo</th>
+                            <th>Monto</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `;
+
+            const sales = await getSales();
+            const tableBody = document.querySelector('#salesTable tbody');
+            for (const sale of sales) {
+                const client = await getClient(sale.clientId);
+                const vehicle = await getVehicle(sale.vehicleId);
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${new Date(sale.date.toDate()).toLocaleDateString()}</td>
+                    <td>${client.name}</td>
+                    <td>${vehicle.brand} ${vehicle.model}</td>
+                    <td>$${sale.amount}</td>
+                    <td>
+                        <button onclick="editSale('${sale.id}')">Editar</button>
+                        <button onclick="deleteSale('${sale.id}')">Eliminar</button>
+                    </td>
+                `;
+            }
+        }
+
+        async function showAddSaleForm() {
+            const mainContent = document.getElementById('main-content');
+            const clients = await getClients();
+            const vehicles = await getInventory();
+
+            mainContent.innerHTML = `
+                <h1>Registrar Venta</h1>
+                <form id="addSaleForm">
+                    <div class="form-group">
+                        <label for="clientId">Cliente:</label>
+                        <select id="clientId" required>
+                            ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleId">Vehículo:</label>
+                        <select id="vehicleId" required>
+                            ${vehicles.filter(v => v.status === 'Disponible').map(vehicle => `<option value="${vehicle.id}">${vehicle.brand} ${vehicle.model}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Monto:</label>
+                        <input type="number" id="amount" required>
+                    </div>
+                    <button type="submit">Registrar Venta</button>
+                </form>
+            `;
+
+            document.getElementById('addSaleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const sale = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    amount: parseFloat(document.getElementById('amount').value),
+                    date: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await addSale(sale);
+                await updateVehicle(sale.vehicleId, { status: 'Vendido' });
+                showSales();
+            });
+        }
+
+        async function editSale(id) {
+            const sale = await getSale(id);
+            const clients = await getClients();
+            const vehicles = await getInventory();
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Editar Venta</h1>
+                <form id="editSaleForm">
+                    <div class="form-group">
+                        <label for="clientId">Cliente:</label>
+                        <select id="clientId" required>
+                            ${clients.map(client => `<option value="${client.id}" ${client.id === sale.clientId ? 'selected' : ''}>${client.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleId">Vehículo:</label>
+                        <select id="vehicleId" required>
+                            ${vehicles.map(vehicle => `<option value="${vehicle.id}" ${vehicle.id === sale.vehicleId ? 'selected' : ''}>${vehicle.brand} ${vehicle.model}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Monto:</label>
+                        <input type="number" id="amount" value="${sale.amount}" required>
+                    </div>
+                    <button type="submit">Actualizar Venta</button>
+                </form>
+            `;
+
+            document.getElementById('editSaleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedSale = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    amount: parseFloat(document.getElementById('amount').value)
+                };
+                await updateSale(id, updatedSale);
+                showSales();
+            });
+        }
+
+        async function deleteSale(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta venta?')) {
+                const sale = await getSale(id);
+                await salesCollection.doc(id).delete();
+                await updateVehicle(sale.vehicleId, { status: 'Disponible' });
+                showSales();
+            }
+        }
+
+        // Services
+        async function showServices() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Servicios</h1>
+                <button onclick="showAddServiceForm()">Programar Servicio</button>
+                <table id="servicesTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Vehículo</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `;
+
+            const services = await getServices();
+            const tableBody = document.querySelector('#servicesTable tbody');
+            for (const service of services) {
+                const client = await getClient(service.clientId);
+                const vehicle = await getVehicle(service.vehicleId);
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${new Date(service.date.toDate()).toLocaleDateString()}</td>
+                    <td>${client.name}</td>
+                    <td>${vehicle.brand} ${vehicle.model}</td>
+                    <td>${service.description}</td>
+                    <td>${service.status}</td>
+                    <td>
+                        <button onclick="editService('${service.id}')">Editar</button>
+                        <button onclick="deleteService('${service.id}')">Eliminar</button>
+                    </td>
+                `;
+            }
+        }
+
+        async function showAddServiceForm() {
+            const mainContent = document.getElementById('main-content');
+            const clients = await getClients();
+            const vehicles = await getInventory();
+
+            mainContent.innerHTML = `
+                <h1>Programar Servicio</h1>
+                <form id="addServiceForm">
+                    <div class="form-group">
+                        <label for="clientId">Cliente:</label>
+                        <select id="clientId" required>
+                            ${clients.map(client => `<option value="${client.id}">${client.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleId">Vehículo:</label>
+                        <select id="vehicleId" required>
+                            ${vehicles.map(vehicle => `<option value="${vehicle.id}">${vehicle.brand} ${vehicle.model}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Descripción:</label>
+                        <textarea id="description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Fecha:</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado:</label>
+                        <select id="status">
+                            <option value="Programado">Programado</option>
+                            <option value="En progreso">En progreso</option>
+                            <option value="Completado">Completado</option>
+                        </select>
+                    </div>
+                    <button type="submit">Programar Servicio</button>
+                </form>
+            `;
+
+            document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const service = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    description: document.getElementById('description').value,
+                    date: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('date').value)),
+                    status: document.getElementById('status').value
+                };
+                await addService(service);
+                showServices();
+            });
+        }
+
+        async function editService(id) {
+            const service = await getService(id);
+            const clients = await getClients();
+            const vehicles = await getInventory();
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Editar Servicio</h1>
+                <form id="editServiceForm">
+                    <div class="form-group">
+                        <label for="clientId">Cliente:</label>
+                        <select id="clientId" required>
+                            ${clients.map(client => `<option value="${client.id}" ${client.id === service.clientId ? 'selected' : ''}>${client.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleId">Vehículo:</label>
+                        <select id="vehicleId" required>
+                            ${vehicles.map(vehicle => `<option value="${vehicle.id}" ${vehicle.id === service.vehicleId ? 'selected' : ''}>${vehicle.brand} ${vehicle.model}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Descripción:</label>
+                        <textarea id="description" required>${service.description}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Fecha:</label>
+                        <input type="date" id="date" value="${service.date.toDate().toISOString().split('T')[0]}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado:</label>
+                        <select id="status">
+                            <option value="Programado" ${service.status === 'Programado' ? 'selected' : ''}>Programado</option>
+                            <option value="En progreso" ${service.status === 'En progreso' ? 'selected' : ''}>En progreso</option>
+                            <option value="Completado" ${service.status === 'Completado' ? 'selected' : ''}>Completado</option>
+                        </select>
+                    </div>
+                    <button type="submit">Actualizar Servicio</button>
+                </form>
+            `;
+
+            document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedService = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    description: document.getElementById('description').value,
+                    date: firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('date').value)),
+                    status: document.getElementById('status').value
+                };
+                await updateService(id, updatedService);
+                showServices();
+            });
+        }
+
+        async function deleteService(id) {
+            if (confirm('¿Está seguro de que desea eliminar este servicio?')) {
+                await servicesCollection.doc(id).delete();
+                showServices();
+            }
+        }
+
+        // CRUD Operations
+        async function addVehicle(vehicle) {
+            try {
+                await inventoryCollection.add(vehicle);
+            } catch (error) {
+                console.error("Error adding vehicle: ", error);
+                alert("Error al agregar vehículo. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getVehicle(id) {
+            try {
+                const doc = await inventoryCollection.doc(id).get();
+                return { id: doc.id, ...doc.data() };
+            } catch (error) {
+                console.error("Error getting vehicle: ", error);
+                alert("Error al obtener información del vehículo. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getInventory() {
+            try {
+                const snapshot = await inventoryCollection.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error getting inventory: ", error);
+                alert("Error al obtener el inventario. Por favor, intente de nuevo.");
+                return [];
+            }
+        }
+
+        async function updateVehicle(id, vehicle) {
+            try {
+                await inventoryCollection.doc(id).update(vehicle);
+            } catch (error) {
+                console.error("Error updating vehicle: ", error);
+                alert("Error al actualizar vehículo. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function addClient(client) {
+            try {
+                await clientsCollection.add(client);
+            } catch (error) {
+                console.error("Error adding client: ", error);
+                alert("Error al agregar cliente. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getClient(id) {
+            try {
+                const doc = await clientsCollection.doc(id).get();
+                return { id: doc.id, ...doc.data() };
+            } catch (error) {
+                console.error("Error getting client: ", error);
+                alert("Error al obtener información del cliente. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getClients() {
+            try {
+                const snapshot = await clientsCollection.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error getting clients: ", error);
+                alert("Error al obtener la lista de clientes. Por favor, intente de nuevo.");
+                return [];
+            }
+        }
+
+        async function updateClient(id, client) {
+            try {
+                await clientsCollection.doc(id).update(client);
+            } catch (error) {
+                console.error("Error updating client: ", error);
+                alert("Error al actualizar cliente. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function addSale(sale) {
+            try {
+                await salesCollection.add(sale);
+            } catch (error) {
+                console.error("Error adding sale: ", error);
+                alert("Error al registrar venta. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getSale(id) {
+            try {
+                const doc = await salesCollection.doc(id).get();
+                return { id: doc.id, ...doc.data() };
+            } catch (error) {
+                console.error("Error getting sale: ", error);
+                alert("Error al obtener información de la venta. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getSales() {
+            try {
+                const snapshot = await salesCollection.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error getting sales: ", error);
+                alert("Error al obtener la lista de ventas. Por favor, intente de nuevo.");
+                return [];
+            }
+        }
+
+        async function updateSale(id, sale) {
+            try {
+                await salesCollection.doc(id).update(sale);
+            } catch (error) {
+                console.error("Error updating sale: ", error);
+                alert("Error al actualizar venta. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function addService(service) {
+            try {
+                await servicesCollection.add(service);
+            } catch (error) {
+                console.error("Error adding service: ", error);
+                alert("Error al programar servicio. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getService(id) {
+            try {
+                const doc = await servicesCollection.doc(id).get();
+                return { id: doc.id, ...doc.data() };
+            } catch (error) {
+                console.error("Error getting service: ", error);
+                alert("Error al obtener información del servicio. Por favor, intente de nuevo.");
+            }
+        }
+
+        async function getServices() {
+            try {
+                const snapshot = await servicesCollection.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error getting services: ", error);
+                alert("Error al obtener la lista de servicios. Por favor, intente de nuevo.");
+                return [];
+            }
+        }
+
+        async function updateService(id, service) {
+            try {
+                await servicesCollection.doc(id).update(service);
+            } catch (error) {
+                console.error("Error updating service: ", error);
+                alert("Error al actualizar servicio. Por favor, intente de nuevo.");
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    showDashboard();
+                } else {
+                    showLoginForm();
+                }
+            });
+        });
+
+        function showLoginForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <h1>Iniciar Sesión</h1>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit">Iniciar Sesión</button>
+                </form>
+            `;
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                } catch (error) {
+                    console.error("Error de autenticación: ", error);
+                    alert("Error al iniciar sesión. Por favor, verifique sus credenciales e intente de nuevo.");
+                }
+            });
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                showLoginForm();
+            }).catch((error) => {
+                console.error("Error al cerrar sesión: ", error);
+                alert("Error al cerrar sesión. Por favor, intente de nuevo.");
+            });
+        }
+
+        // Añadir botón de cierre de sesión al sidebar
+        document.querySelector('.sidebar').innerHTML += `
+            <button onclick="logout()" style="margin-top: 20px;">Cerrar Sesión</button>
+        `;
+    </script>
+</body>
+</html>
