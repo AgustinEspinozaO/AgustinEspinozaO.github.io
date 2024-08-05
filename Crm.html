@@ -3,14 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCRM Pro v2</title>
+    <title>AutoCRM Pro v3</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* ... (el mismo CSS que antes) ... */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f0f0f0;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: white;
+            transition: 0.3s;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 1001;
+            overflow-y: auto;
+            padding-top: 60px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            display: block;
+            padding: 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+
+        .main-content {
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+        .logout-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -40,7 +178,6 @@
     <script>
         // Configuración de Firebase
         const firebaseConfig = {
-            // Reemplaza esto con tu configuración real de Firebase
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
             projectId: "YOUR_PROJECT_ID",
@@ -236,133 +373,40 @@
             });
         }
 
-        // Funciones para obtener datos
+        // Funciones para obtener datos (simuladas para este ejemplo)
         async function getSalesData() {
-            try {
-                const salesRef = db.collection('sales');
-                const snapshot = await salesRef.get();
-                const salesData = snapshot.docs.map(doc => doc.data().amount);
-                return salesData;
-            } catch (error) {
-                console.error("Error al obtener datos de ventas:", error);
-                throw error;
-            }
+            // Simular obtención de datos de ventas
+            return [10000, 15000, 13000, 17000, 20000, 18000];
         }
 
         async function getClientsData() {
-            try {
-                const clientsRef = db.collection('clients');
-                const snapshot = await clientsRef.get();
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } catch (error) {
-                console.error("Error al obtener datos de clientes:", error);
-                throw error;
-            }
+            // Simular obtención de datos de clientes
+            return [5, 7, 3, 8, 4, 6];
         }
 
         async function getInventoryData() {
-            try {
-                const inventoryRef = db.collection('inventory');
-                const snapshot = await inventoryRef.get();
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } catch (error) {
-                console.error("Error al obtener datos de inventario:", error);
-                throw error;
-            }
+            // Simular obtención de datos de inventario
+            return [
+                { id: '1', brand: 'Toyota', model: 'Corolla', year: 2022, price: 25000 },
+                { id: '2', brand: 'Honda', model: 'Civic', year: 2021, price: 23000 },
+                { id: '3', brand: 'Ford', model: 'Mustang', year: 2023, price: 45000 }
+            ];
         }
 
-        // Funciones CRUD para vehículos
+        // Funciones CRUD para vehículos (simuladas)
         async function addVehicle(vehicleData) {
-            try {
-                await db.collection('inventory').add(vehicleData);
-            } catch (error) {
-                console.error("Error al agregar vehículo:", error);
-                throw error;
-            }
+            // Simular agregar vehículo a la base de datos
+            console.log("Vehículo agregado:", vehicleData);
         }
 
         async function editVehicle(id) {
-            try {
-                const vehicleDoc = await db.collection('inventory').doc(id).get();
-                if (vehicleDoc.exists) {
-                    const vehicle = vehicleDoc.data();
-                    showEditVehicleForm(id, vehicle);
-                } else {
-                    throw new Error("Vehículo no encontrado");
-                }
-            } catch (error) {
-                console.error("Error al editar vehículo:", error);
-                alert('Error al cargar los datos del vehículo. Por favor, inténtelo de nuevo.');
-            }
-        }
-
-        function showEditVehicleForm(id, vehicle) {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Editar Vehículo</h3>
-                    <form id="editVehicleForm">
-                        <input type="hidden" id="vehicleId" value="${id}">
-                        <div class="form-group">
-                            <label for="brand">Marca:</label>
-                            <input type="text" id="brand" value="${vehicle.brand}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="model">Modelo:</label>
-                            <input type="text" id="model" value="${vehicle.model}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="year">Año:</label>
-                            <input type="number" id="year" value="${vehicle.year}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="price">Precio:</label>
-                            <input type="number" id="price" value="${vehicle.price}" required>
-                        </div>
-                        <button type="submit" class="btn">Actualizar Vehículo</button>
-                    </form>
-                </div>
-            `;
-
-            document.getElementById('editVehicleForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const updatedVehicleData = {
-                    brand: document.getElementById('brand').value,
-                    model: document.getElementById('model').value,
-                    year: parseInt(document.getElementById('year').value),
-                    price: parseFloat(document.getElementById('price').value)
-                };
-                try {
-                    await updateVehicle(id, updatedVehicleData);
-                    alert('Vehículo actualizado con éxito');
-                    showInventory();
-                } catch (error) {
-                    console.error("Error al actualizar vehículo:", error);
-                    alert('Error al actualizar el vehículo. Por favor, inténtelo de nuevo.');
-                }
-            });
-        }
-
-        async function updateVehicle(id, vehicleData) {
-            try {
-                await db.collection('inventory').doc(id).update(vehicleData);
-            } catch (error) {
-                console.error("Error al actualizar vehículo:", error);
-                throw error;
-            }
+            // Implementar lógica para editar vehículo
+            console.log("Editando vehículo con ID:", id);
         }
 
         async function deleteVehicle(id) {
-            if (confirm('¿Está seguro de que desea eliminar este vehículo?')) {
-                try {
-                    await db.collection('inventory').doc(id).delete();
-                    alert('Vehículo eliminado con éxito');
-                    showInventory();
-                } catch (error) {
-                    console.error("Error al eliminar vehículo:", error);
-                    alert('Error al eliminar el vehículo. Por favor, inténtelo de nuevo.');
-                }
-            }
+            // Implementar lógica para eliminar vehículo
+            console.log("Eliminando vehículo con ID:", id);
         }
 
         // Función para cerrar sesión
@@ -376,17 +420,7 @@
             });
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    showDashboard();
-                } else {
-                    showLoginForm();
-                }
-            });
-        });
-
+        // Función para mostrar el formulario de inicio de sesión
         function showLoginForm() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
@@ -420,6 +454,7 @@
             });
         }
 
+        // Función para mostrar clientes
         async function showClients() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
@@ -443,7 +478,7 @@
             try {
                 const clients = await getClientsData();
                 const tableBody = document.querySelector('#clientsTable tbody');
-                tableBody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
+                tableBody.innerHTML = '';
                 clients.forEach(client => {
                     const row = tableBody.insertRow();
                     row.innerHTML = `
@@ -462,6 +497,7 @@
             }
         }
 
+        // Función para mostrar el formulario de agregar cliente
         function showAddClientForm() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
@@ -503,94 +539,25 @@
             });
         }
 
+        // Funciones CRUD para clientes (simuladas)
         async function addClient(clientData) {
-            try {
-                await db.collection('clients').add(clientData);
-            } catch (error) {
-                console.error("Error al agregar cliente:", error);
-                throw error;
-            }
+            // Simular agregar cliente a la base de datos
+            console.log("Cliente agregado:", clientData);
         }
 
         async function editClient(id) {
-            try {
-                const clientDoc = await db.collection('clients').doc(id).get();
-                if (clientDoc.exists) {
-                    const client = clientDoc.data();
-                    showEditClientForm(id, client);
-                } else {
-                    throw new Error("Cliente no encontrado");
-                }
-            } catch (error) {
-                console.error("Error al editar cliente:", error);
-                alert('Error al cargar los datos del cliente. Por favor, inténtelo de nuevo.');
-            }
-        }
-
-        function showEditClientForm(id, client) {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Editar Cliente</h3>
-                    <form id="editClientForm">
-                        <input type="hidden" id="clientId" value="${id}">
-                        <div class="form-group">
-                            <label for="name">Nombre:</label>
-                            <input type="text" id="name" value="${client.name}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" value="${client.email}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Teléfono:</label>
-                            <input type="tel" id="phone" value="${client.phone}" required>
-                        </div>
-                        <button type="submit" class="btn">Actualizar Cliente</button>
-                    </form>
-                </div>
-            `;
-
-            document.getElementById('editClientForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const updatedClientData = {
-                    name: document.getElementById('name').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value
-                };
-                try {
-                    await updateClient(id, updatedClientData);
-                    alert('Cliente actualizado con éxito');
-                    showClients();
-                } catch (error) {
-                    console.error("Error al actualizar cliente:", error);
-                    alert('Error al actualizar el cliente. Por favor, inténtelo de nuevo.');
-                }
-            });
-        }
-
-        async function updateClient(id, clientData) {
-            try {
-                await db.collection('clients').doc(id).update(clientData);
-            } catch (error) {
-                console.error("Error al actualizar cliente:", error);
-                throw error;
-            }
+            // Implementar lógica para editar cliente
+            console.log("Editando cliente con ID:", id);
         }
 
         async function deleteClient(id) {
             if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
-                try {
-                    await db.collection('clients').doc(id).delete();
-                    alert('Cliente eliminado con éxito');
-                    showClients();
-                } catch (error) {
-                    console.error("Error al eliminar cliente:", error);
-                    alert('Error al eliminar el cliente. Por favor, inténtelo de nuevo.');
-                }
+                // Implementar lógica para eliminar cliente
+                console.log("Eliminando cliente con ID:", id);
             }
         }
 
+        // Función para mostrar ventas
         async function showSales() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
@@ -613,33 +580,29 @@
             `;
 
             try {
-                const sales = await getSalesData();
+                const sales = await getSalesDetailedData();
                 const tableBody = document.querySelector('#salesTable tbody');
-                tableBody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
-                for (const sale of sales) {
-                    const clientDoc = await db.collection('clients').doc(sale.clientId).get();
-                    const vehicleDoc = await db.collection('inventory').doc(sale.vehicleId).get();
-                    const clientName = clientDoc.exists ? clientDoc.data().name : 'Cliente desconocido';
-                    const vehicleName = vehicleDoc.exists ? `${vehicleDoc.data().brand} ${vehicleDoc.data().model}` : 'Vehículo desconocido';
-                    
+                tableBody.innerHTML = '';
+                sales.forEach(sale => {
                     const row = tableBody.insertRow();
                     row.innerHTML = `
                         <td>${new Date(sale.date).toLocaleDateString()}</td>
-                        <td>${clientName}</td>
-                        <td>${vehicleName}</td>
+                        <td>${sale.clientName}</td>
+                        <td>${sale.vehicleName}</td>
                         <td>$${sale.amount.toLocaleString()}</td>
                         <td>
                             <button onclick="editSale('${sale.id}')">Editar</button>
                             <button onclick="deleteSale('${sale.id}')">Eliminar</button>
                         </td>
                     `;
-                }
+                });
             } catch (error) {
                 console.error("Error al cargar ventas:", error);
                 mainContent.innerHTML += `<p>Error al cargar las ventas. Por favor, inténtelo de nuevo más tarde.</p>`;
             }
         }
 
+        // Función para mostrar el formulario de agregar venta
         function showAddSaleForm() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
@@ -693,6 +656,7 @@
             });
         }
 
+        // Funciones auxiliares para cargar datos en selectores
         async function loadClientsIntoSelect() {
             try {
                 const clients = await getClientsData();
@@ -727,362 +691,35 @@
             }
         }
 
+        // Funciones CRUD para ventas (simuladas)
         async function addSale(saleData) {
-            try {
-                await db.collection('sales').add(saleData);
-            } catch (error) {
-                console.error("Error al agregar venta:", error);
-                throw error;
-            }
+            // Simular agregar venta a la base de datos
+            console.log("Venta agregada:", saleData);
         }
 
         async function editSale(id) {
-            try {
-                const saleDoc = await db.collection('sales').doc(id).get();
-                if (saleDoc.exists) {
-                    const sale = saleDoc.data();
-                    showEditSaleForm(id, sale);
-                } else {
-                    throw new Error("Venta no encontrada");
-                }
-            } catch (error) {
-                console.error("Error al editar venta:", error);
-                alert('Error al cargar los datos de la venta. Por favor, inténtelo de nuevo.');
-            }
-        }
-
-        function showEditSaleForm(id, sale) {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Editar Venta</h3>
-                    <form id="editSaleForm">
-                        <input type="hidden" id="saleId" value="${id}">
-                        <div class="form-group">
-                            <label for="clientId">Cliente:</label>
-                            <select id="clientId" required>
-                                <option value="">Seleccione un cliente</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vehicleId">Vehículo:</label>
-                            <select id="vehicleId" required>
-                                <option value="">Seleccione un vehículo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="amount">Monto:</label>
-                            <input type="number" id="amount" value="${sale.amount}" required min="0" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="date">Fecha:</label>
-                            <input type="date" id="date" value="${sale.date}" required>
-                        </div>
-                        <button type="submit" class="btn">Actualizar Venta</button>
-                    </form>
-                </div>
-            `;
-
-            loadClientsIntoSelect(sale.clientId);
-            loadVehiclesIntoSelect(sale.vehicleId);
-
-            document.getElementById('editSaleForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const updatedSaleData = {
-                    clientId: document.getElementById('clientId').value,
-                    vehicleId: document.getElementById('vehicleId').value,
-                    amount: parseFloat(document.getElementById('amount').value),
-                    date: document.getElementById('date').value
-                };
-                try {
-                    await updateSale(id, updatedSaleData);
-                    alert('Venta actualizada con éxito');
-                    showSales();
-                } catch (error) {
-                    console.error("Error al actualizar venta:", error);
-                    alert('Error al actualizar la venta. Por favor, inténtelo de nuevo.');
-                }
-            });
-        }
-
-        async function updateSale(id, saleData) {
-            try {
-                await db.collection('sales').doc(id).update(saleData);
-            } catch (error) {
-                console.error("Error al actualizar venta:", error);
-                throw error;
-            }
+            // Implementar lógica para editar venta
+            console.log("Editando venta con ID:", id);
         }
 
         async function deleteSale(id) {
             if (confirm('¿Está seguro de que desea eliminar esta venta?')) {
-                try {
-                    await db.collection('sales').doc(id).delete();
-                    alert('Venta eliminada con éxito');
-                    showSales();
-                } catch (error) {
-                    console.error("Error al eliminar venta:", error);
-                    alert('Error al eliminar la venta. Por favor, inténtelo de nuevo.');
-                }
+                // Implementar lógica para eliminar venta
+                console.log("Eliminando venta con ID:", id);
             }
         }
 
-        async function showServices() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Servicios</h3>
-                    <button class="btn" onclick="showAddServiceForm()">Programar Servicio</button>
-                    <table id="servicesTable">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Cliente</th>
-                                <th>Vehículo</th>
-                                <th>Tipo de Servicio</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            `;
-
-            try {
-                const services = await getServicesData();
-                const tableBody = document.querySelector('#servicesTable tbody');
-                tableBody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
-                for (const service of services) {
-                    const clientDoc = await db.collection('clients').doc(service.clientId).get();
-                    const vehicleDoc = await db.collection('inventory').doc(service.vehicleId).get();
-                    const clientName = clientDoc.exists ? clientDoc.data().name : 'Cliente desconocido';
-                    const vehicleName = vehicleDoc.exists ? `${vehicleDoc.data().brand} ${vehicleDoc.data().model}` : 'Vehículo desconocido';
-                    
-                    const row = tableBody.insertRow();
-                    row.innerHTML = `
-                        <td>${new Date(service.date).toLocaleDateString()}</td>
-                        <td>${clientName}</td>
-                        <td>${vehicleName}</td>
-                        <td>${service.serviceType}</td>
-                        <td>${service.status}</td>
-                        <td>
-                            <button onclick="editService('${service.id}')">Editar</button>
-                            <button onclick="deleteService('${service.id}')">Eliminar</button>
-                        </td>
-                    `;
-                }
-            } catch (error) {
-                console.error("Error al cargar servicios:", error);
-                mainContent.innerHTML += `<p>Error al cargar los servicios. Por favor, inténtelo de nuevo más tarde.</p>`;
-            }
+        // Función para obtener datos detallados de ventas (simulada)
+        async function getSalesDetailedData() {
+            // Simular obtención de datos detallados de ventas
+            return [
+                { id: '1', date: '2023-08-01', clientName: 'Juan Pérez', vehicleName: 'Toyota Corolla', amount: 25000 },
+                { id: '2', date: '2023-08-15', clientName: 'María García', vehicleName: 'Honda Civic', amount: 23000 }
+            ];
         }
 
-        function showAddServiceForm() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Programar Nuevo Servicio</h3>
-                    <form id="addServiceForm">
-                        <div class="form-group">
-                            <label for="clientId">Cliente:</label>
-                            <select id="clientId" required>
-                                <option value="">Seleccione un cliente</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vehicleId">Vehículo:</label>
-                            <select id="vehicleId" required>
-                                <option value="">Seleccione un vehículo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="serviceType">Tipo de Servicio:</label>
-                            <input type="text" id="serviceType" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="date">Fecha:</label>
-                            <input type="date" id="date" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Estado:</label>
-                            <select id="status" required>
-                                <option value="Programado">Programado</option>
-                                <option value="En Progreso">En Progreso</option>
-                                <option value="Completado">Completado</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn">Programar Servicio</button>
-                    </form>
-                </div>
-            `;
-
-            loadClientsIntoSelect();
-            loadVehiclesIntoSelect();
-
-            document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const serviceData = {
-                    clientId: document.getElementById('clientId').value,
-                    vehicleId: document.getElementById('vehicleId').value,
-                    serviceType: document.getElementById('serviceType').value,
-                    date: document.getElementById('date').value,
-                    status: document.getElementById('status').value
-                };
-                try {
-                    await addService(serviceData);
-                    alert('Servicio programado con éxito');
-                    showServices();
-                } catch (error) {
-                    console.error("Error al programar servicio:", error);
-                    alert('Error al programar el servicio. Por favor, inténtelo de nuevo.');
-                }
-            });
-        }
-
-        async function addService(serviceData) {
-            try {
-                await db.collection('services').add(serviceData);
-            } catch (error) {
-                console.error("Error al agregar servicio:", error);
-                throw error;
-            }
-        }
-
-        async function editService(id) {
-            try {
-                const serviceDoc = await db.collection('services').doc(id).get();
-                if (serviceDoc.exists) {
-                    const service = serviceDoc.data();
-                    showEditServiceForm(id, service);
-                } else {
-                    throw new Error("Servicio no encontrado");
-                }
-            } catch (error) {
-                console.error("Error al editar servicio:", error);
-                alert('Error al cargar los datos del servicio. Por favor, inténtelo de nuevo.');
-            }
-        }
-
-        function showEditServiceForm(id, service) {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h3>Editar Servicio</h3>
-                    <form id="editServiceForm">
-                        <input type="hidden" id="serviceId" value="${id}">
-                        <div class="form-group">
-                            <label for="clientId">Cliente:</label>
-                            <select id="clientId" required>
-                                <option value="">Seleccione un cliente</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="vehicleId">Vehículo:</label>
-                            <select id="vehicleId" required>
-                                <option value="">Seleccione un vehículo</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="serviceType">Tipo de Servicio:</label>
-                            <input type="text" id="serviceType" value="${service.serviceType}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="date">Fecha:</label>
-                            <input type="date" id="date" value="${service.date}" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="status">Estado:</label>
-                            <select id="status" required>
-                                <option value="Programado" ${service.status === 'Programado' ? 'selected' : ''}>Programado</option>
-                                <option value="En Progreso" ${service.status === 'En Progreso' ? 'selected' : ''}>En Progreso</option>
-                                <option value="Completado" ${service.status === 'Completado' ? 'selected' : ''}>Completado</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn">Actualizar Servicio</button>
-                    </form>
-                </div>
-            `;
-
-            loadClientsIntoSelect(service.clientId);
-            loadVehiclesIntoSelect(service.vehicleId);
-
-            document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const updatedServiceData = {
-                    clientId: document.getElementById('clientId').value,
-                    vehicleId: document.getElementById('vehicleId').value,
-                    serviceType: document.getElementById('serviceType').value,
-                    date: document.getElementById('date').value,
-                    status: document.getElementById('status').value
-                };
-                try {
-                    await updateService(id, updatedServiceData);
-                    alert('Servicio actualizado con éxito');
-                    showServices();
-                } catch (error) {
-                    console.error("Error al actualizar servicio:", error);
-                    alert('Error al actualizar el servicio. Por favor, inténtelo de nuevo.');
-                }
-            });
-        }
-
-        async function updateService(id, serviceData) {
-            try {
-                await db.collection('services').doc(id).update(serviceData);
-            } catch (error) {
-                console.error("Error al actualizar servicio:", error);
-                throw error;
-            }
-        }
-
-        async function deleteService(id) {
-            if (confirm('¿Está seguro de que desea eliminar este servicio?')) {
-                try {
-                    await db.collection('services').doc(id).delete();
-                    alert('Servicio eliminado con éxito');
-                    showServices();
-                } catch (error) {
-                    console.error("Error al eliminar servicio:", error);
-                    alert('Error al eliminar el servicio. Por favor, inténtelo de nuevo.');
-                }
-            }
-        }
-
-        async function getServicesData() {
-            try {
-                const servicesRef = db.collection('services');
-                const snapshot = await servicesRef.get();
-                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } catch (error) {
-                console.error("Error al obtener datos de servicios:", error);
-                throw error;
-            }
-        }
-
-        // Manejo de errores global
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Error no capturado:", error);
-            alert("Ha ocurrido un error inesperado. Por favor, recargue la página e inténtelo de nuevo.");
-            return true;
-        };
-
-        // Inicialización de Firebase
-        function initializeFirebase() {
-            if (!firebase.apps.length) {
-                try {
-                    firebase.initializeApp(firebaseConfig);
-                } catch (error) {
-                    console.error("Error al inicializar Firebase:", error);
-                    alert("Error al inicializar la aplicación. Por favor, recargue la página.");
-                }
-            }
-            return firebase.firestore();
-        }
-
-        // Iniciar la aplicación
+        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            db = initializeFirebase();
             firebase.auth().onAuthStateChanged(function(user) {
                 if (user) {
                     showDashboard();
@@ -1091,6 +728,13 @@
                 }
             });
         });
+
+        // Manejo de errores global
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("Error no capturado:", error);
+            alert("Ha ocurrido un error inesperado. Por favor, recargue la página e inténtelo de nuevo.");
+            return true;
+        };
 
     </script>
 </body>
