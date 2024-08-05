@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoCRM Pro v3</title>
+    <title>AutoCRM Pro v4</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -373,85 +373,78 @@
             });
         }
 
-        // Funciones para obtener datos (simuladas para este ejemplo)
-        async function getSalesData() {
-            // Simular obtención de datos de ventas
-            return [10000, 15000, 13000, 17000, 20000, 18000];
-        }
-
-        async function getClientsData() {
-            // Simular obtención de datos de clientes
-            return [5, 7, 3, 8, 4, 6];
-        }
-
-        async function getInventoryData() {
-            // Simular obtención de datos de inventario
-            return [
-                { id: '1', brand: 'Toyota', model: 'Corolla', year: 2022, price: 25000 },
-                { id: '2', brand: 'Honda', model: 'Civic', year: 2021, price: 23000 },
-                { id: '3', brand: 'Ford', model: 'Mustang', year: 2023, price: 45000 }
-            ];
-        }
-
-        // Funciones CRUD para vehículos (simuladas)
-        async function addVehicle(vehicleData) {
-            // Simular agregar vehículo a la base de datos
-            console.log("Vehículo agregado:", vehicleData);
-        }
-
+        // Función para editar vehículo
         async function editVehicle(id) {
-            // Implementar lógica para editar vehículo
-            console.log("Editando vehículo con ID:", id);
+            try {
+                const vehicle = await getVehicleById(id);
+                showEditVehicleForm(vehicle);
+            } catch (error) {
+                console.error("Error al obtener datos del vehículo:", error);
+                alert('Error al cargar los datos del vehículo. Por favor, inténtelo de nuevo.');
+            }
         }
 
-        async function deleteVehicle(id) {
-            // Implementar lógica para eliminar vehículo
-            console.log("Eliminando vehículo con ID:", id);
-        }
-
-        // Función para cerrar sesión
-        function logout() {
-            firebase.auth().signOut().then(() => {
-                alert('Has cerrado sesión correctamente');
-                showLoginForm();
-            }).catch((error) => {
-                console.error('Error al cerrar sesión:', error);
-                alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
-            });
-        }
-
-        // Función para mostrar el formulario de inicio de sesión
-        function showLoginForm() {
+        // Función para mostrar el formulario de edición de vehículo
+        function showEditVehicleForm(vehicle) {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
                 <div class="card">
-                    <h2>Iniciar Sesión</h2>
-                    <form id="loginForm">
+                    <h3>Editar Vehículo</h3>
+                    <form id="editVehicleForm">
+                        <input type="hidden" id="vehicleId" value="${vehicle.id}">
                         <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" required>
+                            <label for="brand">Marca:</label>
+                            <input type="text" id="brand" value="${vehicle.brand}" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Contraseña:</label>
-                            <input type="password" id="password" required>
+                            <label for="model">Modelo:</label>
+                            <input type="text" id="model" value="${vehicle.model}" required>
                         </div>
-                        <button type="submit" class="btn">Iniciar Sesión</button>
+                        <div class="form-group">
+                            <label for="year">Año:</label>
+                            <input type="number" id="year" value="${vehicle.year}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">Precio:</label>
+                            <input type="number" id="price" value="${vehicle.price}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Vehículo</button>
                     </form>
                 </div>
             `;
 
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            document.getElementById('editVehicleForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+                const updatedVehicleData = {
+                    id: document.getElementById('vehicleId').value,
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    year: parseInt(document.getElementById('year').value),
+                    price: parseFloat(document.getElementById('price').value)
+                };
                 try {
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
-                    showDashboard();
+                    await updateVehicle(updatedVehicleData);
+                    alert('Vehículo actualizado con éxito');
+                    showInventory();
                 } catch (error) {
-                    console.error("Error de autenticación:", error);
-                    alert('Error al iniciar sesión. Verifique sus credenciales.');
+                    console.error("Error al actualizar vehículo:", error);
+                    alert('Error al actualizar el vehículo. Por favor, inténtelo de nuevo.');
                 }
             });
+        }
+
+        // Función para eliminar vehículo
+        async function deleteVehicle(id) {
+            if (confirm('¿Está seguro de que desea eliminar este vehículo?')) {
+                try {
+                    await removeVehicle(id);
+                    alert('Vehículo eliminado con éxito');
+                    showInventory();
+                } catch (error) {
+                    console.error("Error al eliminar vehículo:", error);
+                    alert('Error al eliminar el vehículo. Por favor, inténtelo de nuevo.');
+                }
+            }
         }
 
         // Función para mostrar clientes
@@ -539,21 +532,72 @@
             });
         }
 
-        // Funciones CRUD para clientes (simuladas)
-        async function addClient(clientData) {
-            // Simular agregar cliente a la base de datos
-            console.log("Cliente agregado:", clientData);
-        }
-
+        // Función para editar cliente
         async function editClient(id) {
-            // Implementar lógica para editar cliente
-            console.log("Editando cliente con ID:", id);
+            try {
+                const client = await getClientById(id);
+                showEditClientForm(client);
+            } catch (error) {
+                console.error("Error al obtener datos del cliente:", error);
+                alert('Error al cargar los datos del cliente. Por favor, inténtelo de nuevo.');
+            }
         }
 
+        // Función para mostrar el formulario de edición de cliente
+        function showEditClientForm(client) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Cliente</h3>
+                    <form id="editClientForm">
+                        <input type="hidden" id="clientId" value="${client.id}">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name" value="${client.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" value="${client.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" value="${client.phone}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Cliente</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedClientData = {
+                    id: document.getElementById('clientId').value,
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                try {
+                    await updateClient(updatedClientData);
+                    alert('Cliente actualizado con éxito');
+                    showClients();
+                } catch (error) {
+                    console.error("Error al actualizar cliente:", error);
+                    alert('Error al actualizar el cliente. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        // Función para eliminar cliente
         async function deleteClient(id) {
             if (confirm('¿Está seguro de que desea eliminar este cliente?')) {
-                // Implementar lógica para eliminar cliente
-                console.log("Eliminando cliente con ID:", id);
+                try {
+                    await removeClient(id);
+                    alert('Cliente eliminado con éxito');
+                    showClients();
+                } catch (error) {
+                    console.error("Error al eliminar cliente:", error);
+                    alert('Error al eliminar el cliente. Por favor, inténtelo de nuevo.');
+                }
             }
         }
 
@@ -656,8 +700,289 @@
             });
         }
 
+        // Función para editar venta
+        async function editSale(id) {
+            try {
+                const sale = await getSaleById(id);
+                showEditSaleForm(sale);
+            } catch (error) {
+                console.error("Error al obtener datos de la venta:", error);
+                alert('Error al cargar los datos de la venta. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        // Función para mostrar el formulario de edición de venta
+        function showEditSaleForm(sale) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Venta</h3>
+                    <form id="editSaleForm">
+                        <input type="hidden" id="saleId" value="${sale.id}">
+                        <div class="form-group">
+                            <label for="clientId">Cliente:</label>
+                            <select id="clientId" required>
+                                <option value="">Seleccione un cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleId">Vehículo:</label>
+                            <select id="vehicleId" required>
+                                <option value="">Seleccione un vehículo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="amount">Monto:</label>
+                            <input type="number" id="amount" value="${sale.amount}" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Fecha:</label>
+                            <input type="date" id="date" value="${sale.date}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Venta</button>
+                    </form>
+                </div>
+            `;
+
+            loadClientsIntoSelect(sale.clientId);
+            loadVehiclesIntoSelect(sale.vehicleId);
+
+            document.getElementById('editSaleForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedSaleData = {
+                    id: document.getElementById('saleId').value,
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    amount: parseFloat(document.getElementById('amount').value),
+                    date: document.getElementById('date').value
+                };
+                try {
+                    await updateSale(updatedSaleData);
+                    alert('Venta actualizada con éxito');
+                    showSales();
+                } catch (error) {
+                    console.error("Error al actualizar venta:", error);
+                    alert('Error al actualizar la venta. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        // Función para eliminar venta
+        async function deleteSale(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta venta?')) {
+                try {
+                    await removeSale(id);
+                    alert('Venta eliminada con éxito');
+                    showSales();
+                } catch (error) {
+                    console.error("Error al eliminar venta:", error);
+                    alert('Error al eliminar la venta. Por favor, inténtelo de nuevo.');
+                }
+            }
+        }
+
+        // Función para mostrar servicios
+        async function showServices() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Servicios</h3>
+                    <button class="btn" onclick="showAddServiceForm()">Programar Servicio</button>
+                    <table id="servicesTable">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Vehículo</th>
+                                <th>Tipo de Servicio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            `;
+
+            try {
+                const services = await getServicesData();
+                const tableBody = document.querySelector('#servicesTable tbody');
+                tableBody.innerHTML = '';
+                services.forEach(service => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${new Date(service.date).toLocaleDateString()}</td>
+                        <td>${service.clientName}</td>
+                        <td>${service.vehicleName}</td>
+                        <td>${service.serviceType}</td>
+                        <td>${service.status}</td>
+                        <td>
+                            <button onclick="editService('${service.id}')">Editar</button>
+                            <button onclick="deleteService('${service.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar servicios:", error);
+                mainContent.innerHTML += `<p>Error al cargar los servicios. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        // Función para mostrar el formulario de agregar servicio
+        function showAddServiceForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Programar Nuevo Servicio</h3>
+                    <form id="addServiceForm">
+                        <div class="form-group">
+                            <label for="clientId">Cliente:</label>
+                            <select id="clientId" required>
+                                <option value="">Seleccione un cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleId">Vehículo:</label>
+                            <select id="vehicleId" required>
+                                <option value="">Seleccione un vehículo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">Tipo de Servicio:</label>
+                            <input type="text" id="serviceType" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Fecha:</label>
+                            <input type="date" id="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Estado:</label>
+                            <select id="status" required>
+                                <option value="Programado">Programado</option>
+                                <option value="En Progreso">En Progreso</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Programar Servicio</button>
+                    </form>
+                </div>
+            `;
+
+            loadClientsIntoSelect();
+            loadVehiclesIntoSelect();
+
+            document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const serviceData = {
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    serviceType: document.getElementById('serviceType').value,
+                    date: document.getElementById('date').value,
+                    status: document.getElementById('status').value
+                };
+                try {
+                    await addService(serviceData);
+                    alert('Servicio programado con éxito');
+                    showServices();
+                } catch (error) {
+                    console.error("Error al programar servicio:", error);
+                    alert('Error al programar el servicio. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        // Función para editar servicio
+        async function editService(id) {
+            try {
+                const service = await getServiceById(id);
+                showEditServiceForm(service);
+            } catch (error) {
+                console.error("Error al obtener datos del servicio:", error);
+                alert('Error al cargar los datos del servicio. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        // Función para mostrar el formulario de edición de servicio
+        function showEditServiceForm(service) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Servicio</h3>
+                    <form id="editServiceForm">
+                        <input type="hidden" id="serviceId" value="${service.id}">
+                        <div class="form-group">
+                            <label for="clientId">Cliente:</label>
+                            <select id="clientId" required>
+                                <option value="">Seleccione un cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleId">Vehículo:</label>
+                            <select id="vehicleId" required>
+                                <option value="">Seleccione un vehículo</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="serviceType">Tipo de Servicio:</label>
+                            <input type="text" id="serviceType" value="${service.serviceType}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Fecha:</label>
+                            <input type="date" id="date" value="${service.date}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Estado:</label>
+                            <select id="status" required>
+                                <option value="Programado" ${service.status === 'Programado' ? 'selected' : ''}>Programado</option>
+                                <option value="En Progreso" ${service.status === 'En Progreso' ? 'selected' : ''}>En Progreso</option>
+                                <option value="Completado" ${service.status === 'Completado' ? 'selected' : ''}>Completado</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Servicio</button>
+                    </form>
+                </div>
+            `;
+
+            loadClientsIntoSelect(service.clientId);
+            loadVehiclesIntoSelect(service.vehicleId);
+
+            document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedServiceData = {
+                    id: document.getElementById('serviceId').value,
+                    clientId: document.getElementById('clientId').value,
+                    vehicleId: document.getElementById('vehicleId').value,
+                    serviceType: document.getElementById('serviceType').value,
+                    date: document.getElementById('date').value,
+                    status: document.getElementById('status').value
+                };
+                try {
+                    await updateService(updatedServiceData);
+                    alert('Servicio actualizado con éxito');
+                    showServices();
+                } catch (error) {
+                    console.error("Error al actualizar servicio:", error);
+                    alert('Error al actualizar el servicio. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        // Función para eliminar servicio
+        async function deleteService(id) {
+            if (confirm('¿Está seguro de que desea eliminar este servicio?')) {
+                try {
+                    await removeService(id);
+                    alert('Servicio eliminado con éxito');
+                    showServices();
+                } catch (error) {
+                    console.error("Error al eliminar servicio:", error);
+                    alert('Error al eliminar el servicio. Por favor, inténtelo de nuevo.');
+                }
+            }
+        }
+
         // Funciones auxiliares para cargar datos en selectores
-        async function loadClientsIntoSelect() {
+        async function loadClientsIntoSelect(selectedClientId = '') {
             try {
                 const clients = await getClientsData();
                 const select = document.getElementById('clientId');
@@ -666,6 +991,9 @@
                     const option = document.createElement('option');
                     option.value = client.id;
                     option.textContent = client.name;
+                    if (client.id === selectedClientId) {
+                        option.selected = true;
+                    }
                     select.appendChild(option);
                 });
             } catch (error) {
@@ -674,7 +1002,7 @@
             }
         }
 
-        async function loadVehiclesIntoSelect() {
+        async function loadVehiclesIntoSelect(selectedVehicleId = '') {
             try {
                 const vehicles = await getInventoryData();
                 const select = document.getElementById('vehicleId');
@@ -683,6 +1011,9 @@
                     const option = document.createElement('option');
                     option.value = vehicle.id;
                     option.textContent = `${vehicle.brand} ${vehicle.model} (${vehicle.year})`;
+                    if (vehicle.id === selectedVehicleId) {
+                        option.selected = true;
+                    }
                     select.appendChild(option);
                 });
             } catch (error) {
@@ -691,31 +1022,218 @@
             }
         }
 
-        // Funciones CRUD para ventas (simuladas)
+        // Funciones de interacción con la base de datos (simuladas para este ejemplo)
+        async function addVehicle(vehicleData) {
+            // Simular agregar vehículo a la base de datos
+            console.log("Vehículo agregado:", vehicleData);
+            // En una implementación real, aquí se agregaría el vehículo a Firebase
+        }
+
+        async function updateVehicle(vehicleData) {
+            // Simular actualizar vehículo en la base de datos
+            console.log("Vehículo actualizado:", vehicleData);
+            // En una implementación real, aquí se actualizaría el vehículo en Firebase
+        }
+
+        async function removeVehicle(id) {
+            // Simular eliminar vehículo de la base de datos
+            console.log("Vehículo eliminado:", id);
+            // En una implementación real, aquí se eliminaría el vehículo de Firebase
+        }
+
+        async function addClient(clientData) {
+            // Simular agregar cliente a la base de datos
+            console.log("Cliente agregado:", clientData);
+            // En una implementación real, aquí se agregaría el cliente a Firebase
+        }
+
+        async function updateClient(clientData) {
+            // Simular actualizar cliente en la base de datos
+            console.log("Cliente actualizado:", clientData);
+            // En una implementación real, aquí se actualizaría el cliente en Firebase
+        }
+
+        async function removeClient(id) {
+            // Simular eliminar cliente de la base de datos
+            console.log("Cliente eliminado:", id);
+            // En una implementación real, aquí se eliminaría el cliente de Firebase
+        }
+
         async function addSale(saleData) {
             // Simular agregar venta a la base de datos
             console.log("Venta agregada:", saleData);
+            // En una implementación real, aquí se agregaría la venta a Firebase
         }
 
-        async function editSale(id) {
-            // Implementar lógica para editar venta
-            console.log("Editando venta con ID:", id);
+        async function updateSale(saleData) {
+            // Simular actualizar venta en la base de datos
+            console.log("Venta actualizada:", saleData);
+            // En una implementación real, aquí se actualizaría la venta en Firebase
         }
 
-        async function deleteSale(id) {
-            if (confirm('¿Está seguro de que desea eliminar esta venta?')) {
-                // Implementar lógica para eliminar venta
-                console.log("Eliminando venta con ID:", id);
-            }
+        async function removeSale(id) {
+            // Simular eliminar venta de la base de datos
+            console.log("Venta eliminada:", id);
+            // En una implementación real, aquí se eliminaría la venta de Firebase
         }
 
-        // Función para obtener datos detallados de ventas (simulada)
+        async function addService(serviceData) {
+            // Simular agregar servicio a la base de datos
+            console.log("Servicio agregado:", serviceData);
+            // En una implementación real, aquí se agregaría el servicio a Firebase
+        }
+
+        async function updateService(serviceData) {
+            // Simular actualizar servicio en la base de datos
+            console.log("Servicio actualizado:", serviceData);
+            // En una implementación real, aquí se actualizaría el servicio en Firebase
+        }
+
+        async function removeService(id) {
+            // Simular eliminar servicio de la base de datos
+            console.log("Servicio eliminado:", id);
+            // En una implementación real, aquí se eliminaría el servicio de Firebase
+        }
+
+        // Funciones para obtener datos (simuladas para este ejemplo)
+        async function getSalesData() {
+            // Simular obtención de datos de ventas
+            return [10000, 15000, 13000, 17000, 20000, 18000];
+        }
+
+        async function getClientsData() {
+            // Simular obtención de datos de clientes
+            return [
+                { id: '1', name: 'Juan Pérez', email: 'juan@example.com', phone: '123-456-7890' },
+                { id: '2', name: 'María García', email: 'maria@example.com', phone: '098-765-4321' }
+            ];
+        }
+
+        async function getInventoryData() {
+            // Simular obtención de datos de inventario
+            return [
+                { id: '1', brand: 'Toyota', model: 'Corolla', year: 2022, price: 25000 },
+                { id: '2', brand: 'Honda', model: 'Civic', year: 2021, price: 23000 },
+                { id: '3', brand: 'Ford', model: 'Mustang', year: 2023, price: 45000 }
+            ];
+        }
+
         async function getSalesDetailedData() {
             // Simular obtención de datos detallados de ventas
             return [
                 { id: '1', date: '2023-08-01', clientName: 'Juan Pérez', vehicleName: 'Toyota Corolla', amount: 25000 },
                 { id: '2', date: '2023-08-15', clientName: 'María García', vehicleName: 'Honda Civic', amount: 23000 }
             ];
+        }
+
+        async function getServicesData() {
+            // Simular obtención de datos de servicios
+            return [
+                { id: '1', date: '2023-08-10', clientName: 'Juan Pérez', vehicleName: 'Toyota Corolla', serviceType: 'Mantenimiento', status: 'Completado' },
+                { id: '2', date: '2023-08-20', clientName: 'María García', vehicleName: 'Honda Civic', serviceType: 'Reparación', status: 'En Progreso' }
+            ];
+        }
+
+        async function getVehicleById(id) {
+            // Simular obtención de un vehículo por ID
+            const vehicles = await getInventoryData();
+            return vehicles.find(vehicle => vehicle.id === id);
+        }
+
+        async function getClientById(id) {
+            // Simular obtención de un cliente por ID
+            const clients = await getClientsData();
+            return clients.find(client => client.id === id);
+        }
+
+        async function getSaleById(id) {
+            // Simular obtención de una venta por ID
+            const sales = await getSalesDetailedData();
+            return sales.find(sale => sale.id === id);
+        }
+
+        async function getServiceById(id) {
+            // Simular obtención de un servicio por ID
+            const services = await getServicesData();
+            return services.find(service => service.id === id);
+        }
+
+        // Función para mostrar pipelines
+        function showPipelines() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Pipelines de Ventas</h3>
+                    <p>Funcionalidad de pipelines en desarrollo.</p>
+                </div>
+            `;
+        }
+
+        // Función para mostrar empleados
+        function showEmployees() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Gestión de Empleados</h3>
+                    <p>Funcionalidad de gestión de empleados en desarrollo.</p>
+                </div>
+            `;
+        }
+
+        // Función para mostrar etiquetas
+        function showTags() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Gestión de Etiquetas</h3>
+                    <p>Funcionalidad de gestión de etiquetas en desarrollo.</p>
+                </div>
+            `;
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                alert('Has cerrado sesión correctamente');
+                showLoginForm();
+            }).catch((error) => {
+                console.error('Error al cerrar sesión:', error);
+                alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
+            });
+        }
+
+        // Función para mostrar el formulario de inicio de sesión
+        function showLoginForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit" class="btn">Iniciar Sesión</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    await firebase.auth().signInWithEmailAndPassword(email, password);
+                    showDashboard();
+                } catch (error) {
+                    console.error("Error de autenticación:", error);
+                    alert('Error al iniciar sesión. Verifique sus credenciales.');
+                }
+            });
         }
 
         // Inicialización
@@ -735,7 +1253,6 @@
             alert("Ha ocurrido un error inesperado. Por favor, recargue la página e inténtelo de nuevo.");
             return true;
         };
-
     </script>
 </body>
 </html>
