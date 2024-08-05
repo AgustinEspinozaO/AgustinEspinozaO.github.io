@@ -1158,101 +1158,627 @@
             return services.find(service => service.id === id);
         }
 
+        // ... (código anterior sin cambios)
+
         // Función para mostrar pipelines
-        function showPipelines() {
+        async function showPipelines() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
                 <div class="card">
                     <h3>Pipelines de Ventas</h3>
-                    <p>Funcionalidad de pipelines en desarrollo.</p>
+                    <button class="btn" onclick="showAddPipelineForm()">Agregar Pipeline</button>
+                    <div id="pipelinesContainer"></div>
                 </div>
             `;
+
+            try {
+                const pipelines = await getPipelinesData();
+                const pipelinesContainer = document.getElementById('pipelinesContainer');
+                pipelines.forEach(pipeline => {
+                    const pipelineElement = document.createElement('div');
+                    pipelineElement.className = 'pipeline';
+                    pipelineElement.innerHTML = `
+                        <h4>${pipeline.name}</h4>
+                        <div class="pipeline-stages">
+                            ${pipeline.stages.map(stage => `
+                                <div class="pipeline-stage">
+                                    <h5>${stage.name}</h5>
+                                    <ul>
+                                        ${stage.opportunities.map(opp => `
+                                            <li>${opp.name} - $${opp.value}</li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="editPipeline('${pipeline.id}')">Editar</button>
+                        <button onclick="deletePipeline('${pipeline.id}')">Eliminar</button>
+                    `;
+                    pipelinesContainer.appendChild(pipelineElement);
+                });
+            } catch (error) {
+                console.error("Error al cargar pipelines:", error);
+                mainContent.innerHTML += `<p>Error al cargar los pipelines. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddPipelineForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Agregar Nuevo Pipeline</h3>
+                    <form id="addPipelineForm">
+                        <div class="form-group">
+                            <label for="pipelineName">Nombre del Pipeline:</label>
+                            <input type="text" id="pipelineName" required>
+                        </div>
+                        <div id="stagesContainer">
+                            <h4>Etapas</h4>
+                        </div>
+                        <button type="button" onclick="addStageField()">Agregar Etapa</button>
+                        <button type="submit" class="btn">Crear Pipeline</button>
+                    </form>
+                </div>
+            `;
+
+            addStageField(); // Agregar al menos una etapa por defecto
+
+            document.getElementById('addPipelineForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const pipelineData = {
+                    name: document.getElementById('pipelineName').value,
+                    stages: Array.from(document.querySelectorAll('.stage-field')).map(stage => ({
+                        name: stage.querySelector('input').value,
+                        opportunities: []
+                    }))
+                };
+                try {
+                    await addPipeline(pipelineData);
+                    alert('Pipeline creado con éxito');
+                    showPipelines();
+                } catch (error) {
+                    console.error("Error al crear pipeline:", error);
+                    alert('Error al crear el pipeline. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        function addStageField() {
+            const stagesContainer = document.getElementById('stagesContainer');
+            const stageField = document.createElement('div');
+            stageField.className = 'form-group stage-field';
+            stageField.innerHTML = `
+                <label for="stageName">Nombre de la Etapa:</label>
+                <input type="text" name="stageName" required>
+                <button type="button" onclick="this.parentElement.remove()">Eliminar Etapa</button>
+            `;
+            stagesContainer.appendChild(stageField);
+        }
+
+        async function editPipeline(id) {
+            try {
+                const pipeline = await getPipelineById(id);
+                showEditPipelineForm(pipeline);
+            } catch (error) {
+                console.error("Error al obtener datos del pipeline:", error);
+                alert('Error al cargar los datos del pipeline. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        function showEditPipelineForm(pipeline) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Pipeline</h3>
+                    <form id="editPipelineForm">
+                        <input type="hidden" id="pipelineId" value="${pipeline.id}">
+                        <div class="form-group">
+                            <label for="pipelineName">Nombre del Pipeline:</label>
+                            <input type="text" id="pipelineName" value="${pipeline.name}" required>
+                        </div>
+                        <div id="stagesContainer">
+                            <h4>Etapas</h4>
+                            ${pipeline.stages.map((stage, index) => `
+                                <div class="form-group stage-field">
+                                    <label for="stageName${index}">Nombre de la Etapa:</label>
+                                    <input type="text" name="stageName" id="stageName${index}" value="${stage.name}" required>
+                                    <button type="button" onclick="this.parentElement.remove()">Eliminar Etapa</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" onclick="addStageField()">Agregar Etapa</button>
+                        <button type="submit" class="btn">Actualizar Pipeline</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('editPipelineForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedPipelineData = {
+                    id: document.getElementById('pipelineId').value,
+                    name: document.getElementById('pipelineName').value,
+                    stages: Array.from(document.querySelectorAll('.stage-field')).map(stage => ({
+                        name: stage.querySelector('input').value,
+                        opportunities: []
+                    }))
+                };
+                try {
+                    await updatePipeline(updatedPipelineData);
+                    alert('Pipeline actualizado con éxito');
+                    showPipelines();
+                } catch (error) {
+                    console.error("Error al actualizar pipeline:", error);
+                    alert('Error al actualizar el pipeline. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        async function deletePipeline(id) {
+            if (confirm('¿Está seguro de que desea eliminar este pipeline?')) {
+                try {
+                    await removePipeline(id);
+                    alert('Pipeline eliminado con éxito');
+                    showPipelines();
+                } catch (error) {
+                    console.error("Error al eliminar pipeline:", error);
+                    alert('Error al eliminar el pipeline. Por favor, inténtelo de nuevo.');
+                }
+            }
         }
 
         // Función para mostrar empleados
-        function showEmployees() {
+        async function showEmployees() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
                 <div class="card">
                     <h3>Gestión de Empleados</h3>
-                    <p>Funcionalidad de gestión de empleados en desarrollo.</p>
+                    <button class="btn" onclick="showAddEmployeeForm()">Agregar Empleado</button>
+                    <table id="employeesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cargo</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             `;
+
+            try {
+                const employees = await getEmployeesData();
+                const tableBody = document.querySelector('#employeesTable tbody');
+                tableBody.innerHTML = '';
+                employees.forEach(employee => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${employee.name}</td>
+                        <td>${employee.position}</td>
+                        <td>${employee.email}</td>
+                        <td>${employee.phone}</td>
+                        <td>
+                            <button onclick="editEmployee('${employee.id}')">Editar</button>
+                            <button onclick="deleteEmployee('${employee.id}')">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                console.error("Error al cargar empleados:", error);
+                mainContent.innerHTML += `<p>Error al cargar los empleados. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
         }
 
-        // Función para mostrar etiquetas
-        function showTags() {
+        function showAddEmployeeForm() {
             const mainContent = document.getElementById('main-content');
             mainContent.innerHTML = `
                 <div class="card">
-                    <h3>Gestión de Etiquetas</h3>
-                    <p>Funcionalidad de gestión de etiquetas en desarrollo.</p>
-                </div>
-            `;
-        }
-
-        // Función para cerrar sesión
-        function logout() {
-            firebase.auth().signOut().then(() => {
-                alert('Has cerrado sesión correctamente');
-                showLoginForm();
-            }).catch((error) => {
-                console.error('Error al cerrar sesión:', error);
-                alert('Error al cerrar sesión. Por favor, inténtelo de nuevo.');
-            });
-        }
-
-        // Función para mostrar el formulario de inicio de sesión
-        function showLoginForm() {
-            const mainContent = document.getElementById('main-content');
-            mainContent.innerHTML = `
-                <div class="card">
-                    <h2>Iniciar Sesión</h2>
-                    <form id="loginForm">
+                    <h3>Agregar Empleado</h3>
+                    <form id="addEmployeeForm">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Cargo:</label>
+                            <input type="text" id="position" required>
+                        </div>
                         <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Contraseña:</label>
-                            <input type="password" id="password" required>
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" required>
                         </div>
-                        <button type="submit" class="btn">Iniciar Sesión</button>
+                        <button type="submit" class="btn">Agregar Empleado</button>
                     </form>
                 </div>
             `;
 
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+                const employeeData = {
+                    name: document.getElementById('name').value,
+                    position: document.getElementById('position').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
                 try {
-                    await firebase.auth().signInWithEmailAndPassword(email, password);
-                    showDashboard();
+                    await addEmployee(employeeData);
+                    alert('Empleado agregado con éxito');
+                    showEmployees();
                 } catch (error) {
-                    console.error("Error de autenticación:", error);
-                    alert('Error al iniciar sesión. Verifique sus credenciales.');
+                    console.error("Error al agregar empleado:", error);
+                    alert('Error al agregar empleado. Por favor, inténtelo de nuevo.');
                 }
             });
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    showDashboard();
-                } else {
-                    showLoginForm();
+        async function editEmployee(id) {
+            try {
+                const employee = await getEmployeeById(id);
+                showEditEmployeeForm(employee);
+            } catch (error) {
+                console.error("Error al obtener datos del empleado:", error);
+                alert('Error al cargar los datos del empleado. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        function showEditEmployeeForm(employee) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Empleado</h3>
+                    <form id="editEmployeeForm">
+                        <input type="hidden" id="employeeId" value="${employee.id}">
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            <input type="text" id="name" value="${employee.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="position">Cargo:</label>
+                            <input type="text" id="position" value="${employee.position}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" value="${employee.email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Teléfono:</label>
+                            <input type="tel" id="phone" value="${employee.phone}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Empleado</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('editEmployeeForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedEmployeeData = {
+                    id: document.getElementById('employeeId').value,
+                    name: document.getElementById('name').value,
+                    position: document.getElementById('position').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value
+                };
+                try {
+                    await updateEmployee(updatedEmployeeData);
+                    alert('Empleado actualizado con éxito');
+                    showEmployees();
+                } catch (error) {
+                    console.error("Error al actualizar empleado:", error);
+                    alert('Error al actualizar el empleado. Por favor, inténtelo de nuevo.');
                 }
             });
-        });
+        }
 
-        // Manejo de errores global
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Error no capturado:", error);
-            alert("Ha ocurrido un error inesperado. Por favor, recargue la página e inténtelo de nuevo.");
-            return true;
-        };
+        async function deleteEmployee(id) {
+            if (confirm('¿Está seguro de que desea eliminar este empleado?')) {
+                try {
+                    await removeEmployee(id);
+                    alert('Empleado eliminado con éxito');
+                    showEmployees();
+                } catch (error) {
+                    console.error("Error al eliminar empleado:", error);
+                    alert('Error al eliminar el empleado. Por favor, inténtelo de nuevo.');
+                }
+            }
+        }
+
+        // Función para mostrar etiquetas
+        async function showTags() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Gestión de Etiquetas</h3>
+                    <button class="btn" onclick="showAddTagForm()">Agregar Etiqueta</button>
+                    <div id="tagsContainer"></div>
+                </div>
+            `;
+
+            try {
+                const tags = await getTagsData();
+                const tagsContainer = document.getElementById('tagsContainer');
+                tagsContainer.innerHTML = '';
+                tags.forEach(tag => {
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag';
+                    tagElement.style.backgroundColor = tag.color;
+                    tagElement.innerHTML = `
+                        ${tag.name}
+                        <button onclick="editTag('${tag.id}')">Editar</button>
+                        <button onclick="deleteTag('${tag.id}')">Eliminar</button>
+                    `;
+                    tagsContainer.appendChild(tagElement);
+                });
+            } catch (error) {
+                console.error("Error al cargar etiquetas:", error);
+                    mainContent.innerHTML += `<p>Error al cargar las etiquetas. Por favor, inténtelo de nuevo más tarde.</p>`;
+            }
+        }
+
+        function showAddTagForm() {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Agregar Etiqueta</h3>
+                    <form id="addTagForm">
+                        <div class="form-group">
+                            <label for="tagName">Nombre de la Etiqueta:</label>
+                            <input type="text" id="tagName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tagColor">Color:</label>
+                            <input type="color" id="tagColor" required>
+                        </div>
+                        <button type="submit" class="btn">Agregar Etiqueta</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('addTagForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const tagData = {
+                    name: document.getElementById('tagName').value,
+                    color: document.getElementById('tagColor').value
+                };
+                try {
+                    await addTag(tagData);
+                    alert('Etiqueta agregada con éxito');
+                    showTags();
+                } catch (error) {
+                    console.error("Error al agregar etiqueta:", error);
+                    alert('Error al agregar etiqueta. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        async function editTag(id) {
+            try {
+                const tag = await getTagById(id);
+                showEditTagForm(tag);
+            } catch (error) {
+                console.error("Error al obtener datos de la etiqueta:", error);
+                alert('Error al cargar los datos de la etiqueta. Por favor, inténtelo de nuevo.');
+            }
+        }
+
+        function showEditTagForm(tag) {
+            const mainContent = document.getElementById('main-content');
+            mainContent.innerHTML = `
+                <div class="card">
+                    <h3>Editar Etiqueta</h3>
+                    <form id="editTagForm">
+                        <input type="hidden" id="tagId" value="${tag.id}">
+                        <div class="form-group">
+                            <label for="tagName">Nombre de la Etiqueta:</label>
+                            <input type="text" id="tagName" value="${tag.name}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tagColor">Color:</label>
+                            <input type="color" id="tagColor" value="${tag.color}" required>
+                        </div>
+                        <button type="submit" class="btn">Actualizar Etiqueta</button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('editTagForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const updatedTagData = {
+                    id: document.getElementById('tagId').value,
+                    name: document.getElementById('tagName').value,
+                    color: document.getElementById('tagColor').value
+                };
+                try {
+                    await updateTag(updatedTagData);
+                    alert('Etiqueta actualizada con éxito');
+                    showTags();
+                } catch (error) {
+                    console.error("Error al actualizar etiqueta:", error);
+                    alert('Error al actualizar la etiqueta. Por favor, inténtelo de nuevo.');
+                }
+            });
+        }
+
+        async function deleteTag(id) {
+            if (confirm('¿Está seguro de que desea eliminar esta etiqueta?')) {
+                try {
+                    await removeTag(id);
+                    alert('Etiqueta eliminada con éxito');
+                    showTags();
+                } catch (error) {
+                    console.error("Error al eliminar etiqueta:", error);
+                    alert('Error al eliminar la etiqueta. Por favor, inténtelo de nuevo.');
+                }
+            }
+        }
+
+        // Funciones de interacción con la base de datos para pipelines
+        async function addPipeline(pipelineData) {
+            try {
+                await db.collection('pipelines').add(pipelineData);
+            } catch (error) {
+                console.error("Error al agregar pipeline:", error);
+                throw error;
+            }
+        }
+
+        async function updatePipeline(pipelineData) {
+            try {
+                await db.collection('pipelines').doc(pipelineData.id).update(pipelineData);
+            } catch (error) {
+                console.error("Error al actualizar pipeline:", error);
+                throw error;
+            }
+        }
+
+        async function removePipeline(id) {
+            try {
+                await db.collection('pipelines').doc(id).delete();
+            } catch (error) {
+                console.error("Error al eliminar pipeline:", error);
+                throw error;
+            }
+        }
+
+        async function getPipelinesData() {
+            try {
+                const pipelinesRef = db.collection('pipelines');
+                const snapshot = await pipelinesRef.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error al obtener datos de pipelines:", error);
+                throw error;
+            }
+        }
+
+        async function getPipelineById(id) {
+            try {
+                const doc = await db.collection('pipelines').doc(id).get();
+                if (doc.exists) {
+                    return { id: doc.id, ...doc.data() };
+                } else {
+                    throw new Error('Pipeline no encontrado');
+                }
+            } catch (error) {
+                console.error("Error al obtener pipeline por ID:", error);
+                throw error;
+            }
+        }
+
+        // Funciones de interacción con la base de datos para empleados
+        async function addEmployee(employeeData) {
+            try {
+                await db.collection('employees').add(employeeData);
+            } catch (error) {
+                console.error("Error al agregar empleado:", error);
+                throw error;
+            }
+        }
+
+        async function updateEmployee(employeeData) {
+            try {
+                await db.collection('employees').doc(employeeData.id).update(employeeData);
+            } catch (error) {
+                console.error("Error al actualizar empleado:", error);
+                throw error;
+            }
+        }
+
+        async function removeEmployee(id) {
+            try {
+                await db.collection('employees').doc(id).delete();
+            } catch (error) {
+                console.error("Error al eliminar empleado:", error);
+                throw error;
+            }
+        }
+
+        async function getEmployeesData() {
+            try {
+                const employeesRef = db.collection('employees');
+                const snapshot = await employeesRef.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error al obtener datos de empleados:", error);
+                throw error;
+            }
+        }
+
+        async function getEmployeeById(id) {
+            try {
+                const doc = await db.collection('employees').doc(id).get();
+                if (doc.exists) {
+                    return { id: doc.id, ...doc.data() };
+                } else {
+                    throw new Error('Empleado no encontrado');
+                }
+            } catch (error) {
+                console.error("Error al obtener empleado por ID:", error);
+                throw error;
+            }
+        }
+
+        // Funciones de interacción con la base de datos para etiquetas
+        async function addTag(tagData) {
+            try {
+                await db.collection('tags').add(tagData);
+            } catch (error) {
+                console.error("Error al agregar etiqueta:", error);
+                throw error;
+            }
+        }
+
+        async function updateTag(tagData) {
+            try {
+                await db.collection('tags').doc(tagData.id).update(tagData);
+            } catch (error) {
+                console.error("Error al actualizar etiqueta:", error);
+                throw error;
+            }
+        }
+
+        async function removeTag(id) {
+            try {
+                await db.collection('tags').doc(id).delete();
+            } catch (error) {
+                console.error("Error al eliminar etiqueta:", error);
+                throw error;
+            }
+        }
+
+        async function getTagsData() {
+            try {
+                const tagsRef = db.collection('tags');
+                const snapshot = await tagsRef.get();
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error al obtener datos de etiquetas:", error);
+                throw error;
+            }
+        }
+
+        async function getTagById(id) {
+            try {
+                const doc = await db.collection('tags').doc(id).get();
+                if (doc.exists) {
+                    return { id: doc.id, ...doc.data() };
+                } else {
+                    throw new Error('Etiqueta no encontrada');
+                }
+            } catch (error) {
+                console.error("Error al obtener etiqueta por ID:", error);
+                throw error;
+            }
+        }
+
+        // ... (resto del código sin cambios)
+
     </script>
 </body>
 </html>
+
