@@ -143,15 +143,20 @@
     const productSelect = document.getElementById('product');
     const fileInput = document.getElementById('fileInput');
 
+    let currentPrice = '';
+
     // Función para manejar el teclado numérico
     numButtons.forEach(button => {
         button.addEventListener('click', () => {
-            if (button.textContent === 'C') {
-                priceInput.value = '';
-                quantityInput.value = '';
+            const buttonValue = button.textContent;
+
+            if (buttonValue === 'C') {
+                currentPrice = '';
             } else {
-                priceInput.value += button.textContent;
+                currentPrice += buttonValue;
             }
+
+            priceInput.value = currentPrice;
         });
     });
 
@@ -244,17 +249,15 @@
                 if (name && price) {
                     const option = document.createElement('option');
                     option.value = `${name}|${price}`;
-                    option.text Content = name;
-productSelect.appendChild(option);
-}
-});
-};
-reader.readAsArrayBuffer(file);
-});
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
+                    option.textContent = name;
+                    productSelect.appendChild(option);
+                }
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js”>
 
 </body>
 </html>
