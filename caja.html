@@ -136,7 +136,7 @@
         </select>
 
         <label for="priceExcel">Precio del producto:</label>
-        <input type="number" id="priceExcel" placeholder="Precio" step="0.01" min="0">
+        <input type="number" id="priceExcel" placeholder="Precio" step="0.01" min="0" readonly>
 
         <label for="quantity">Cantidad:</label>
         <input type="number" id="quantity" placeholder="Cantidad" min="1">
@@ -206,8 +206,9 @@
             productsData.forEach((row, index) => {
                 if (index === 0) return; // Saltar la fila de encabezado
                 const name = row[1]; // Segunda columna para nombre del producto
-                if (name) {
-                    productsFromExcel.push(name);
+                const price = row[2]; // Tercera columna para el precio del producto
+                if (name && price) {
+                    productsFromExcel.push({ name, price });
                 }
             });
 
@@ -223,8 +224,8 @@
 
         productList.forEach(product => {
             const option = document.createElement('option');
-            option.value = product;
-            option.textContent = product;
+            option.value = product.name;
+            option.textContent = `${product.name} - Precio: $${product.price}`;
             productSelect.appendChild(option);
         });
     }
@@ -233,7 +234,7 @@
     document.getElementById('searchProduct').addEventListener('input', (event) => {
         const searchQuery = event.target.value.toLowerCase();
         const filteredProducts = productsFromExcel.filter(product => 
-            product.toLowerCase().includes(searchQuery)
+            product.name.toLowerCase().includes(searchQuery)
         );
         updateProductSelect(filteredProducts);
     });
@@ -241,11 +242,13 @@
     // Agregar productos desde el Excel al carrito
     document.getElementById('addProductFromExcel').addEventListener('click', () => {
         const selectedProduct = document.getElementById('product').value;
-        const quantity = document.getElementById('quantity').value;
-        const price = document.getElementById('priceExcel').value;
-        if (selectedProduct && quantity && price) {cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
-renderCart();
-}
+        const quantity= document.getElementById(‘quantity’).value;
+const price = document.getElementById(‘priceExcel’).value;
+
+    if (selectedProduct && quantity && price) {
+        cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
+        renderCart();
+    }
 });
 
 // Agregar productos manualmente al carrito
@@ -277,8 +280,12 @@ document.querySelectorAll('.num-button').forEach(button => {
         const number = button.dataset.number;
         if (number !== undefined) {
             currentInput += number;
+            document.getElementById('priceExcel').value = currentInput;
+            document.getElementById('manualProductPrice').value = currentInput;
         } else if (button.id === 'clear') {
             currentInput = '';
+            document.getElementById('priceExcel').value = '';
+            document.getElementById('manualProductPrice').value = '';
         }
     });
 });
@@ -287,8 +294,12 @@ document.querySelectorAll('.num-button').forEach(button => {
 window.addEventListener('keydown', (event) => {
     if (event.key >= '0' && event.key <= '9') {
         currentInput += event.key;
+        document.getElementById('priceExcel').value = currentInput;
+        document.getElementById('manualProductPrice').value = currentInput;
     } else if (event.key === 'Backspace') {
         currentInput = currentInput.slice(0, -1);
+        document.getElementById('priceExcel').value = currentInput;
+        document.getElementById('manualProductPrice').value = currentInput;
     }
     // Aquí puedes agregar más teclas si es necesario
 });
@@ -306,7 +317,7 @@ document.getElementById('generateReceipt').addEventListener('click', () => {
         total += product.quantity * product.price;
     });
 
-    document.getElementById('receiptTotal').textContent = total;
+    document.getElementById('receiptTotal').textContent = total.toFixed(2);
     document.getElementById('receiptContent').style.display = 'block';
 
     // Resetear carrito después de generar la boleta
@@ -319,4 +330,3 @@ document.getElementById('generateReceipt').addEventListener('click', () => {
 
 </body>
 </html>
-           
