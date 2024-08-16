@@ -69,8 +69,19 @@
             margin-left: 10px;
             width: 80px;
         }
+        .receipt-content {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            width: 300px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .receipt-content h3 {
+            text-align: center;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -143,18 +154,48 @@
         const total = productPrice * quantity;
 
         receipt.innerHTML = `
-            <h3>Comprobante de Venta</h3>
-            <p>Producto: ${productName}</p>
-            <p>Cantidad: ${quantity}</p>
-            <p>Precio Unitario: $${productPrice.toFixed(2)}</p>
-            <p>Total: $${total.toFixed(2)}</p>
-            <p>Número de Referencia: ${Math.floor(Math.random() * 1000000)}</p>
+            <div class="receipt-content">
+                <h3>Comprobante de Venta</h3>
+                <p><strong>Producto:</strong> ${productName}</p>
+                <p><strong>Cantidad:</strong> ${quantity}</p>
+                <p><strong>Precio Unitario:</strong> $${productPrice.toFixed(2)}</p>
+                <p><strong>Total:</strong> $${total.toFixed(2)}</p>
+                <p><strong>Número de Referencia:</strong> ${Math.floor(Math.random() * 1000000)}</p>
+            </div>
         `;
     });
 
     // Función para imprimir el comprobante de venta
     printReceiptButton.addEventListener('click', () => {
-        window.print();
+        const printWindow = window.open('', '', 'width=400,height=600');
+        printWindow.document.open();
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Impresión de Comprobante</title>
+                    <style>
+                        .receipt-content {
+                            font-family: Arial, sans-serif;
+                            padding: 20px;
+                            width: 300px;
+                            margin: 0 auto;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            background-color: #fff;
+                        }
+                        .receipt-content h3 {
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${receipt.innerHTML}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
     });
 
     // Función para cargar productos desde un archivo Excel
