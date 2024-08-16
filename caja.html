@@ -144,6 +144,7 @@
     <label for="manualProduct">Agregar producto manualmente:</label>
     <input type="text" id="manualProductName" placeholder="Nombre del producto">
     <input type="number" id="manualProductQuantity" placeholder="Cantidad" min="1">
+    <input type="number" id="manualProductPrice" placeholder="Precio" step="0.01">
     <button id="addManualProduct">Agregar Producto Manual</button>
 
     <div id="numPad">
@@ -234,12 +235,13 @@
         updateProductSelect(filteredProducts);
     });
 
-    // Ejemplo de agregar productos desde el Excel a una lista o carrito de compra
+    // Agregar productos desde el Excel al carrito
     document.getElementById('addProductFromExcel').addEventListener('click', () => {
         const selectedProduct = document.getElementById('product').value;
         const quantity = document.getElementById('quantity').value;
+        const price = currentInput || 0;
         if (selectedProduct && quantity) {
-            cart.push({ name: selectedProduct, quantity: quantity, price: currentInput });
+            cart.push({ name: selectedProduct, quantity: quantity, price: parseFloat(price) });
             renderCart();
             currentInput = '';
         }
@@ -249,17 +251,17 @@
     document.getElementById('addManualProduct').addEventListener('click', () => {
         const manualProductName = document.getElementById('manualProductName').value;
         const manualProductQuantity = document.getElementById('manualProductQuantity').value;
-        if (manualProductName && manualProductQuantity) {
-            cart.push({ name: manualProductName, quantity: manualProductQuantity, price: currentInput });
-            renderCart();
-            currentInput = '';
-        }
-    });
+        const manualProductPrice = document.getElementById('manualProductPrice').value;
+        if (manualProductName && manualProductQuantity && manualProductPrice) {
+cart.push({ name: manualProductName, quantity: manualProductQuantity, price: parseFloat(manualProductPrice) });
+renderCart();
+}
+});
 
-    // Mostrar el carrito actualizado en la interfaz
-    function renderCart() {
-        const productList = document.getElementById('productList');
-        productList.innerHTML = ‘’; // Limpiar el contenido anterior
+// Mostrar productos en el carrito
+function renderCart() {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = ''; // Limpiar el contenido anterior
 
     cart.forEach((product, index) => {
         const productItem = document.createElement('p');
