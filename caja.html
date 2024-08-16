@@ -135,6 +135,9 @@
             <!-- Los productos serán cargados desde el archivo Excel -->
         </select>
 
+        <label for="priceExcel">Precio del producto:</label>
+        <input type="number" id="priceExcel" placeholder="Precio" step="0.01" min="0">
+
         <label for="quantity">Cantidad:</label>
         <input type="number" id="quantity" placeholder="Cantidad" min="1">
 
@@ -144,7 +147,7 @@
     <label for="manualProduct">Agregar producto manualmente:</label>
     <input type="text" id="manualProductName" placeholder="Nombre del producto">
     <input type="number" id="manualProductQuantity" placeholder="Cantidad" min="1">
-    <input type="number" id="manualProductPrice" placeholder="Precio" step="0.01">
+    <input type="number" id="manualProductPrice" placeholder="Precio" step="0.01" min="0">
     <button id="addManualProduct">Agregar Producto Manual</button>
 
     <div id="numPad">
@@ -239,23 +242,21 @@
     document.getElementById('addProductFromExcel').addEventListener('click', () => {
         const selectedProduct = document.getElementById('product').value;
         const quantity = document.getElementById('quantity').value;
-        const price = currentInput || 0;
-        if (selectedProduct && quantity) {
-            cart.push({ name: selectedProduct, quantity: quantity, price: parseFloat(price) });
-            renderCart();
-            currentInput = '';
-        }
-    });
-
-    // Agregar productos manualmente al carrito
-    document.getElementById('addManualProduct').addEventListener('click', () => {
-        const manualProductName = document.getElementById('manualProductName').value;
-        const manualProductQuantity = document.getElementById('manualProductQuantity').value;
-        const manualProductPrice = document.getElementById('manualProductPrice').value;
-        if (manualProductName && manualProductQuantity && manualProductPrice) {
-cart.push({ name: manualProductName, quantity: manualProductQuantity, price: parseFloat(manualProductPrice) });
+        const price = document.getElementById('priceExcel').value;
+        if (selectedProduct && quantity && price) {cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
 renderCart();
 }
+});
+
+// Agregar productos manualmente al carrito
+document.getElementById('addManualProduct').addEventListener('click', () => {
+    const manualProductName = document.getElementById('manualProductName').value;
+    const manualProductQuantity = document.getElementById('manualProductQuantity').value;
+    const manualProductPrice = document.getElementById('manualProductPrice').value;
+    if (manualProductName && manualProductQuantity && manualProductPrice) {
+        cart.push({ name: manualProductName, quantity: parseInt(manualProductQuantity), price: parseFloat(manualProductPrice) });
+        renderCart();
+    }
 });
 
 // Mostrar productos en el carrito
@@ -280,6 +281,16 @@ document.querySelectorAll('.num-button').forEach(button => {
             currentInput = '';
         }
     });
+});
+
+// Escuchar eventos del teclado físico
+window.addEventListener('keydown', (event) => {
+    if (event.key >= '0' && event.key <= '9') {
+        currentInput += event.key;
+    } else if (event.key === 'Backspace') {
+        currentInput = currentInput.slice(0, -1);
+    }
+    // Aquí puedes agregar más teclas si es necesario
 });
 
 // Generar boleta y mostrarla en pantalla
@@ -308,3 +319,4 @@ document.getElementById('generateReceipt').addEventListener('click', () => {
 
 </body>
 </html>
+           
