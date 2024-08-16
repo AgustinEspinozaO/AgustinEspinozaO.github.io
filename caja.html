@@ -106,6 +106,9 @@
         <input type="number" id="quantity" placeholder="Cantidad" min="1">
     </div>
 
+    <label for="manualProduct">Escribir producto manualmente:</label>
+    <input type="text" id="manualProduct" placeholder="Nombre del producto">
+
     <label for="price">Precio:</label>
     <input type="text" id="price" placeholder="Ingresa el precio" readonly>
 
@@ -136,6 +139,7 @@
 <script>
     const quantityInput = document.getElementById('quantity');
     const priceInput = document.getElementById('price');
+    const manualProductInput = document.getElementById('manualProduct');
     const numButtons = document.querySelectorAll('.num-button');
     const receipt = document.getElementById('receipt');
     const generateReceiptButton = document.getElementById('generateReceipt');
@@ -162,8 +166,7 @@
 
     // Función para generar el comprobante de venta
     generateReceiptButton.addEventListener('click', () => {
-        const selectedProduct = productSelect.value.split('|');
-        const productName = selectedProduct[0];
+        let selectedProduct = productSelect.value.split('|')[0] || manualProductInput.value;
         const productPrice = parseFloat(priceInput.value);
         const quantity = parseInt(quantityInput.value) || 1;
         const total = productPrice * quantity;
@@ -173,13 +176,13 @@
                 <div class="receipt-header">
                     <h4>Emporio Valdiviano</h4>
                     <p>Avenida San Martín 01745</p>
-                    <p>Valdivia, Chile</p>
+                    <p>Temuco, Chile</p>
                     <p>Tel: +56951589539</p>
                     <p>Email: contacto@emporiovaldivianoko.cl</p>
                     <p>www.emporiovaldivianoko.cl</p>
                 </div>
                 <h3>Comprobante de Venta</h3>
-                <p><strong>Producto:</strong> ${productName}</p>
+                <p><strong>Producto:</strong> ${selectedProduct}</p>
                 <p><strong>Cantidad:</strong> ${quantity}</p>
                 <p><strong>Precio Unitario:</strong> $${productPrice.toFixed(2)}</p>
                 <p><strong>Total:</strong> $${total.toFixed(2)}</p>
@@ -257,8 +260,7 @@
         reader.readAsArrayBuffer(file);
     });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js”>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </body>
 </html>
-```
