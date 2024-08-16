@@ -250,16 +250,16 @@
         const manualProductName = document.getElementById('manualProductName').value;
         const manualProductQuantity = document.getElementById('manualProductQuantity').value;
         if (manualProductName && manualProductQuantity) {
-            cart.push({ name: manualProductName, quantity: manualProductQuantity, price: currentInput});
-renderCart();
-currentInput = ‘’;
-}
-});
+            cart.push({ name: manualProductName, quantity: manualProductQuantity, price: currentInput });
+            renderCart();
+            currentInput = '';
+        }
+    });
 
-// Mostrar el carrito actualizado en la interfaz
-function renderCart() {
-    const productList = document.getElementById('productList');
-    productList.innerHTML = ''; // Limpiar el contenido anterior
+    // Mostrar el carrito actualizado en la interfaz
+    function renderCart() {
+        const productList = document.getElementById('productList');
+        productList.innerHTML = ‘’; // Limpiar el contenido anterior
 
     cart.forEach((product, index) => {
         const productItem = document.createElement('p');
