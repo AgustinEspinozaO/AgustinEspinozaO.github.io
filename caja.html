@@ -60,9 +60,6 @@
         #fileInput {
             margin-top: 10px;
         }
-        .product-container, .discount-container {
-            margin-bottom: 10px;
-        }
         .product-list {
             margin-top: 10px;
         }
@@ -128,11 +125,8 @@
 
     <label for="manualProduct">Agregar producto manualmente:</label>
     <input type="text" id="manualProductName" placeholder="Nombre del producto">
-    <input type="number" id="manualProductPrice" placeholder="Precio del producto" min="0">
     <input type="number" id="manualProductQuantity" placeholder="Cantidad" min="1">
-
-    <label for="price">Precio:</label>
-    <input type="text" id="price" placeholder="Ingresa el precio" readonly>
+    <input type="text" id="manualProductPriceDisplay" placeholder="Precio ingresado" readonly>
 
     <div id="numPad">
         <!-- Teclado numérico -->
@@ -143,10 +137,11 @@
         <button class="num-button">5</button>
         <button class="num-button">6</button>
         <button class="num-button">7</button>
-        <button class="num-button">8</button</button>
+        <button class="num-button">8</button>
         <button class="num-button">9</button>
         <button class="num-button">0</button>
         <button class="num-button" id="clear">C</button>
+        <button class="num-button" id="enter">Enter</button>
     </div>
 
     <div class="discount-container">
@@ -167,11 +162,9 @@
 </div>
 
 <script>
-    const quantityInput = document.getElementById('quantity');
-    const priceInput = document.getElementById('price');
     const manualProductNameInput = document.getElementById('manualProductName');
-    const manualProductPriceInput = document.getElementById('manualProductPrice');
     const manualProductQuantityInput = document.getElementById('manualProductQuantity');
+    const manualProductPriceDisplay = document.getElementById('manualProductPriceDisplay');
     const numButtons = document.querySelectorAll('.num-button');
     const receipt = document.getElementById('receipt');
     const generateReceiptButton = document.getElementById('generateReceipt');
@@ -181,6 +174,8 @@
     const productList = document.getElementById('productList');
     const discountInput = document.getElementById('discount');
     const addProductButton = document.getElementById('addProduct');
+    const enterButton = document.getElementById('enter');
+    const clearButton = document.getElementById('clear');
 
     let currentPrice = '';
     let products = [];
@@ -192,33 +187,22 @@
 
             if (buttonValue === 'C') {
                 currentPrice = '';
+                manualProductPriceDisplay.value = '';
+            } else if (buttonValue === 'Enter') {
+                addManualProduct();
+                currentPrice = '';
+                manualProductPriceDisplay.value = '';
             } else {
                 currentPrice += buttonValue;
+                manualProductPriceDisplay.value = currentPrice;
             }
-
-            priceInput.value = currentPrice;
         });
-    });
-
-    // Función para agregar un producto a la lista
-    addProductButton.addEventListener('click', () => {
-        const selectedProduct = productSelect.value.split('|')[0];
-        const productPrice = parseFloat(priceInput.value);
-        const quantity = parseInt(quantityInput.value) || 1;
-
-        if (selectedProduct && productPrice > 0 && quantity > 0) {
-            products.push({ name: selectedProduct, price: productPrice, quantity });
-            updateProductList();
-            clearInputs();
-        } else {
-            alert('Por favor, ingrese todos los datos correctamente.');
-        }
     });
 
     // Función para agregar un producto manual a la lista
     function addManualProduct() {
         const productName = manualProductNameInput.value;
-        const productPrice = parseFloat(manualProductPriceInput.value);
+        const productPrice = parseFloat(manualProductPriceDisplay.value);
         const quantity = parseInt(manualProductQuantityInput.value) || 1;
 
         if (productName && productPrice > 0 && quantity > 0) {
@@ -232,7 +216,6 @@
 
     function clearManualInputs() {
         manualProductNameInput.value = '';
-        manualProductPriceInput.value = '';
         manualProductQuantityInput.value = '';
     }
 
@@ -255,35 +238,25 @@
         updateProductList();
     }
 
-    // Función para limpiar los campos de entrada
-    function clearInputs() {
-        manualProductNameInput.value = '';
-        manualProductPriceInput.value = '';
-        manualProductQuantityInput.value = '';
-        priceInput.value = '';
-        quantityInput.value = '';
-        currentPrice = '';
-    }
+    // Función para generar el comprobante de venta
+    generateReceiptButton.addEventListener('click', () => {
+        const discount = parseFloat(discountInput.value) || 0;
+        let total = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+        const discountAmount = (total * discount) / 100;
+        total -= discountAmount;
 
-    // Función para generarel comprobante de venta
-generateReceiptButton.addEventListener(‘click’, () => {
-const discount = parseFloat(discountInput.value) || 0;
-let total = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
-const discountAmount = (total * discount) / 100;
-total -= discountAmount;
+        let receiptContent = `
+            <div class="receipt-header">
+                <h3>Emporio Temuco
+Avenida San Martín 01745
+Tel: +56951589539
+Email: contacto@emporiovaldivianoko.cl
+www.emporiovaldivianoko.cl
 
-    let receiptContent = `
-        <div class="receipt-header">
-            <h3>Emporio Temuco</h3>
-            <p>Avenida San Martín 01745</p>
-            <p>Tel: +56951589539</p>
-            <p>Email: contacto@emporiovaldivianoko.cl</p>
-            <p>www.emporiovaldivianoko.cl</p>
-        </div>
-        <div class="receipt-content">
-            <h3>Comprobante de Venta</h3>
-            <ul>
-    `;
+
+Comprobante de Venta
+
+`;
 
     products.forEach(product => {
         receiptContent += `
@@ -350,6 +323,8 @@ printReceiptButton.addEventListener('click', () => {
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();
+    products = [];  // Limpiar la lista de productos después de imprimir
+    updateProductList();
 });
 
 // Función para cargar productos desde un archivo Excel
@@ -362,10 +337,10 @@ fileInput.addEventListener('change', (event) => {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const products = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const productsData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
         productSelect.innerHTML = '';
 
-        products.forEach((row, index) => {
+        productsData.forEach((row, index) => {
             if (index === 0) return; // Skip header row
             const [name, price] = row;
             if (name && price) {
@@ -379,18 +354,9 @@ fileInput.addEventListener('change', (event) => {
     reader.readAsArrayBuffer(file);
 });
 
-// Agregar producto manualmente al hacer Enter en el campo de precio
-manualProductPriceInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        addManualProduct();
-    }
-});
-
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 
 </body>
 </html>
-```
