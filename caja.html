@@ -60,6 +60,15 @@
         #fileInput {
             margin-top: 10px;
         }
+        .product-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .product-container input {
+            margin-left: 10px;
+            width: 80px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
 </head>
@@ -68,13 +77,16 @@
 <div class="container">
     <h2>Programa de Caja</h2>
 
-    <label for="product">Selecciona un producto:</label>
-    <select id="product">
-        <!-- Los productos serán cargados desde el archivo Excel -->
-    </select>
+    <div class="product-container">
+        <label for="product">Selecciona un producto:</label>
+        <select id="product">
+            <!-- Los productos serán cargados desde el archivo Excel -->
+        </select>
+        <input type="number" id="quantity" placeholder="Cantidad" min="1">
+    </div>
 
-    <label for="quantity">Cantidad:</label>
-    <input type="text" id="quantity" placeholder="Ingresa la cantidad" readonly>
+    <label for="price">Precio:</label>
+    <input type="text" id="price" placeholder="Ingresa el precio" readonly>
 
     <div id="numPad">
         <!-- Teclado numérico -->
@@ -102,6 +114,7 @@
 
 <script>
     const quantityInput = document.getElementById('quantity');
+    const priceInput = document.getElementById('price');
     const numButtons = document.querySelectorAll('.num-button');
     const receipt = document.getElementById('receipt');
     const generateReceiptButton = document.getElementById('generateReceipt');
@@ -113,9 +126,10 @@
     numButtons.forEach(button => {
         button.addEventListener('click', () => {
             if (button.textContent === 'C') {
+                priceInput.value = '';
                 quantityInput.value = '';
             } else {
-                quantityInput.value += button.textContent;
+                priceInput.value += button.textContent;
             }
         });
     });
@@ -124,7 +138,7 @@
     generateReceiptButton.addEventListener('click', () => {
         const selectedProduct = productSelect.value.split('|');
         const productName = selectedProduct[0];
-        const productPrice = parseFloat(selectedProduct[1]);
+        const productPrice = parseFloat(priceInput.value);
         const quantity = parseInt(quantityInput.value) || 1;
         const total = productPrice * quantity;
 
