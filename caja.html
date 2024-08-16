@@ -81,6 +81,16 @@
         .receipt-content h3 {
             text-align: center;
         }
+        .receipt-content p {
+            margin: 5px 0;
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .receipt-header h4 {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +165,14 @@
 
         receipt.innerHTML = `
             <div class="receipt-content">
+                <div class="receipt-header">
+                    <h4>Emporio Valdiviano</h4>
+                    <p>Avenida San Martín 01745</p>
+                    <p>Valdivia, Chile</p>
+                    <p>Tel: +56951589539</p>
+                    <p>Email: contacto@emporiovaldivianoko.cl</p>
+                    <p>www.emporiovaldivianoko.cl</p>
+                </div>
                 <h3>Comprobante de Venta</h3>
                 <p><strong>Producto:</strong> ${productName}</p>
                 <p><strong>Cantidad:</strong> ${quantity}</p>
@@ -165,7 +183,7 @@
         `;
     });
 
-    // Función para imprimir el comprobante de venta
+    // Función para imprimir el comprobante de venta en formato 80mm
     printReceiptButton.addEventListener('click', () => {
         const printWindow = window.open('', '', 'width=400,height=600');
         printWindow.document.open();
@@ -174,17 +192,26 @@
                 <head>
                     <title>Impresión de Comprobante</title>
                     <style>
-                        .receipt-content {
+                        body {
                             font-family: Arial, sans-serif;
-                            padding: 20px;
-                            width: 300px;
-                            margin: 0 auto;
-                            border: 1px solid #ccc;
-                            border-radius: 5px;
-                            background-color: #fff;
+                            width: 80mm;
+                            margin: 0;
+                            padding: 0;
                         }
-                        .receipt-content h3 {
+                        .receipt-content {
+                            padding: 10px;
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+                        .receipt-header {
                             text-align: center;
+                            margin-bottom: 10px;
+                        }
+                        h3 {
+                            text-align: center;
+                        }
+                        p {
+                            margin: 5px 0;
                         }
                     </style>
                 </head>
@@ -217,14 +244,18 @@
                 if (name && price) {
                     const option = document.createElement('option');
                     option.value = `${name}|${price}`;
-                    option.textContent = `${name} - $${price}`;
-                    productSelect.appendChild(option);
-                }
-            });
-        };
-        reader.readAsArrayBuffer(file);
-    });
-</script>
+                    option.text Content = name;
+productSelect.appendChild(option);
+}
+});
+};
+reader.readAsArrayBuffer(file);
+});
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 
 </body>
 </html>
+```
