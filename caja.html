@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programa de Caja</title>
+    <title>Programa de Caja con Búsqueda</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -197,22 +197,25 @@
 
         const reader = new FileReader();
         reader.onload = (e) => {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const productsData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-            productsFromExcel = [];
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const productsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                
+                productsFromExcel = [];
+                productsData.forEach((row, index) => {
+                    if (index === 0 || !row[1] || !row[2]) return; // Saltar la fila de encabezado o filas sin datos
+                    const name = row[1]; // Segunda columna para nombre del producto
+                    const price = row[2]; // Tercera columna para el precio del producto
+                    productsFromExcel.push({ name, price: parseFloat(price) });
+                });
 
-            productsData.forEach((row, index) => {
-                if (index === 0) return; // Saltar la fila de encabezado
-                const name = row[1]; // Segunda columna para nombre del producto
-                const price = row[2]; // Tercera columna para el precio del producto
-                if (name && price) {
-                    productsFromExcel.push({ name, price });
-                }
-            });
-
-            updateProductSelect(productsFromExcel);
+                updateProductSelect(productsFromExcel);
+            } catch (error) {
+                console.error('Error al leer el archivo Excel:', error);
+                alert('Error al leer el archivo Excel. Verifica el formato del archivo.');
+            }
         };
         reader.readAsArrayBuffer(file);
     });
@@ -225,7 +228,7 @@
         productList.forEach(product => {
             const option = document.createElement('option');
             option.value = product.name;
-            option.textContent = `${product.name} - Precio: $${product.price}`;
+            option.textContent = `${product.name} - Precio: $${product.price.toFixed(2)}`;
             productSelect.appendChild(option);
         });
     }
@@ -237,29 +240,37 @@
             product.name.toLowerCase().includes(searchQuery)
         );
         updateProductSelect(filteredProducts);
-    });
+});
 
-    // Agregar productos desde el Excel al carrito
-    document.getElementById('addProductFromExcel').addEventListener('click', () => {
-        const selectedProduct = document.getElementById('product').value;
-        const quantity = document.getElementById('quantity').value;
-        const price = document.getElementById('priceExcel').value;
+// Cargar el precio del producto seleccionado
+document.getElementById('product').addEventListener('change', (event) => {
+    const selectedProduct = productsFromExcel.find(product => product.name === event.target.value);
+    if (selectedProduct) {
+        document.getElementById('priceExcel').value = selectedProduct.price.toFixed(2);
+    }
+});
 
-        if (selectedProduct && quantity && price) {
-            cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
-            renderCart();
-        }
-    });
+// Agregar productos del Excel al carrito
+document.getElementById('addProductFromExcel').addEventListener('click', () => {
+    const selectedProductName = document.getElementById('product').value;
+    const quantity = document.getElementById('quantity').value;
+    const price = parseFloat(document.getElementById('priceExcel').value);
 
-    // Agregar productos manualmente al carrito
-document.getElementById(‘addManualProduct’).addEventListener(‘click’, () => {
-const manualProductName = document.getElementById(‘manualProductName’).value;
-const manualProductQuantity = document.getElementById(‘manualProductQuantity’).value;
-const manualProductPrice = document.getElementById(‘manualProductPrice’).value;
-if (manualProductName && manualProductQuantity && manualProductPrice) {
-cart.push({ name: manualProductName, quantity: parseInt(manualProductQuantity), price: parseFloat(manualProductPrice) });
-renderCart();
-}
+    if (selectedProductName && quantity && price) {
+        cart.push({ name: selectedProductName, quantity: parseInt(quantity), price: price });
+        renderCart();
+    }
+});
+
+// Agregar productos manualmente al carrito
+document.getElementById('addManualProduct').addEventListener('click', () => {
+    const manualProductName = document.getElementById('manualProductName').value;
+    const manualProductQuantity = document.getElementById('manualProductQuantity').value;
+    const manualProductPrice = document.getElementById('manualProductPrice').value;
+    if (manualProductName && manualProductQuantity && manualProductPrice) {
+        cart.push({ name: manualProductName, quantity: parseInt(manualProductQuantity), price: parseFloat(manualProductPrice) });
+        renderCart();
+    }
 });
 
 // Mostrar productos en el carrito
@@ -269,7 +280,7 @@ function renderCart() {
 
     cart.forEach((product, index) => {
         const productItem = document.createElement('p');
-        productItem.textContent = `${product.name} - Cantidad: ${product.quantity} - Precio: $${product.price}`;
+        productItem.textContent = `${product.name} - Cantidad: ${product.quantity} - Precio: $${product.price.toFixed(2)}`;
         productList.appendChild(productItem);
     });
 }
@@ -311,7 +322,7 @@ document.getElementById('generateReceipt').addEventListener('click', () => {
     let total = 0;
     cart.forEach(product => {
         const listItem = document.createElement('li');
-        listItem.textContent = `${product.name} - Cantidad: ${product.quantity} - Precio: $${product.price}`;
+        listItem.textContent = `${product.name} - Cantidad: ${product.quantity} - Precio: $${product.price.toFixed(2)}`;
         receiptItems.appendChild(listItem);
         total += product.quantity * product.price;
     });
