@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programa de Caja</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+        }
+        select, input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        #numPad {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .num-button {
+            width: 30%;
+            padding: 15px;
+            font-size: 20px;
+            margin: 5px 0;
+            text-align: center;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .num-button:hover {
+            background-color: #0056b3;
+        }
+        .receipt {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+        }
+        #fileInput {
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h2>Programa de Caja</h2>
+
+    <label for="product">Selecciona un producto:</label>
+    <select id="product">
+        <!-- Los productos serán cargados desde el archivo Excel -->
+    </select>
+
+    <label for="quantity">Cantidad:</label>
+    <input type="text" id="quantity" placeholder="Ingresa la cantidad" readonly>
+
+    <div id="numPad">
+        <!-- Teclado numérico -->
+        <button class="num-button">1</button>
+        <button class="num-button">2</button>
+        <button class="num-button">3</button>
+        <button class="num-button">4</button>
+        <button class="num-button">5</button>
+        <button class="num-button">6</button>
+        <button class="num-button">7</button>
+        <button class="num-button">8</button>
+        <button class="num-button">9</button>
+        <button class="num-button">0</button>
+        <button class="num-button" id="clear">C</button>
+    </div>
+
+    <button id="generateReceipt">Generar Comprobante</button>
+    <button id="printReceipt">Imprimir Comprobante</button>
+
+    <input type="file" id="fileInput" accept=".xlsx">
+    <div class="receipt" id="receipt">
+        <!-- Aquí se mostrará el comprobante -->
+    </div>
+</div>
+
+<script>
+    const quantityInput = document.getElementById('quantity');
+    const numButtons = document.querySelectorAll('.num-button');
+    const receipt = document.getElementById('receipt');
+    const generateReceiptButton = document.getElementById('generateReceipt');
+    const printReceiptButton = document.getElementById('printReceipt');
+    const productSelect = document.getElementById('product');
+    const fileInput = document.getElementById('fileInput');
+
+    // Función para manejar el teclado numérico
+    numButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.textContent === 'C') {
+                quantityInput.value = '';
+            } else {
+                quantityInput.value += button.textContent;
+            }
+        });
+    });
+
+    // Función para generar el comprobante de venta
+    generateReceiptButton.addEventListener('click', () => {
+        const selectedProduct = productSelect.value.split('|');
+        const productName = selectedProduct[0];
+        const productPrice = parseFloat(selectedProduct[1]);
+        const quantity = parseInt(quantityInput.value) || 1;
+        const total = productPrice * quantity;
+
+        receipt.innerHTML = `
+            <h3>Comprobante de Venta</h3>
+            <p>Producto: ${productName}</p>
+            <p>Cantidad: ${quantity}</p>
+            <p>Precio Unitario: $${productPrice.toFixed(2)}</p>
+            <p>Total: $${total.toFixed(2)}</p>
+            <p>Número de Referencia: ${Math.floor(Math.random() * 1000000)}</p>
+        `;
+    });
+
+    // Función para imprimir el comprobante de venta
+    printReceiptButton.addEventListener('click', () => {
+        window.print();
+    });
+
+    // Función para cargar productos desde un archivo Excel
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const products = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            productSelect.innerHTML = '';
+
+            products.forEach((row, index) => {
+                if (index === 0) return; // Skip header row
+                const [name, price] = row;
+                if (name && price) {
+                    const option = document.createElement('option');
+                    option.value = `${name}|${price}`;
+                    option.textContent = `${name} - $${price}`;
+                    productSelect.appendChild(option);
+                }
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    });
+</script>
+
+</body>
+</html>
