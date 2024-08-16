@@ -242,24 +242,24 @@
     // Agregar productos desde el Excel al carrito
     document.getElementById('addProductFromExcel').addEventListener('click', () => {
         const selectedProduct = document.getElementById('product').value;
-        const quantity= document.getElementById(‘quantity’).value;
-const price = document.getElementById(‘priceExcel’).value;
+        const quantity = document.getElementById('quantity').value;
+        const price = document.getElementById('priceExcel').value;
 
-    if (selectedProduct && quantity && price) {
-        cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
-        renderCart();
-    }
-});
+        if (selectedProduct && quantity && price) {
+            cart.push({ name: selectedProduct, quantity: parseInt(quantity), price: parseFloat(price) });
+            renderCart();
+        }
+    });
 
-// Agregar productos manualmente al carrito
-document.getElementById('addManualProduct').addEventListener('click', () => {
-    const manualProductName = document.getElementById('manualProductName').value;
-    const manualProductQuantity = document.getElementById('manualProductQuantity').value;
-    const manualProductPrice = document.getElementById('manualProductPrice').value;
-    if (manualProductName && manualProductQuantity && manualProductPrice) {
-        cart.push({ name: manualProductName, quantity: parseInt(manualProductQuantity), price: parseFloat(manualProductPrice) });
-        renderCart();
-    }
+    // Agregar productos manualmente al carrito
+document.getElementById(‘addManualProduct’).addEventListener(‘click’, () => {
+const manualProductName = document.getElementById(‘manualProductName’).value;
+const manualProductQuantity = document.getElementById(‘manualProductQuantity’).value;
+const manualProductPrice = document.getElementById(‘manualProductPrice’).value;
+if (manualProductName && manualProductQuantity && manualProductPrice) {
+cart.push({ name: manualProductName, quantity: parseInt(manualProductQuantity), price: parseFloat(manualProductPrice) });
+renderCart();
+}
 });
 
 // Mostrar productos en el carrito
@@ -301,7 +301,6 @@ window.addEventListener('keydown', (event) => {
         document.getElementById('priceExcel').value = currentInput;
         document.getElementById('manualProductPrice').value = currentInput;
     }
-    // Aquí puedes agregar más teclas si es necesario
 });
 
 // Generar boleta y mostrarla en pantalla
