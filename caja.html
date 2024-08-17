@@ -3,389 +3,352 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programa de Caja con Búsqueda</title>
+    <title>Programa de Caja</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            background-color: #e9ecef;
-            margin: 0;
         }
-
+        h1 {
+            color: #333;
+        }
         .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-width: 800px;
             width: 100%;
         }
-
-        h2 {
+        .section {
+            margin-bottom: 20px;
+        }
+        #productList {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        #receiptContent {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        #receiptContent h3 {
+            margin-top: 0;
+        }
+        .num-button {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            background-color: #eee;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             text-align: center;
-            color: #343a40;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #495057;
-        }
-
-        select, input, button {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ced4da;
-        }
-
-        select {
-            background-color: #ffffff;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
+            line-height: 40px;
             cursor: pointer;
             font-size: 18px;
         }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
         #numPad {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            width: 200px;
             margin-top: 20px;
         }
-
-        .num-button {
-            padding: 20px;
-            font-size: 24px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        #numPad .num-button {
+            flex: 1 0 33%;
         }
-
-        .num-button:hover {
-            background-color: #0056b3;
+        #numPad #clear, #numPad #enter {
+            flex: 1 0 100%;
         }
-
-        .product-list {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        #productSelect, #manualProductName, #manualProductQuantity, #manualProductPrice, #priceExcel, #quantity {
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
         }
-
-        .receipt-content {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-            font-size: 16px;
+        #manualProductPrice, #priceExcel {
+            text-align: right;
         }
-
-        .receipt-content h3 {
-            text-align: center;
-        }
-
-        .receipt-content p {
-            margin: 5px 0;
-        }
-
-        .receipt-content ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .receipt-content ul li {
-            margin: 5px 0;
+        #printReceipt {
+            display: none;
         }
     </style>
 </head>
 <body>
 
+<h1>Programa de Caja</h1>
 <div class="container">
-    <h2>Programa de Caja con Búsqueda</h2>
 
-    <!-- Campo de carga del archivo Excel -->
-    <label for="fileInput">Cargar archivo Excel:</label>
-    <input type="file" id="fileInput" accept=".xlsx, .xls">
-
-    <div class="product-container">
-        <label for="searchProduct">Buscar producto por nombre:</label>
-        <input type="text" id="searchProduct" placeholder="Escriba el nombre del producto...">
-
-        <label for="product">Selecciona un producto del Excel:</label>
-        <select id="product">
-            <!-- Los productos serán cargados desde el archivo Excel -->
-        </select>
-
-        <label for="priceExcel">Precio del producto:</label>
-        <input type="number" id="priceExcel" placeholder="Precio" step="0.01" min="0">
-
-        <label for="quantity">Cantidad:</label>
-        <input type="number" id="quantity" placeholder="Cantidad" min="1">
-
-        <button id="addProductFromExcel">Agregar Producto del Excel</button>
+    <!-- Sección de carga y selección de productos -->
+    <div class="section">
+        <h2>Cargar Productos desde Excel</h2>
+        <input type="file" id="fileInput" />
+        <input type="text" id="productFilter" placeholder="Buscar producto..." />
+        <select id="product" size="5"></select>
+        <input type="text" id="priceExcel" placeholder="Precio" />
+        <input type="number" id="quantity" placeholder="Cantidad" />
+        <button id="addProductFromExcel">Agregar Producto desde Excel</button>
     </div>
 
-    <label for="manualProduct">Agregar producto manualmente:</label>
-    <input type="text" id="manualProductName" placeholder="Nombre del producto">
-    <input type="number" id="manualProductQuantity" placeholder="Cantidad" min="1">
-    <input type="number" id="manualProductPrice" placeholder="Precio" step="0.01" min="0">
-    <button id="addManualProduct">Agregar Producto Manual</button>
-
-    <div id="numPad">
-        <button class="num-button" data-number="1">1</button>
-        <button class="num-button" data-number="2">2</button>
-        <button class="num-button" data-number="3">3</button>
-        <button class="num-button" data-number="4">4</button>
-        <button class="num-button" data-number="5">5</button>
-        <button class="num-button" data-number="6">6</button>
-        <button class="num-button" data-number="7">7</button>
-        <button class="num-button" data-number="8">8</button>
-        <button class="num-button" data-number="9">9</button>
-        <button class="num-button" data-number="0">0</button>
-        <button class="num-button" id="clear">C</button>
-        <button class="num-button" id="enter">Enter</button>
+    <!-- Sección de productos manuales -->
+    <div class="section">
+        <h2>Agregar Producto Manual</h2>
+        <input type="text" id="manualProductName" placeholder="Nombre del Producto" />
+        <input type="number" id="manualProductQuantity" placeholder="Cantidad" />
+        <input type="text" id="manualProductPrice" placeholder="Precio" />
+        <button id="addManualProduct">Agregar Producto Manual</button>
     </div>
 
-    <div class="product-list" id="productList">
-        <!-- Aquí se agregarán los productos seleccionados -->
+    <!-- Sección del teclado numérico -->
+    <div class="section">
+        <h2>Teclado Numérico</h2>
+        <div id="numPad">
+            <div class="num-button" data-number="1">1</div>
+            <div class="num-button" data-number="2">2</div>
+            <div class="num-button" data-number="3">3</div>
+            <div class="num-button" data-number="4">4</div>
+            <div class="num-button" data-number="5">5</div>
+            <div class="num-button" data-number="6">6</div>
+            <div class="num-button" data-number="7">7</div>
+            <div class="num-button" data-number="8">8</div>
+            <div class="num-button" data-number="9">9</div>
+            <div class="num-button" data-number="0">0</div>
+            <div class="num-button" id="clear">C</div>
+            <div class="num-button" id="enter">Enter</div>
+        </div>
     </div>
 
-    <button id="generateReceipt">Generar Boleta</button>
-    <button id="printReceipt" style="display:none;">Imprimir Boleta</button>
+    <!-- Sección de la lista de productos -->
+    <div class="section">
+        <h2>Lista de Productos</h2>
+        <div id="productList"></div>
+        <h3>Total: $<span id="receiptTotal">0.00</span></h3>
+    </div>
 
-    <div class="receipt-content" id="receiptContent" style="display:none;">
-        <h3>Boleta - Emporio Valdiviano</h3>
-        <p>Teléfono: +56951589539</p>
-        <p>Dirección: Avenida San Martín 01745, Temuco</p>
+    <!-- Botones para generar e imprimir boleta -->
+    <div class="section">
+        <button id="generateReceipt">Generar Boleta</button>
+        <button id="printReceipt">Imprimir Boleta</button>
+    </div>
+
+    <!-- Contenido de la boleta -->
+    <div id="receiptContent">
+        <h3>Emporio Temuco</h3>
+        <p>Avenida San Martín 01745, Temuco</p>
+        <p>Tel: +56951589539</p>
         <p>Email: contacto@emporiovaldivianoko.cl</p>
-        <p>Sitio web: emporiovaldivianoko.cl</p>
-        <hr>
-        <ul id="receiptItems">
-            <!-- Aquí se agregarán los ítems de la boleta -->
-        </ul>
-        <p>Total: $<span id="receiptTotal">0</span></p>
+        <p>Web: emporiovaldivianoko.cl</p>
+        <h4>Productos:</h4>
+        <ul id="receiptItems"></ul>
+        <h3>Total: $<span id="receiptTotalReceipt">0.00</span></h3>
+        <p>&copy; 2024 Emporio Temuco</p>
     </div>
+
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
     let productsFromExcel = [];
     let cart = [];
     let currentInput = '';
 
-    // Función para cargar productos desde un archivo Excel
+    // Leer el archivo Excel
     document.getElementById('fileInput').addEventListener('change', (event) => {
         const file = event.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const productsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = workbook.Sheets[sheetName];
+                const range = XLSX.utils.decode_range(sheet['!ref']);
                 productsFromExcel = [];
-                productsData.forEach((row, index) => {
-                    if (index === 0 || !row[1] || !row[2]) return; // Saltar la fila de encabezado o filas sin datos
-                    const name = row[1]; // Segunda columna para nombre del producto
-                    const price = row[2]; // Tercera columna para el precio del producto
-                    if (name && !isNaN(price)) {
-                        productsFromExcel.push({ name, price: parseFloat(price) });
+                for (let row = 1; row <= range.e.r; row++) { // Empezar en 1 para omitir la fila de encabezado
+                    const cell = sheet[XLSX.utils.encode_cell({ r: row, c: 1 })]; // Segunda columna
+                    if (cell) {
+                        productsFromExcel.push({ name: cell.v });
                     }
-                });
-
+                }
                 updateProductSelect(productsFromExcel);
-            } catch (error) {
-                console.error('Error al leer el archivo Excel:', error);
-                alert('Error al leer el archivo Excel. Verifica el formato del archivo.');
-            }
-        };
-        reader.readAsArrayBuffer(file);
+            };
+            reader.readAsBinaryString(file);
+        }
     });
 
-    // Función para actualizar el menú de selección de productos
-    function updateProductSelect(productList) {
+    // Actualizar opciones de productos
+    function updateProductSelect(products) {
         const productSelect = document.getElementById('product');
-        productSelect.innerHTML = ''; // Limpiar opciones anteriores
-
-        productList.forEach(product => {
+        productSelect.innerHTML = '';
+        products.forEach(product => {
             const option = document.createElement('option');
             option.value = product.name;
-            option.textContent = `${product.name} - Precio: $${product.price.toFixed(2)}`;
+            option.textContent = product.name;
             productSelect.appendChild(option);
         });
     }
 
-    // Filtrar productos mientras se escribe en la barra de búsqueda
-    document.getElementById('searchProduct').addEventListener('input',(event) => {
-const searchQuery = event.target.value.toLowerCase();
-const filteredProducts = productsFromExcel.filter(product =>
-product.name.toLowerCase().includes(searchQuery)
-);
-updateProductSelect(filteredProducts);
-});
-
-// Agregar producto del Excel a la lista
-document.getElementById('addProductFromExcel').addEventListener('click', () => {
-    const selectedProduct = document.getElementById('product').value;
-    const price = parseFloat(document.getElementById('priceExcel').value);
-    const quantity = parseInt(document.getElementById('quantity').value, 10);
-
-    if (!selectedProduct || isNaN(price) || isNaN(quantity) || quantity <= 0) {
-        alert('Por favor, complete todos los campos.');
-        return;
-    }
-
-    const product = productsFromExcel.find(p => p.name === selectedProduct);
-    if (product) {
-        cart.push({ name: product.name, price: price, quantity: quantity });
-        updateCart();
-    }
-
-    document.getElementById('priceExcel').value = '';
-    document.getElementById('quantity').value = '';
-});
-
-// Agregar producto manual a la lista
-document.getElementById('addManualProduct').addEventListener('click', () => {
-    const name = document.getElementById('manualProductName').value;
-    const quantity = parseInt(document.getElementById('manualProductQuantity').value, 10);
-    const price = parseFloat(document.getElementById('manualProductPrice').value);
-
-    if (!name || isNaN(quantity) || isNaN(price) || quantity <= 0) {
-        alert('Por favor, complete todos los campos.');
-        return;
-    }
-
-    cart.push({ name, price, quantity });
-    updateCart();
-
-    document.getElementById('manualProductName').value = '';
-    document.getElementById('manualProductQuantity').value = '';
-    document.getElementById('manualProductPrice').value = '';
-});
-
-// Actualizar la lista de productos en el carrito
-function updateCart() {
-    const productList = document.getElementById('productList');
-    productList.innerHTML = ''; // Limpiar lista anterior
-
-    let total = 0;
-
-    cart.forEach(item => {
-        const listItem = document.createElement('div');
-        listItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)} - Subtotal: $${(item.quantity * item.price).toFixed(2)}`;
-        productList.appendChild(listItem);
-        total += item.quantity * item.price;
+    // Filtrar productos por palabra clave
+    document.getElementById('productFilter').addEventListener('input', (event) => {
+        const searchQuery = event.target.value.toLowerCase();
+        const filteredProducts = productsFromExcel.filter(product => 
+            product.name.toLowerCase().includes(searchQuery)
+        );
+        updateProductSelect(filteredProducts);
     });
 
-    document.getElementById('receiptTotal').textContent = total.toFixed(2);
-}
-
-// Manejar eventos del teclado numérico
-document.querySelectorAll('.num-button').forEach(button => {
-    button.addEventListener('click', (event) => {
-        const number = event.target.getAttribute('data-number');
-        if (number) {
-            currentInput += number;
-            document.getElementById('priceExcel').value = currentInput;
-            document.getElementById('manualProductPrice').value = currentInput;
-        }
-    });
-});
-
-// Manejar el botón de borrar en el teclado numérico
-document.getElementById('clear').addEventListener('click', () => {
-    currentInput = '';
-    document.getElementById('priceExcel').value = '';
-    document.getElementById('manualProductPrice').value = '';
-});
-
-// Manejar el botón de enter en el teclado numérico
-document.getElementById('enter').addEventListener('click', () => {
-    const price = parseFloat(document.getElementById('priceExcel').value);
-    const manualName = document.getElementById('manualProductName').value;
-    const manualQuantity = parseInt(document.getElementById('manualProductQuantity').value, 10);
-    const manualPrice = parseFloat(document.getElementById('manualProductPrice').value);
-
-    if (manualName && !isNaN(manualQuantity) && !isNaN(manualPrice) && manualQuantity > 0) {
-        cart.push({ name: manualName, price: manualPrice, quantity: manualQuantity });
-        updateCart();
-        document.getElementById('manualProductName').value = '';
-        document.getElementById('manualProductQuantity').value = '';
-        document.getElementById('manualProductPrice').value = '';
-    } else if (!manualName && !isNaN(price)) {
+    // Agregar producto del Excel a la lista
+    document.getElementById('addProductFromExcel').addEventListener('click', () => {
         const selectedProduct = document.getElementById('product').value;
+        const price = parseFloat(document.getElementById('priceExcel').value);
         const quantity = parseInt(document.getElementById('quantity').value, 10);
 
-        if (selectedProduct && !isNaN(quantity) && quantity > 0) {
-            const product = productsFromExcel.find(p => p.name === selectedProduct);
-            if (product) {
-                cart.push({ name: product.name, price: price, quantity: quantity });
-                updateCart();
-            }
-
-            document.getElementById('priceExcel').value = '';
-            document.getElementById('quantity').value = '';
-        } else {
+        if (!selectedProduct || isNaN(price) || isNaN(quantity) || quantity <= 0) {
             alert('Por favor, complete todos los campos.');
+            return;
         }
-    }
-    currentInput = '';
-});
 
-// Generar boleta
-document.getElementById('generateReceipt').addEventListener('click', () => {
-    const receiptContent = document.getElementById('receiptContent');
-    const receiptItems = document.getElementById('receiptItems');
+        const product = productsFromExcel.find(p => p.name === selectedProduct);
+        if (product) {
+            cart.push({ name: product.name, price: price, quantity: quantity });
+            updateCart();
+        }
 
-    receiptItems.innerHTML = '';
-    cart.forEach(item => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)} - Subtotal: $${(item.quantity * item.price).toFixed(2)}`;
-        receiptItems.appendChild(listItem);
+        document.getElementById('priceExcel').value = '';
+        document.getElementById('quantity').value = '';
     });
 
-    receiptContent.style.display = 'block';
-    document.getElementById('printReceipt').style.display = 'inline-block';
-});
+    // Agregar producto manual a la lista
+    document.getElementById('addManualProduct').addEventListener('click', () => {
+        const name = document.getElementById('manualProductName').value;
+        const quantity = parseInt(document.getElementById('manualProductQuantity').value, 10);
+        const price = parseFloat(document.getElementById('manualProductPrice').value);
 
-// Imprimir boleta
-document.getElementById('printReceipt').addEventListener('click', () => {
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write('<html><head><title>Boleta</title>');
-    printWindow.document.write('<style>body{font-family: Arial, sans-serif; font-size: 16px;} h3{text-align: center;} ul{list-style-type: none; padding: 0;} ul li{margin: 5px 0;}</style>');
-    printWindow.document.write('</head><body >');
-    printWindow.document.write(document.getElementById('receiptContent').innerHTML);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-});
+        if (!name || isNaN(quantity) || isNaN(price) || quantity <= 0) {
+            alert('Por favor, complete todos los campos.');
+            return;
+        }
 
+        cart.push({ name, price, quantity });
+        updateCart();
+
+        document.getElementById('manualProductName').value = '';
+        document
+
+.getElementById('manualProductQuantity').value = '';
+        document.getElementById('manualProductPrice').value = '';
+    });
+
+    // Actualizar la lista de productos en el carrito
+    function updateCart() {
+        const productList = document.getElementById('productList');
+        const receiptItems = document.getElementById('receiptItems');
+        let total = 0;
+
+        productList.innerHTML = '';
+        receiptItems.innerHTML = '';
+
+        cart.forEach(item => {
+            const listItem = document.createElement('div');
+            listItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)}`;
+            productList.appendChild(listItem);
+
+            const receiptItem = document.createElement('li');
+            receiptItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)} - Total: $${(item.price * item.quantity).toFixed(2)}`;
+            receiptItems.appendChild(receiptItem);
+
+            total += item.price * item.quantity;
+        });
+
+        document.getElementById('receiptTotal').textContent = total.toFixed(2);
+        document.getElementById('receiptTotalReceipt').textContent = total.toFixed(2);
+    }
+
+    // Generar boleta
+    document.getElementById('generateReceipt').addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert('No hay productos en la lista.');
+            return;
+        }
+
+        document.getElementById('receiptContent').style.display = 'block';
+        document.getElementById('printReceipt').style.display = 'inline';
+
+        // Limpiar la lista para la próxima venta
+        cart = [];
+        updateCart();
+    });
+
+    // Imprimir boleta
+    document.getElementById('printReceipt').addEventListener('click', () => {
+        window.print();
+        document.getElementById('receiptContent').style.display = 'none';
+        document.getElementById('printReceipt').style.display = 'none';
+    });
+
+    // Manejo del teclado numérico
+    document.querySelectorAll('#numPad .num-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const number = button.getAttribute('data-number');
+            if (number !== undefined) {
+                currentInput += number;
+                updatePriceField();
+            } else if (button.id === 'clear') {
+                currentInput = '';
+                updatePriceField();
+            } else if (button.id === 'enter') {
+                const price = parseFloat(currentInput);
+                if (!isNaN(price) && price > 0) {
+                    if (document.getElementById('manualProductName').value) {
+                        document.getElementById('manualProductPrice').value = price.toFixed(2);
+                        document.getElementById('manualProductQuantity').focus();
+                    } else {
+                        document.getElementById('priceExcel').value = price.toFixed(2);
+                    }
+                }
+                currentInput = '';
+                updatePriceField();
+            }
+        });
+    });
+
+    // Actualizar el campo de precio del teclado numérico
+    function updatePriceField() {
+        if (document.getElementById('manualProductName').value) {
+            document.getElementById('manualProductPrice').value = currentInput;
+        } else {
+            document.getElementById('priceExcel').value = currentInput;
+        }
+    }
+
+    // Sincronizar el teclado numérico con el teclado físico
+    document.addEventListener('keydown', (event) => {
+        const num = event.key;
+        if (!isNaN(num) && num !== ' ' && num !== '.') {
+            currentInput += num;
+            updatePriceField();
+        } else if (event.key === 'Enter') {
+            const price = parseFloat(currentInput);
+            if (!isNaN(price) && price > 0) {
+                if (document.getElementById('manualProductName').value) {
+                    document.getElementById('manualProductPrice').value = price.toFixed(2);
+                    document.getElementById('manualProductQuantity').focus();
+                } else {
+                    document.getElementById('priceExcel').value = price.toFixed(2);
+                }
+                currentInput = '';
+                updatePriceField();
+            }
+        } else if (event.key === 'Escape') {
+            currentInput = '';
+            updatePriceField();
+        }
+    });
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 </body>
 </html>
