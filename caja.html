@@ -3,352 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programa de Caja</title>
+    <title>Sistema de Punto de Venta</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h1 {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
             color: #333;
         }
         .container {
-            max-width: 800px;
-            width: 100%;
+            display: flex;
+            height: 100vh;
         }
-        .section {
+        .product-section {
+            flex: 2;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .cart-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 10px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-bar {
+            display: flex;
             margin-bottom: 20px;
         }
-        #productList {
-            margin-top: 10px;
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 10px;
+        }
+        .product-item {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .product-item h3 {
+            font-size: 16px;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        .product-item p {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+        }
+        .cart-item:hover {
+            background-color: #f1f1f1;
+        }
+        .cart-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: right;
+            color: #2c3e50;
+        }
+        .checkout-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .checkout-btn:hover {
+            background-color: #27ae60;
+        }
+        #error-modal, #receipt-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .close:hover {
+            color: #000;
+        }
+        #receipt {
+            width: 80mm;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            line-height: 1.2;
+            white-space: pre-wrap;
+        }
+        #file-input {
+            margin-bottom: 20px;
             padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        #receiptContent {
-            display: none;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
-        }
-        #receiptContent h3 {
-            margin-top: 0;
-        }
-        .num-button {
-            width: 40px;
-            height: 40px;
-            margin: 5px;
-            background-color: #eee;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-            line-height: 40px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        #numPad {
-            display: flex;
-            flex-wrap: wrap;
-            width: 200px;
-            margin-top: 20px;
-        }
-        #numPad .num-button {
-            flex: 1 0 33%;
-        }
-        #numPad #clear, #numPad #enter {
-            flex: 1 0 100%;
-        }
-        #productSelect, #manualProductName, #manualProductQuantity, #manualProductPrice, #priceExcel, #quantity {
-            margin-bottom: 10px;
-            padding: 8px;
+            border-radius: 4px;
             width: 100%;
-            box-sizing: border-box;
-        }
-        #manualProductPrice, #priceExcel {
-            text-align: right;
-        }
-        #printReceipt {
-            display: none;
         }
     </style>
 </head>
 <body>
-
-<h1>Programa de Caja</h1>
-<div class="container">
-
-    <!-- Sección de carga y selección de productos -->
-    <div class="section">
-        <h2>Cargar Productos desde Excel</h2>
-        <input type="file" id="fileInput" />
-        <input type="text" id="productFilter" placeholder="Buscar producto..." />
-        <select id="product" size="5"></select>
-        <input type="text" id="priceExcel" placeholder="Precio" />
-        <input type="number" id="quantity" placeholder="Cantidad" />
-        <button id="addProductFromExcel">Agregar Producto desde Excel</button>
-    </div>
-
-    <!-- Sección de productos manuales -->
-    <div class="section">
-        <h2>Agregar Producto Manual</h2>
-        <input type="text" id="manualProductName" placeholder="Nombre del Producto" />
-        <input type="number" id="manualProductQuantity" placeholder="Cantidad" />
-        <input type="text" id="manualProductPrice" placeholder="Precio" />
-        <button id="addManualProduct">Agregar Producto Manual</button>
-    </div>
-
-    <!-- Sección del teclado numérico -->
-    <div class="section">
-        <h2>Teclado Numérico</h2>
-        <div id="numPad">
-            <div class="num-button" data-number="1">1</div>
-            <div class="num-button" data-number="2">2</div>
-            <div class="num-button" data-number="3">3</div>
-            <div class="num-button" data-number="4">4</div>
-            <div class="num-button" data-number="5">5</div>
-            <div class="num-button" data-number="6">6</div>
-            <div class="num-button" data-number="7">7</div>
-            <div class="num-button" data-number="8">8</div>
-            <div class="num-button" data-number="9">9</div>
-            <div class="num-button" data-number="0">0</div>
-            <div class="num-button" id="clear">C</div>
-            <div class="num-button" id="enter">Enter</div>
+    <div class="container">
+        <div class="product-section">
+            <h1>Productos</h1>
+            <input type="file" id="file-input" accept=".xlsx, .xls" />
+            <div class="search-bar">
+                <input type="text" id="productSearch" placeholder="Buscar producto...">
+            </div>
+            <div class="product-grid" id="productGrid"></div>
+        </div>
+        <div class="cart-section">
+            <h2>Carrito</h2>
+            <div class="cart-items" id="cartItems"></div>
+            <div class="cart-total">Total: <span id="cartTotal">$0</span></div>
+            <button class="checkout-btn" onclick="checkout()">Finalizar Compra</button>
         </div>
     </div>
 
-    <!-- Sección de la lista de productos -->
-    <div class="section">
-        <h2>Lista de Productos</h2>
-        <div id="productList"></div>
-        <h3>Total: $<span id="receiptTotal">0.00</span></h3>
+    <div id="error-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="error-message"></p>
+        </div>
     </div>
 
-    <!-- Botones para generar e imprimir boleta -->
-    <div class="section">
-        <button id="generateReceipt">Generar Boleta</button>
-        <button id="printReceipt">Imprimir Boleta</button>
+    <div id="receipt-modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="receipt"></div>
+            <button onclick="printReceipt()">Imprimir Boleta</button>
+        </div>
     </div>
 
-    <!-- Contenido de la boleta -->
-    <div id="receiptContent">
-        <h3>Emporio Temuco</h3>
-        <p>Avenida San Martín 01745, Temuco</p>
-        <p>Tel: +56951589539</p>
-        <p>Email: contacto@emporiovaldivianoko.cl</p>
-        <p>Web: emporiovaldivianoko.cl</p>
-        <h4>Productos:</h4>
-        <ul id="receiptItems"></ul>
-        <h3>Total: $<span id="receiptTotalReceipt">0.00</span></h3>
-        <p>&copy; 2024 Emporio Temuco</p>
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let products = [];
+        let cart = [];
 
-</div>
+        document.getElementById('file-input').addEventListener('change', handleFile, false);
+        document.getElementById('productSearch').addEventListener('input', searchProducts);
 
-<script>
-    let productsFromExcel = [];
-    let cart = [];
-    let currentInput = '';
-
-    // Leer el archivo Excel
-    document.getElementById('fileInput').addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
+        function handleFile(e) {
+            const file = e.target.files[0];
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = e.target.result;
-                const workbook = XLSX.read(data, { type: 'binary' });
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
-                const range = XLSX.utils.decode_range(sheet['!ref']);
-                productsFromExcel = [];
-                for (let row = 1; row <= range.e.r; row++) { // Empezar en 1 para omitir la fila de encabezado
-                    const cell = sheet[XLSX.utils.encode_cell({ r: row, c: 1 })]; // Segunda columna
-                    if (cell) {
-                        productsFromExcel.push({ name: cell.v });
-                    }
-                }
-                updateProductSelect(productsFromExcel);
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                
+                products = json.slice(1).map((row, index) => {
+                    const name = row[1] || `Producto ${index + 1}`;
+                    const price = parseFloat(row[3]) || 0;
+                    return {
+                        id: index + 1,
+                        name: name,
+                        price: price,
+                        image: "https://via.placeholder.com/150"
+                    };
+                });
+                
+                displayProducts(products);
             };
-            reader.readAsBinaryString(file);
-        }
-    });
-
-    // Actualizar opciones de productos
-    function updateProductSelect(products) {
-        const productSelect = document.getElementById('product');
-        productSelect.innerHTML = '';
-        products.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.name;
-            option.textContent = product.name;
-            productSelect.appendChild(option);
-        });
-    }
-
-    // Filtrar productos por palabra clave
-    document.getElementById('productFilter').addEventListener('input', (event) => {
-        const searchQuery = event.target.value.toLowerCase();
-        const filteredProducts = productsFromExcel.filter(product => 
-            product.name.toLowerCase().includes(searchQuery)
-        );
-        updateProductSelect(filteredProducts);
-    });
-
-    // Agregar producto del Excel a la lista
-    document.getElementById('addProductFromExcel').addEventListener('click', () => {
-        const selectedProduct = document.getElementById('product').value;
-        const price = parseFloat(document.getElementById('priceExcel').value);
-        const quantity = parseInt(document.getElementById('quantity').value, 10);
-
-        if (!selectedProduct || isNaN(price) || isNaN(quantity) || quantity <= 0) {
-            alert('Por favor, complete todos los campos.');
-            return;
+            reader.readAsArrayBuffer(file);
         }
 
-        const product = productsFromExcel.find(p => p.name === selectedProduct);
-        if (product) {
-            cart.push({ name: product.name, price: price, quantity: quantity });
-            updateCart();
+        function displayProducts(productsToShow) {
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = '';
+            productsToShow.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product-item';
+                productElement.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${formatPrice(product.price)}</p>
+                `;
+                productElement.onclick = () => addToCart(product);
+                productGrid.appendChild(productElement);
+            });
         }
 
-        document.getElementById('priceExcel').value = '';
-        document.getElementById('quantity').value = '';
-    });
-
-    // Agregar producto manual a la lista
-    document.getElementById('addManualProduct').addEventListener('click', () => {
-        const name = document.getElementById('manualProductName').value;
-        const quantity = parseInt(document.getElementById('manualProductQuantity').value, 10);
-        const price = parseFloat(document.getElementById('manualProductPrice').value);
-
-        if (!name || isNaN(quantity) || isNaN(price) || quantity <= 0) {
-            alert('Por favor, complete todos los campos.');
-            return;
+        function searchProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm)
+            );
+            displayProducts(filteredProducts);
         }
 
-        cart.push({ name, price, quantity });
-        updateCart();
-
-        document.getElementById('manualProductName').value = '';
-        document
-
-.getElementById('manualProductQuantity').value = '';
-        document.getElementById('manualProductPrice').value = '';
-    });
-
-    // Actualizar la lista de productos en el carrito
-    function updateCart() {
-        const productList = document.getElementById('productList');
-        const receiptItems = document.getElementById('receiptItems');
-        let total = 0;
-
-        productList.innerHTML = '';
-        receiptItems.innerHTML = '';
-
-        cart.forEach(item => {
-            const listItem = document.createElement('div');
-            listItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)}`;
-            productList.appendChild(listItem);
-
-            const receiptItem = document.createElement('li');
-            receiptItem.textContent = `${item.name} - Cantidad: ${item.quantity} - Precio: $${item.price.toFixed(2)} - Total: $${(item.price * item.quantity).toFixed(2)}`;
-            receiptItems.appendChild(receiptItem);
-
-            total += item.price * item.quantity;
-        });
-
-        document.getElementById('receiptTotal').textContent = total.toFixed(2);
-        document.getElementById('receiptTotalReceipt').textContent = total.toFixed(2);
-    }
-
-    // Generar boleta
-    document.getElementById('generateReceipt').addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('No hay productos en la lista.');
-            return;
-        }
-
-        document.getElementById('receiptContent').style.display = 'block';
-        document.getElementById('printReceipt').style.display = 'inline';
-
-        // Limpiar la lista para la próxima venta
-        cart = [];
-        updateCart();
-    });
-
-    // Imprimir boleta
-    document.getElementById('printReceipt').addEventListener('click', () => {
-        window.print();
-        document.getElementById('receiptContent').style.display = 'none';
-        document.getElementById('printReceipt').style.display = 'none';
-    });
-
-    // Manejo del teclado numérico
-    document.querySelectorAll('#numPad .num-button').forEach(button => {
-        button.addEventListener('click', () => {
-            const number = button.getAttribute('data-number');
-            if (number !== undefined) {
-                currentInput += number;
-                updatePriceField();
-            } else if (button.id === 'clear') {
-                currentInput = '';
-                updatePriceField();
-            } else if (button.id === 'enter') {
-                const price = parseFloat(currentInput);
-                if (!isNaN(price) && price > 0) {
-                    if (document.getElementById('manualProductName').value) {
-                        document.getElementById('manualProductPrice').value = price.toFixed(2);
-                        document.getElementById('manualProductQuantity').focus();
-                    } else {
-                        document.getElementById('priceExcel').value = price.toFixed(2);
-                    }
-                }
-                currentInput = '';
-                updatePriceField();
-            }
-        });
-    });
-
-    // Actualizar el campo de precio del teclado numérico
-    function updatePriceField() {
-        if (document.getElementById('manualProductName').value) {
-            document.getElementById('manualProductPrice').value = currentInput;
-        } else {
-            document.getElementById('priceExcel').value = currentInput;
-        }
-    }
-
-    // Sincronizar el teclado numérico con el teclado físico
-    document.addEventListener('keydown', (event) => {
-        const num = event.key;
-        if (!isNaN(num) && num !== ' ' && num !== '.') {
-            currentInput += num;
-            updatePriceField();
-        } else if (event.key === 'Enter') {
-            const price = parseFloat(currentInput);
-            if (!isNaN(price) && price > 0) {
-                if (document.getElementById('manualProductName').value) {
-                    document.getElementById('manualProductPrice').value = price.toFixed(2);
-                    document.getElementById('manualProductQuantity').focus();
+        function addToCart(product) {
+            try {
+                const existingItem = cart.find(item => item.id === product.id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
                 } else {
-                    document.getElementById('priceExcel').value = price.toFixed(2);
+                    cart.push({ ...product, quantity: 1 });
                 }
-                currentInput = '';
-                updatePriceField();
+                updateCart();
+            } catch (error) {
+                showError("Error al agregar producto al carrito: " + error.message);
             }
-        } else if (event.key === 'Escape') {
-            currentInput = '';
-            updatePriceField();
         }
-    });
-</script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+        function updateCart() {
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            cartItems.innerHTML = '';
+            let total = 0;
 
+            cart.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <span>${item.name} x${item.quantity}</span>
+                    <span>${formatPrice(item.price * item.quantity)}</span>
+                `;
+                cartItems.appendChild(itemElement);
+                total += item.price * item.quantity;
+            });
+
+            cartTotal.textContent = formatPrice(total);
+        }
+
+        function checkout() {
+            try {
+                if (cart.length === 0) {
+                    throw new Error("El carrito está vacío");
+                }
+                generateReceipt();
+            } catch (error) {
+                showError("Error al finalizar la compra: " + error.message);
+            }
+        }
+
+        function generateReceipt() {
+            const receipt = document.getElementById('receipt');
+            let receiptContent = "EMPORIO TEMUCO\n";
+            receiptContent += "Avenida San Martín 01745, Temuco\n";
+            receiptContent += "Tel: +56951589539\n";
+            receiptContent += "Email: contacto@emporiovaldivianoko.cl\n";
+            receiptContent += "Web: emporiovaldivianoko.cl\n\n";
+            receiptContent += "BOLETA\n";
+            receiptContent += "Fecha: " + new Date().toLocaleString() + "\n\n";
+            receiptContent += "--------------------------------\n";
+            receiptContent += "PRODUCTO      CANT   PRECIO   TOTAL\n";
+            receiptContent += "--------------------------------\n";
+
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                receiptContent += `${item.name.substring(0, 12).padEnd(12)} ${item.quantity.toString().padStart(4)} ${formatPrice(item.price).padStart(8)} ${formatPrice(itemTotal).padStart(8)}\n`;
+            });
+
+            receiptContent += "--------------------------------\n";
+            receiptContent += `TOTAL:${formatPrice(total).padStart(29)}\n`;
+            receiptContent += "--------------------------------\n\n";
+            receiptContent += "Gracias por su compra!\n";
+
+            receipt.textContent = receiptContent;
+            document.getElementById('receipt-modal').style.display = "block";
+        }
+
+        function printReceipt() {
+            const receiptWindow = window.open('', '', 'width=300,height=600');
+            receiptWindow.document.write('<html><head><title>Boleta</title>');
+            receiptWindow.document.write('<style>body { font-family: "Courier New", Courier, monospace; font-size: 12px; }</style>');
+            receiptWindow.document.write('</head><body>');
+            receiptWindow.document.write('<pre>' + document.getElementById('receipt').textContent + '</pre>');
+            receiptWindow.document.write('</body></html>');
+            receiptWindow.document.close();
+            receiptWindow.print();
+        }
+
+        function showError(message) {
+            const errorModal = document.getElementById('error-modal');
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message;
+            errorModal.style.display = "block";
+        }
+
+        function formatPrice(price) {
+            return '$' + price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Cerrar los modales
+        document.querySelectorAll('.close').forEach(closeBtn => {
+            closeBtn.onclick = function() {
+                this.closest('.modal-content').parentElement.style.display = "none";
+            }
+        });
+
+        window.onclick = function(event) {
+            if (event.target.id === 'error-modal' || event.target.id === 'receipt-modal') {
+                event.target.style.display = "none";
+            }
+        }
+
+        // Manejo global de errores
+        window.onerror = function(message, source, lineno, colno, error) {
+            showError("Ha ocurrido un error inesperado: " + message);
+            return true;
+        };
+    </script>
 </body>
 </html>
