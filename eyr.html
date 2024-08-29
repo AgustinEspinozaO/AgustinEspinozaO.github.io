@@ -16,6 +16,19 @@
         .progress-bar {
             transition: width 0.5s ease-in-out;
         }
+        .pdf-header, .pdf-footer {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .pdf-content {
+            margin: 20px;
+        }
+        .pdf-content h2 {
+            margin-bottom: 10px;
+        }
+        .pdf-content p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
@@ -113,33 +126,18 @@
             <div class="step" id="step3">
                 <h2 class="text-xl font-semibold mb-4">Inspección del Vehículo</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label><input type="checkbox" id="espejoRetrovisor" class="mt-1 mr-2"> Espejo Retrovisor</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="parabrisas" class="mt-1 mr-2"> Parabrisas</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="limpiaParabrisas" class="mt-1 mr-2"> Limpia Parabrisas</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="alfombras" class="mt-1 mr-2"> Alfombras</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="tapiceria" class="mt-1 mr-2"> Tapicería</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="controlesElectricos" class="mt-1 mr-2"> Controles Eléctricos</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="encendedor" class="mt-1 mr-2"> Encendedor / Switch</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="radioReproductor" class="mt-1 mr-2"> Radio / Reproductor</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="tablero" class="mt-1 mr-2"> Tablero en General</label>
-                    </div>
+                    <div><label><input type="checkbox" id="espejoRetrovisor" class="mt-1 mr-2"> Espejo Retrovisor</label></div>
+                    <div><label><input type="checkbox" id="parabrisas" class="mt-1 mr-2"> Parabrisas</label></div>
+                    <div><label><input type="checkbox" id="limpiaParabrisas" class="mt-1 mr-2"> Limpia Parabrisas</label></div>
+                    <div><label><input type="checkbox" id="alfombras" class="mt-1 mr-2"> Alfombras</label></div>
+                    <div><label><input type="checkbox" id="tapiceria" class="mt-1 mr-2"> Tapicería</label></div>
+                    <div><label><input type="checkbox" id="controlesElectricos" class="mt-1 mr-2"> Controles Eléctricos</label></div>
+                    <div><label><input type="checkbox" id="encendedor" class="mt-1 mr-2"> Encendedor / Switch</label></div>
+                                        <div><label><input type="checkbox" id="radioReproductor" class="mt-1 mr-2"> Radio / Reproductor</label></div>
+                    <div><label><input type="checkbox" id="luces" class="mt-1 mr-2"> Luces</label></div>
+                    <div><label><input type="checkbox" id="neblineros" class="mt-1 mr-2"> Neblineros</label></div>
+                    <div><label><input type="checkbox" id="llantas" class="mt-1 mr-2"> Llantas</label></div>
+                    <div><label><input type="checkbox" id="frenos" class="mt-1 mr-2"> Frenos</label></div>
                 </div>
                 <div class="flex justify-between">
                     <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md">Anterior</button>
@@ -147,16 +145,13 @@
                 </div>
             </div>
 
-            <!-- Paso 4: Firma -->
+            <!-- Paso 4: Confirmación y Generación del PDF -->
             <div class="step" id="step4">
-                <h2 class="text-xl font-semibold mb-4">Firma</h2>
-                <div class="mb-4">
-                    <label for="firma" class="block text-sm font-medium text-gray-700">Firma del Cliente</label>
-                    <input type="text" id="firma" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                </div>
+                <h2 class="text-xl font-semibold mb-4">Confirmación</h2>
+                <p class="text-gray-700 mb-4">Revise la información ingresada antes de generar el PDF.</p>
                 <div class="flex justify-between">
                     <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md">Anterior</button>
-                    <button type="button" class="submit-btn bg-blue-600 text-white py-2 px-4 rounded-md">Generar Boleta</button>
+                    <button type="button" id="generatePdf" class="bg-green-600 text-white py-2 px-4 rounded-md">Generar PDF</button>
                 </div>
             </div>
         </form>
@@ -164,68 +159,80 @@
 
     <script>
         const steps = document.querySelectorAll('.step');
+        const nextButtons = document.querySelectorAll('.next-btn');
+        const prevButtons = document.querySelectorAll('.prev-btn');
         const progressBar = document.querySelector('.progress-bar');
         const progressText = document.getElementById('progress-text');
-        const nextBtns = document.querySelectorAll('.next-btn');
-        const prevBtns = document.querySelectorAll('.prev-btn');
-        const submitBtn = document.querySelector('.submit-btn');
         let currentStep = 0;
 
-        function updateStep() {
+        function showStep(stepIndex) {
             steps.forEach((step, index) => {
-                step.classList.toggle('active', index === currentStep);
+                step.classList.toggle('active', index === stepIndex);
             });
-            const progress = (currentStep / (steps.length - 1)) * 100;
-            progressBar.style.width = `${progress}%`;
-            progressText.textContent = `Paso ${currentStep + 1} de ${steps.length}`;
+            progressBar.style.width = `${(stepIndex + 1) * 25}%`;
+            progressText.textContent = `Paso ${stepIndex + 1} de 4`;
         }
 
-        nextBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+        nextButtons.forEach(button => {
+            button.addEventListener('click', () => {
                 if (currentStep < steps.length - 1) {
                     currentStep++;
-                    updateStep();
+                    showStep(currentStep);
                 }
             });
         });
 
-        prevBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
+        prevButtons.forEach(button => {
+            button.addEventListener('click', () => {
                 if (currentStep > 0) {
                     currentStep--;
-                    updateStep();
+                    showStep(currentStep);
                 }
             });
         });
 
-        submitBtn.addEventListener('click', () => {
+        document.getElementById('generatePdf').addEventListener('click', () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            doc.setFont('Helvetica', 'normal');
 
-            doc.text('Boleta de Entrega y Recepción de Vehículos', 10, 10);
-            doc.text(`Nombre del Cliente: ${document.getElementById('nombre').value}`, 10, 20);
-            doc.text(`C.I.: ${document.getElementById('ci').value}`, 10, 30);
-            doc.text(`Email: ${document.getElementById('email').value}`, 10, 40);
-            doc.text(`Teléfono: ${document.getElementById('telefono').value}`, 10, 50);
-            doc.text(`Marca del Vehículo: ${document.getElementById('marca').value}`, 10, 60);
-            doc.text(`Modelo del Vehículo: ${document.getElementById('modelo').value}`, 10, 70);
-            doc.text(`Placas: ${document.getElementById('placas').value}`, 10, 80);
-            doc.text(`Número de Chasis: ${document.getElementById('chasis').value}`, 10, 90);
-            doc.text(`Kilometraje: ${document.getElementById('kilometraje').value}`, 10, 100);
-            doc.text(`Nivel de Combustible: ${document.getElementById('combustible').value}`, 10, 110);
-            
-            const checkboxes = ['espejoRetrovisor', 'parabrisas', 'limpiaParabrisas', 'alfombras', 'tapiceria', 'controlesElectricos', 'encendedor', 'radioReproductor', 'tablero'];
-            checkboxes.forEach((id, index) => {
-                const checked = document.getElementById(id).checked ? 'Sí' : 'No';
-                doc.text(`${id.replace(/([A-Z])/g, ' $1').toUpperCase()}: ${checked}`, 10, 120 + (index * 10));
+            doc.text('Entrega y Recepción de Vehículos', 105, 20, { align: 'center' });
+            doc.setFontSize(12);
+            doc.text(`Nombre del Cliente: ${document.getElementById('nombre').value}`, 20, 40);
+            doc.text(`C.I.: ${document.getElementById('ci').value}`, 20, 50);
+            doc.text(`Email: ${document.getElementById('email').value}`, 20, 60);
+            doc.text(`Teléfono: ${document.getElementById('telefono').value}`, 20, 70);
+            doc.text(`Marca del Vehículo: ${document.getElementById('marca').value}`, 20, 80);
+            doc.text(`Modelo del Vehículo: ${document.getElementById('modelo').value}`, 20, 90);
+            doc.text(`Placas: ${document.getElementById('placas').value}`, 20, 100);
+            doc.text(`Número de Chasis: ${document.getElementById('chasis').value}`, 20, 110);
+            doc.text(`Kilometraje: ${document.getElementById('kilometraje').value}`, 20, 120);
+            doc.text(`Nivel de Combustible: ${document.getElementById('combustible').value}`, 20, 130);
+
+            doc.text('Inspección del Vehículo:', 20, 150);
+            const inspections = [
+                'Espejo Retrovisor',
+                'Parabrisas',
+                'Limpia Parabrisas',
+                'Alfombras',
+                'Tapicería',
+                'Controles Eléctricos',
+                'Encendedor / Switch',
+                'Radio / Reproductor',
+                'Luces',
+                'Neblineros',
+                'Llantas',
+                'Frenos'
+            ];
+            inspections.forEach((item, index) => {
+                const isChecked = document.getElementById(item.replace(/\s+/g, '')).checked ? 'Sí' : 'No';
+                doc.text(`${item}: ${isChecked}`, 20, 160 + (index * 10));
             });
 
-            doc.text(`Firma del Cliente: ${document.getElementById('firma').value}`, 10, 200);
-
-            doc.save('boleta.pdf');
+            doc.save('Entrega_Recepcion_Vehiculos.pdf');
         });
 
-        updateStep();
+        showStep(currentStep);
     </script>
 </body>
 </html>
