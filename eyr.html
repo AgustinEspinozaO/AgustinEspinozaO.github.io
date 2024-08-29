@@ -125,23 +125,36 @@
             </div>
 
             <!-- Paso 3: Inspección del Vehículo -->
-            <div class="step" id="step3">
+            <div class="step" id="step2">
                 <h2 class="text-xl font-semibold mb-4">Inspección del Vehículo</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label><input type="checkbox" id="espejoRetrovisor" class="mt-1 mr-2"> Espejo Retrovisor</label>
-                    </div>
-                    <div>
-                        <label><input type="checkbox" id="parabrisas" class="mt-1 mr-2"> Parabrisas</label>
-                    </div>
-                    <!-- Add the rest of the checkboxes similarly -->
-                    <div>
-                        <label><input type="checkbox" id="otros" class="mt-1 mr-2"> Otros</label>
-                    </div>
+                <div class="mb-4">
+                    <label for="inspectionCondition" class="block text-gray-700">Condición:</label>
+                    <select id="inspectionCondition" name="inspectionCondition" class="mt-1 block w-full border border-gray-300 rounded-md p-2" required>
+                        <option value="Excelente">Excelente</option>
+                        <option value="Buena">Buena</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Mala">Mala</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="inspectionNotes" class="block text-gray-700">Notas:</label>
+                    <textarea id="inspectionNotes" name="inspectionNotes" class="mt-1 block w-full border border-gray-300 rounded-md p-2" rows="4" required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="inspectionTires" class="block text-gray-700">Estado de Neumáticos:</label>
+                    <input type="text" id="inspectionTires" name="inspectionTires" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                </div>
+                <div class="mb-4">
+                    <label for="inspectionEngine" class="block text-gray-700">Estado del Motor:</label>
+                    <input type="text" id="inspectionEngine" name="inspectionEngine" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
+                </div>
+                <div class="mb-4">
+                    <label for="inspectionBrakes" class="block text-gray-700">Estado de Frenos:</label>
+                    <input type="text" id="inspectionBrakes" name="inspectionBrakes" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
                 </div>
                 <div class="flex justify-between">
                     <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-300">Anterior</button>
-                                        <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Siguiente</button>
+                    <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Siguiente</button>
                 </div>
             </div>
 
