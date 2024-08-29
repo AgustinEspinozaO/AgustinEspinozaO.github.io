@@ -125,7 +125,7 @@
             </div>
 
             <!-- Paso 3: Inspección del Vehículo -->
-            <div class="step" id="step2">
+            <div class="step" id="step3">
                 <h2 class="text-xl font-semibold mb-4">Inspección del Vehículo</h2>
                 <div class="mb-4">
                     <label for="inspectionCondition" class="block text-gray-700">Condición:</label>
@@ -140,70 +140,101 @@
                     <label for="inspectionNotes" class="block text-gray-700">Notas:</label>
                     <textarea id="inspectionNotes" name="inspectionNotes" class="mt-1 block w-full border border-gray-300 rounded-md p-2" rows="4" required></textarea>
                 </div>
-                <div class="mb-4">
-                    <label for="inspectionTires" class="block text-gray-700">Estado de Neumáticos:</label>
-                    <input type="text" id="inspectionTires" name="inspectionTires" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                </div>
-                <div class="mb-4">
-                    <label for="inspectionEngine" class="block text-gray-700">Estado del Motor:</label>
-                    <input type="text" id="inspectionEngine" name="inspectionEngine" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                </div>
-                <div class="mb-4">
-                    <label for="inspectionBrakes" class="block text-gray-700">Estado de Frenos:</label>
-                    <input type="text" id="inspectionBrakes" name="inspectionBrakes" class="mt-1 block w-full border border-gray-300 rounded-md p-2">
-                </div>
                 <div class="flex justify-between">
                     <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-300">Anterior</button>
                     <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Siguiente</button>
                 </div>
             </div>
 
-            <!-- Paso 4: Confirmación y Resumen -->
+            <!-- Paso 4: Confirmación -->
             <div class="step" id="step4">
-                <h2 class="text-xl font-semibold mb-4">Confirmación y Resumen</h2>
-                <div id="summary" class="space-y-4">
-                    <!-- Resumen dinámico generado aquí -->
-                </div>
+                <h2 class="text-xl font-semibold mb-4">Confirmación</h2>
+                <div id="summary" class="mb-4"></div>
                 <div class="flex justify-between">
                     <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-300">Anterior</button>
-                    <button type="button" class="submit-btn bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300">Generar PDF</button>
+                    <button type="button" id="generatePdf" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300">Generar PDF</button>
                 </div>
             </div>
         </form>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             const steps = document.querySelectorAll('.step');
-            const progressBar = document.querySelector('.progress-bar');
+            const nextBtns = document.querySelectorAll('.next-btn');
+            const prevBtns = document.querySelectorAll('.prev-btn');
             const progressText = document.getElementById('progress-text');
+            const progressBar = document.querySelector('.progress-bar');
+            const summary = document.getElementById('summary');
+            const form = document.getElementById('vehicleForm');
+
             let currentStep = 0;
 
-            function showStep(stepIndex) {
-                steps.forEach((step, index) => {
-                    step.classList.toggle('active', index === stepIndex);
+            function showStep(step) {
+                steps.forEach((s, index) => {
+                    s.classList.toggle('active', index === step);
                 });
-                progressBar.style.width = `${(stepIndex + 1) * 25}%`;
-                progressText.textContent = `Paso ${stepIndex + 1} de 4`;
+                progressText.textContent = `Paso ${step + 1} de ${steps.length}`;
+                progressBar.style.width = `${((step + 1) / steps.length) * 100}%`;
                 updateSummary();
             }
 
             function updateSummary() {
-                const summary = document.getElementById('summary');
-                const formData = new FormData(document.getElementById('vehicleForm'));
-                summary.innerHTML = '';
-                formData.forEach((value, key) => {
-                    if (key !== 'step') {
-                        summary.innerHTML += `<div class="pdf-section">
-                            <span class="pdf-label">${key.replace(/([A-Z])/g, ' $1').toUpperCase()}:</span>
-                            <div class="pdf-content">${value}</div>
-                        </div>`;
-                    }
-                });
+                summary.innerHTML = `
+                    <div class="pdf-header">Resumen de Entrega y Recepción de Vehículos</div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Nombre del Cliente:</div>
+                        <div class="pdf-content">${document.getElementById('nombre').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">C.I.:</div>
+                        <div class="pdf-content">${document.getElementById('ci').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Email:</div>
+                        <div class="pdf-content">${document.getElementById('email').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Teléfono:</div>
+                        <div class="pdf-content">${document.getElementById('telefono').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Marca del Vehículo:</div>
+                        <div class="pdf-content">${document.getElementById('marca').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Modelo del Vehículo:</div>
+                        <div class="pdf-content">${document.getElementById('modelo').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Placas:</div>
+                        <div class="pdf-content">${document.getElementById('placas').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Número de Chasis:</div>
+                        <div class="pdf-content">${document.getElementById('chasis').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Kilometraje:</div>
+                        <div class="pdf-content">${document.getElementById('kilometraje').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Nivel de Combustible:</div>
+                        <div class="pdf-content">${document.getElementById('combustible').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Condición del Vehículo:</div>
+                        <div class="pdf-content">${document.getElementById('inspectionCondition').value}</div>
+                    </div>
+                    <div class="pdf-section">
+                        <div class="pdf-label">Notas de Inspección:</div>
+                        <div class="pdf-content">${document.getElementById('inspectionNotes').value}</div>
+                    </div>
+                `;
             }
 
-            document.querySelectorAll('.next-btn').forEach(button => {
-                button.addEventListener('click', () => {
+            nextBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
                     if (currentStep < steps.length - 1) {
                         currentStep++;
                         showStep(currentStep);
@@ -211,8 +242,8 @@
                 });
             });
 
-            document.querySelectorAll('.prev-btn').forEach(button => {
-                button.addEventListener('click', () => {
+            prevBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
                     if (currentStep > 0) {
                         currentStep--;
                         showStep(currentStep);
@@ -220,18 +251,40 @@
                 });
             });
 
-            document.querySelector('.submit-btn').addEventListener('click', () => {
+            document.getElementById('generatePdf').addEventListener('click', function() {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
-                doc.text('Resumen de Entrega y Recepción de Vehículo', 10, 10);
-                const pdfContent = document.getElementById('summary').innerText;
-                doc.text(pdfContent, 10, 20);
-                doc.save('resumen-entrega-recepcion.pdf');
-            });
 
-            showStep(currentStep);
+                doc.setFontSize(18);
+                doc.text('Resumen de Entrega y Recepción de Vehículos', 105, 20, { align: 'center' });
+
+                doc.setFontSize(12);
+                let y = 30;
+
+                const addText = (label, content) => {
+                    doc.setFontType('bold');
+                    doc.text(label, 10, y);
+                    doc.setFontType('normal');
+                    doc.text(content, 60, y);
+                    y += 10;
+                };
+
+                addText('Nombre del Cliente:', document.getElementById('nombre').value);
+                addText('C.I.:', document.getElementById('ci').value);
+                addText('Email:', document.getElementById('email').value);
+                addText('Teléfono:', document.getElementById('telefono').value);
+                addText('Marca del Vehículo:', document.getElementById('marca').value);
+                addText('Modelo del Vehículo:', document.getElementById('modelo').value);
+                addText('Placas:', document.getElementById('placas').value);
+                addText('Número de Chasis:', document.getElementById('chasis').value);
+                addText('Kilometraje:', document.getElementById('kilometraje').value);
+                addText('Nivel de Combustible:', document.getElementById('combustible').value);
+                addText('Condición del Vehículo:', document.getElementById('inspectionCondition').value);
+                addText('Notas de Inspección:', document.getElementById('inspectionNotes').value);
+
+                doc.save('Resumen_Vehiculo.pdf');
+            });
         });
     </script>
 </body>
 </html>
-
