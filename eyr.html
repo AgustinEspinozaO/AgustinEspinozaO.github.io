@@ -4,256 +4,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrega y Recepción de Vehículos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+        .step {
+            display: none;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 100%;
+        .step.active {
+            display: block;
         }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        label {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="number"],
-        input[type="date"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .full-width {
-            grid-column: span 2;
-        }
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .checkbox-group label {
-            width: 50%;
-            display: flex;
-            align-items: center;
-        }
-        .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            grid-column: span 2;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        .output {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .output h2 {
-            margin-top: 0;
-            color: #333;
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Entrega y Recepción de Vehículos</h1>
-        <form id="vehicleForm">
-            <div>
-                <label for="nombre">Nombre del Cliente:</label>
-                <input type="text" id="nombre" required>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="container mx-auto p-8 bg-white rounded-lg shadow-lg max-w-4xl">
+        <h1 class="text-3xl font-bold text-center text-blue-600 mb-8">Entrega y Recepción de Vehículos</h1>
+        
+        <div class="mb-8">
+            <div class="relative pt-1">
+                <div class="flex mb-2 items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200" id="progress-text">
+                            Paso 1 de 4
+                        </span>
+                    </div>
+                </div>
+                <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-blue-200">
+                    <div class="progress-bar shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500" style="width: 25%"></div>
+                </div>
             </div>
-            <div>
-                <label for="ci">C.I.:</label>
-                <input type="text" id="ci" required>
-            </div>
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" required>
-            </div>
-            <div>
-                <label for="telefono">Teléfono:</label>
-                <input type="tel" id="telefono" required>
-            </div>
-            <div class="full-width">
-                <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" required>
-            </div>
-            <div class="full-width">
-                <label for="preparadoPor">Preparado por:</label>
-                <input type="text" id="preparadoPor" required>
-            </div>
-            <div class="full-width">
-                <label for="sucursal">Sucursal:</label>
-                <input type="text" id="sucursal" required>
-            </div>
-            <div class="full-width">
-                <label for="marca">Marca del Vehículo:</label>
-                <input type="text" id="marca" required>
-            </div>
-            <div class="full-width">
-                <label for="modelo">Modelo del Vehículo:</label>
-                <input type="text" id="modelo" required>
-            </div>
-            <div class="full-width">
-                <label for="placas">Placas:</label>
-                <input type="text" id="placas" required>
-            </div>
-            <div class="full-width">
-                <label for="chasis">Número de Chasis:</label>
-                <input type="text" id="chasis" required>
-            </div>
-            <div class="full-width">
-                <label for="kilometraje">Kilometraje:</label>
-                <input type="number" id="kilometraje" required>
-            </div>
-            <div class="full-width">
-                <label for="combustible">Nivel de Combustible:</label>
-                <select id="combustible" required>
-                    <option value="">Seleccione...</option>
-                    <option value="1">1/10</option>
-                    <option value="2">2/10</option>
-                    <option value="3">3/10</option>
-                    <option value="4">4/10</option>
-                    <option value="5">5/10</option>
-                    <option value="6">6/10</option>
-                    <option value="7">7/10</option>
-                    <option value="8">8/10</option>
-                    <option value="9">9/10</option>
-                    <option value="10">10/10</option>
-                </select>
-            </div>
-            <div class="checkbox-group full-width">
-                <label><input type="checkbox" id="espejoRetrovisor"> Espejo Retrovisor</label>
-                <label><input type="checkbox" id="parabrisas"> Parabrisas</label>
-                <label><input type="checkbox" id="limpiaParabrisas"> Limpia Parabrisas</label>
-                <label><input type="checkbox" id="alfombras"> Alfombras</label>
-                <label><input type="checkbox" id="tapiceria"> Tapicería</label>
-                <label><input type="checkbox" id="controlesElectricos"> Controles Eléctricos</label>
-                <label><input type="checkbox" id="encendedor"> Encendedor / Switch</label>
-                <label><input type="checkbox" id="radioReproductor"> Radio / Reproductor</label>
-                <label><input type="checkbox" id="tablero"> Tablero en General</label>
-                <label><input type="checkbox" id="espejosLaterales"> Espejos Laterales</label>
-                <label><input type="checkbox" id="antena"> Antena</label>
-                <label><input type="checkbox" id="manijas"> Manijas / Maniguetas</label>
-                <label><input type="checkbox" id="tapaCombustible"> Tapa de Combustible</label>
-                <label><input type="checkbox" id="faros"> Faros Delanteros y Traseros</label>
-                <label><input type="checkbox" id="lucesDireccionales"> Luces Direccionales</label>
-                <label><input type="checkbox" id="lucesRetroceso"> Luces de Retroceso</label>
-                <label><input type="checkbox" id="tapaCubos"> Tapa Cubos / Laterales</label>
-                <label><input type="checkbox" id="llantas"> Llantas</label>
-                <label><input type="checkbox" id="parachoques"> Parachoques</label>
-                <label><input type="checkbox" id="costadoDerecho"> Costado Derecho</label>
-                <label><input type="checkbox" id="costadoIzquierdo"> Costado Izquierdo</label>
-                <label><input type="checkbox" id="capo"> Capó</label>
-                <label><input type="checkbox" id="cajuela"> Cajuela</label>
-                <label><input type="checkbox" id="techo"> Techo</label>
-                <label><input type="checkbox" id="tapaAceite"> Tapa de Aceite</label>
-                <label><input type="checkbox" id="varillaAceite"> Varilla de Aceite</label>
-                <label><input type="checkbox" id="motor"> Motor</label>
-                <label><input type="checkbox" id="tapaRadiador"> Tapa de Radiador</label>
-                <label><input type="checkbox" id="gatoHidraulico"> Gato Hidráulico / Llave / Llanta de Emergencia / Cono</label>
-                <label><input type="checkbox" id="extintor"> Extintor / Kit de Primeros Auxilios</label>
-                <label><input type="checkbox" id="cajaHerramientas"> Caja de Herramientas</label>
-                <label><input type="checkbox" id="cablesAuxiliares"> Cables Auxiliares</label>
-                <label><input type="checkbox" id="otros"> Otros</label>
-            </div>
-            <button type="submit">Generar Acta de Recepción</button>
-        </form>
-        <div class="output" id="output">
-            <h2>Acta de Recepción Generada</h2>
-            <div id="acta"></div>
         </div>
+
+        <form id="vehicleForm" class="space-y-6">
+            <!-- Paso 1: Información del Cliente -->
+            <div class="step active" id="step1">
+                <h2 class="text-xl font-semibold mb-4">Información del Cliente</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Cliente</label>
+                        <input type="text" id="nombre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="ci" class="block text-sm font-medium text-gray-700">C.I.</label>
+                        <input type="text" id="ci" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                        <input type="tel" id="telefono" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md">Siguiente</button>
+                </div>
+            </div>
+
+            <!-- Paso 2: Detalles del Vehículo -->
+            <div class="step" id="step2">
+                <h2 class="text-xl font-semibold mb-4">Detalles del Vehículo</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="marca" class="block text-sm font-medium text-gray-700">Marca del Vehículo</label>
+                        <input type="text" id="marca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="modelo" class="block text-sm font-medium text-gray-700">Modelo del Vehículo</label>
+                        <input type="text" id="modelo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="placas" class="block text-sm font-medium text-gray-700">Placas</label>
+                        <input type="text" id="placas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="chasis" class="block text-sm font-medium text-gray-700">Número de Chasis</label>
+                        <input type="text" id="chasis" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="kilometraje" class="block text-sm font-medium text-gray-700">Kilometraje</label>
+                        <input type="number" id="kilometraje" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    </div>
+                    <div>
+                        <label for="combustible" class="block text-sm font-medium text-gray-700">Nivel de Combustible</label>
+                        <select id="combustible" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                            <option value="">Seleccione...</option>
+                            <option value="1">1/8</option>
+                            <option value="2">2/8</option>
+                            <option value="3">3/8</option>
+                            <option value="4">4/8</option>
+                            <option value="5">5/8</option>
+                            <option value="6">6/8</option>
+                            <option value="7">7/8</option>
+                            <option value="8">8/8</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md">Anterior</button>
+                    <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md">Siguiente</button>
+                </div>
+            </div>
+
+            <!-- Paso 3: Inspección del Vehículo -->
+            <div class="step" id="step3">
+                <h2 class="text-xl font-semibold mb-4">Inspección del Vehículo</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Lista de items a inspeccionar -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Espejo Retrovisor</label>
+                        <input type="checkbox" id="espejoRetrovisor" class="mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Parabrisas</label>
+                        <input type="checkbox" id="parabrisas" class="mt-1">
+                    </div>
+                    <!-- Añadir más elementos de inspección aquí -->
+                    <!-- Este es un ejemplo básico, se pueden añadir más campos según sea necesario -->
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md">Anterior</button>
+                    <button type="button" class="next-btn bg-blue-600 text-white py-2 px-4 rounded-md">Siguiente</button>
+                </div>
+            </div>
+
+            <!-- Paso 4: Resumen y Finalización -->
+            <div class="step" id="step4">
+                <h2 class="text-xl font-semibold mb-4">Resumen</h2>
+                <div id="summary" class="space-y-4">
+                    <!-- Aquí se mostrarán los datos ingresados por el usuario -->
+                </div>
+                <div class="flex justify-between">
+                    <button type="button" class="prev-btn bg-gray-600 text-white py-2 px-4 rounded-md">Anterior</button>
+                    <button type="submit" class="submit-btn bg-green-600 text-white py-2 px-4 rounded-md">Finalizar</button>
+                </div>
+            </div>
+        </form>
     </div>
     
     <script>
-        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentStep = 1;
+            const totalSteps = 4;
 
-            const nombre = document.getElementById('nombre').value;
-            const ci = document.getElementById('ci').value;
-            const email = document.getElementById('email').value;
-            const telefono = document.getElementById('telefono').value;
-            const fecha = document.getElementById('fecha').value;
-            const preparadoPor = document.getElementById('preparadoPor').value;
-            const sucursal = document.getElementById('sucursal').value;
-            const marca = document.getElementById('marca').value;
-            const modelo = document.getElementById('modelo').value;
-            const placas = document.getElementById('placas').value;
-            const chasis = document.getElementById('chasis').value;
-            const kilometraje = document.getElementById('kilometraje').value;
-            const combustible = document.getElementById('combustible').value;
+            const steps = document.querySelectorAll('.step');
+            const progressBar = document.querySelector('.progress-bar');
+            const progressText = document.getElementById('progress-text');
 
-            const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
-            let inspeccion = '';
-            checkboxes.forEach(checkbox => {
-                inspeccion += `<p>${checkbox.id}: ${checkbox.checked ? 'Sí' : 'No'}</p>`;
+            document.querySelectorAll('.next-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    if (currentStep < totalSteps) {
+                        steps[currentStep - 1].classList.remove('active');
+                        currentStep++;
+                        steps[currentStep - 1].classList.add('active');
+                        updateProgress();
+                    }
+                });
             });
 
-            const actaHTML = `
-                <p><strong>Nombre del Cliente:</strong> ${nombre}</p>
-                <p><strong>C.I.:</strong> ${ci}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Teléfono:</strong> ${telefono}</p>
-                <p><strong>Fecha:</strong> ${fecha}</p>
-                <p><strong>Preparado por:</strong> ${preparadoPor}</p>
-                <p><strong>Sucursal:</strong> ${sucursal}</p>
-                <h3>Detalles del Vehículo</h3>
-                <p><strong>Marca:</strong> ${marca}</p>
-                <p><strong>Modelo:</strong> ${modelo}</p>
-                <p><strong>Placas:</strong> ${placas}</p>
-                <p><strong>Número de Chasis:</strong> ${chasis}</p>
-                <p><strong>Kilometraje:</strong> ${kilometraje}</p>
-                <p><strong>Nivel de Combustible:</strong> ${combustible}/10</p>
-                <h3>Inspección del Vehículo</h3>
-                ${inspeccion}
-            `;
+            document.querySelectorAll('.prev-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    if (currentStep > 1) {
+                        steps[currentStep - 1].classList.remove('active');
+                        currentStep--;
+                        steps[currentStep - 1].classList.add('active');
+                        updateProgress();
+                    }
+                });
+            });
 
-            document.getElementById('acta').innerHTML = actaHTML;
+            document.getElementById('vehicleForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                generateSummary();
+                alert('Formulario completado con éxito!');
+            });
+
+            function updateProgress() {
+                progressBar.style.width = (currentStep / totalSteps) * 100 + '%';
+                progressText.innerText = `Paso ${currentStep} de ${totalSteps}`;
+            }
+
+            function generateSummary() {
+                const summary = document.getElementById('summary');
+                summary.innerHTML = `
+                    <p><strong>Nombre del Cliente:</strong> ${document.getElementById('nombre').value}</p>
+                    <p><strong>C.I.:</strong> ${document.getElementById('ci').value}</p>
+                    <p><strong>Email:</strong> ${document.getElementById('email').value}</p>
+                    <p><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</p>
+                    <p><strong>Marca del Vehículo:</strong> ${document.getElementById('marca').value}</p>
+                    <p><strong>Modelo del Vehículo:</strong> ${document.getElementById('modelo').value}</p>
+                    <p><strong>Placas:</strong> ${document.getElementById('placas').value}</p>
+                    <p><strong>Número de Chasis:</strong> ${document.getElementById('chasis').value}</p>
+                    <p><strong>Kilometraje:</strong> ${document.getElementById('kilometraje').value}</p>
+                    <p><strong>Nivel de Combustible:</strong> ${document.getElementById('combustible').value}</p>
+                    <!-- Mostrar más datos de la inspección aquí -->
+                `;
+            }
         });
     </script>
 </body>
