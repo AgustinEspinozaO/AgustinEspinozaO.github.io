@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrega y Recepción de Vehículos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .checkbox-group label {
+            width: 50%;
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            grid-column: span 2;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .output h2 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Entrega y Recepción de Vehículos</h1>
+        <form id="vehicleForm">
+            <div>
+                <label for="nombre">Nombre del Cliente:</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div>
+                <label for="ci">C.I.:</label>
+                <input type="text" id="ci" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div>
+                <label for="telefono">Teléfono:</label>
+                <input type="tel" id="telefono" required>
+            </div>
+            <div class="full-width">
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" required>
+            </div>
+            <div class="full-width">
+                <label for="preparadoPor">Preparado por:</label>
+                <input type="text" id="preparadoPor" required>
+            </div>
+            <div class="full-width">
+                <label for="sucursal">Sucursal:</label>
+                <input type="text" id="sucursal" required>
+            </div>
+            <div class="full-width">
+                <label for="marca">Marca del Vehículo:</label>
+                <input type="text" id="marca" required>
+            </div>
+            <div class="full-width">
+                <label for="modelo">Modelo del Vehículo:</label>
+                <input type="text" id="modelo" required>
+            </div>
+            <div class="full-width">
+                <label for="placas">Placas:</label>
+                <input type="text" id="placas" required>
+            </div>
+            <div class="full-width">
+                <label for="chasis">Número de Chasis:</label>
+                <input type="text" id="chasis" required>
+            </div>
+            <div class="full-width">
+                <label for="kilometraje">Kilometraje:</label>
+                <input type="number" id="kilometraje" required>
+            </div>
+            <div class="full-width">
+                <label for="combustible">Nivel de Combustible:</label>
+                <select id="combustible" required>
+                    <option value="">Seleccione...</option>
+                    <option value="1">1/10</option>
+                    <option value="2">2/10</option>
+                    <option value="3">3/10</option>
+                    <option value="4">4/10</option>
+                    <option value="5">5/10</option>
+                    <option value="6">6/10</option>
+                    <option value="7">7/10</option>
+                    <option value="8">8/10</option>
+                    <option value="9">9/10</option>
+                    <option value="10">10/10</option>
+                </select>
+            </div>
+            <div class="checkbox-group full-width">
+                <label><input type="checkbox" id="espejoRetrovisor"> Espejo Retrovisor</label>
+                <label><input type="checkbox" id="parabrisas"> Parabrisas</label>
+                <label><input type="checkbox" id="limpiaParabrisas"> Limpia Parabrisas</label>
+                <label><input type="checkbox" id="alfombras"> Alfombras</label>
+                <label><input type="checkbox" id="tapiceria"> Tapicería</label>
+                <label><input type="checkbox" id="controlesElectricos"> Controles Eléctricos</label>
+                <label><input type="checkbox" id="encendedor"> Encendedor / Switch</label>
+                <label><input type="checkbox" id="radioReproductor"> Radio / Reproductor</label>
+                <label><input type="checkbox" id="tablero"> Tablero en General</label>
+                <label><input type="checkbox" id="espejosLaterales"> Espejos Laterales</label>
+                <label><input type="checkbox" id="antena"> Antena</label>
+                <label><input type="checkbox" id="manijas"> Manijas / Maniguetas</label>
+                <label><input type="checkbox" id="tapaCombustible"> Tapa de Combustible</label>
+                <label><input type="checkbox" id="faros"> Faros Delanteros y Traseros</label>
+                <label><input type="checkbox" id="lucesDireccionales"> Luces Direccionales</label>
+                <label><input type="checkbox" id="lucesRetroceso"> Luces de Retroceso</label>
+                <label><input type="checkbox" id="tapaCubos"> Tapa Cubos / Laterales</label>
+                <label><input type="checkbox" id="llantas"> Llantas</label>
+                <label><input type="checkbox" id="parachoques"> Parachoques</label>
+                <label><input type="checkbox" id="costadoDerecho"> Costado Derecho</label>
+                <label><input type="checkbox" id="costadoIzquierdo"> Costado Izquierdo</label>
+                <label><input type="checkbox" id="capo"> Capó</label>
+                <label><input type="checkbox" id="cajuela"> Cajuela</label>
+                <label><input type="checkbox" id="techo"> Techo</label>
+                <label><input type="checkbox" id="tapaAceite"> Tapa de Aceite</label>
+                <label><input type="checkbox" id="varillaAceite"> Varilla de Aceite</label>
+                <label><input type="checkbox" id="motor"> Motor</label>
+                <label><input type="checkbox" id="tapaRadiador"> Tapa de Radiador</label>
+                <label><input type="checkbox" id="gatoHidraulico"> Gato Hidráulico / Llave / Llanta de Emergencia / Cono</label>
+                <label><input type="checkbox" id="extintor"> Extintor / Kit de Primeros Auxilios</label>
+                <label><input type="checkbox" id="cajaHerramientas"> Caja de Herramientas</label>
+                <label><input type="checkbox" id="cablesAuxiliares"> Cables Auxiliares</label>
+                <label><input type="checkbox" id="otros"> Otros</label>
+            </div>
+            <button type="submit">Generar Acta de Recepción</button>
+        </form>
+        <div class="output" id="output">
+            <h2>Acta de Recepción Generada</h2>
+            <div id="acta"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value;
+            const ci = document.getElementById('ci').value;
+            const email = document.getElementById('email').value;
+            const telefono = document.getElementById('telefono').value;
+            const fecha = document.getElementById('fecha').value;
+            const preparadoPor = document.getElementById('preparadoPor').value;
+            const sucursal = document.getElementById('sucursal').value;
+            const marca = document.getElementById('marca').value;
+            const modelo = document.getElementById('modelo').value;
+            const placas = document.getElementById('placas').value;
+            const chasis = document.getElementById('chasis').value;
+            const kilometraje = document.getElementById('kilometraje').value;
+            const combustible = document.getElementById('combustible').value;
+
+            const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
+            let inspeccion = '';
+            checkboxes.forEach(checkbox => {
+                inspeccion += `<p>${checkbox.id}: ${checkbox.checked ? 'Sí' : 'No'}</p>`;
+            });
+
+            const actaHTML = `
+                <p><strong>Nombre del Cliente:</strong> ${nombre}</p>
+                <p><strong>C.I.:</strong> ${ci}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Teléfono:</strong> ${telefono}</p>
+                <p><strong>Fecha:</strong> ${fecha}</p>
+                <p><strong>Preparado por:</strong> ${preparadoPor}</p>
+                <p><strong>Sucursal:</strong> ${sucursal}</p>
+                <h3>Detalles del Vehículo</h3>
+                <p><strong>Marca:</strong> ${marca}</p>
+                <p><strong>Modelo:</strong> ${modelo}</p>
+                <p><strong>Placas:</strong> ${placas}</p>
+                <p><strong>Número de Chasis:</strong> ${chasis}</p>
+                <p><strong>Kilometraje:</strong> ${kilometraje}</p>
+                <p><strong>Nivel de Combustible:</strong> ${combustible}/10</p>
+                <h3>Inspección del Vehículo</h3>
+                ${inspeccion}
+            `;
+
+            document.getElementById('acta').innerHTML = actaHTML;
+        });
+    </script>
+</body>
+</html>
