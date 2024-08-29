@@ -234,91 +234,93 @@
     </div>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let currentStep = 1;
-            const totalSteps = 4;
+    document.addEventListener('DOMContentLoaded', function () {
+        let currentStep = 1;
+        const totalSteps = 4;
 
-            const steps = document.querySelectorAll('.step');
-            const progressBar = document.querySelector('.progress-bar');
-            const progressText = document.getElementById('progress-text');
+        const steps = document.querySelectorAll('.step');
+        const progressBar = document.querySelector('.progress-bar');
+        const progressText = document.getElementById('progress-text');
 
-            document.querySelectorAll('.next-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    if (currentStep < totalSteps) {
-                        steps[currentStep - 1].classList.remove('active');
-                        currentStep++;
-                        steps[currentStep - 1].classList.add('active');
-                        updateProgress();
-                    }
-                });
+        document.querySelectorAll('.next-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                if (currentStep < totalSteps) {
+                    steps[currentStep - 1].classList.remove('active');
+                    currentStep++;
+                    steps[currentStep - 1].classList.add('active');
+                    updateProgress();
+                }
             });
-
-            document.querySelectorAll('.prev-btn').forEach(button => {
-                button.addEventListener('click', function () {
-                    if (currentStep > 1) {
-                        steps[currentStep - 1].classList.remove('active');
-                        currentStep--;
-                        steps[currentStep - 1].classList.add('active');
-                        updateProgress();
-                    }
-                });
-            });
-
-            document.getElementById('vehicleForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                generateSummary();
-                generatePDF();
-            });
-
-            function updateProgress() {
-                progressBar.style.width = (currentStep / totalSteps) * 100 + '%';
-                progressText.innerText = `Paso ${currentStep} de ${totalSteps}`;
-            }
-
-            function generateSummary() {
-                const summary = document.getElementById('summary');
-                summary.innerHTML = `
-                    <p><strong>Nombre del Cliente:</strong> ${document.getElementById('nombre').value}</p>
-                    <p><strong>C.I.:</strong> ${document.getElementById('ci').value}</p>
-                    <p><strong>Email:</strong> ${document.getElementById('email').value}</p>
-                    <p><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</p>
-                    <p><strong>Marca del Vehículo:</strong> ${document.getElementById('marca').value}</p>
-                    <p><strong>Modelo del Vehículo:</strong> ${document.getElementById('modelo').value}</p>
-                    <p><strong>Placas:</strong> ${document.getElementById('placas').value}</p>
-                    <p><strong>Número de Chasis:</strong> ${document.getElementById('chasis').value}</p>
-                    <p><strong>Kilometraje:</strong> ${document.getElementById('kilometraje').value}</p>
-                    <p><strong>Nivel de Combustible:</strong> ${document.getElementById('combustible').value}</p>
-                    <h3>Inspección del Vehículo</h3>
-                    ${generateInspectionSummary()}
-                `;
-            }
-
-            function generateInspectionSummary() {
-                const inspectionItems = [
-                    'espejoRetrovisor', 'parabrisas', 'limpiaParabrisas', 'alfombras',
-                    'tapiceria', 'controlesElectricos', 'encendedor', 'radioReproductor',
-                    'tablero', 'espejosLaterales', 'antena', 'manijas', 'tapaCombustible',
-                    'faros', 'lucesDireccionales', 'lucesRetroceso', 'tapaCubos', 'llantas',
-                    'parachoques', 'costadoDerecho', 'costadoIzquierdo', 'capo', 'cajuela',
-                    'techo', 'tapaAceite', 'varillaAceite', 'motor', 'tapaRadiador',
-                    'gatoHidraulico', 'extintor', 'cajaHerramientas', 'cablesAuxiliares', 'otros'
-                ];
-
-                return inspectionItems.map(item => {
-                    return `<p>${document.querySelector(`label[for="${item}"]`).innerText}: ${document.getElementById(item).checked ? 'Sí' : 'No'}</p>`;
-                }).join('');
-            }
-
-            function generatePDF() {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                const summary = document.getElementById('summary').innerHTML;
-                doc.text('Acta de Recepción de Vehículos', 10, 10);
-                doc.fromHTML(summary, 10, 20);
-                doc.save('acta-recepcion.pdf');
-            }
         });
-    </script>
+
+        document.querySelectorAll('.prev-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                if (currentStep > 1) {
+                    steps[currentStep - 1].classList.remove('active');
+                    currentStep--;
+                    steps[currentStep - 1].classList.add('active');
+                    updateProgress();
+                }
+            });
+        });
+
+        document.getElementById('vehicleForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            generateSummary();
+            generatePDF();
+        });
+
+        function updateProgress() {
+            progressBar.style.width = (currentStep / totalSteps) * 100 + '%';
+            progressText.innerText = `Paso ${currentStep} de ${totalSteps}`;
+        }
+
+        function generateSummary() {
+            const summary = document.getElementById('summary');
+            summary.innerHTML = `
+                <p><strong>Nombre del Cliente:</strong> ${document.getElementById('nombre').value}</p>
+                <p><strong>C.I.:</strong> ${document.getElementById('ci').value}</p>
+                <p><strong>Email:</strong> ${document.getElementById('email').value}</p>
+                <p><strong>Teléfono:</strong> ${document.getElementById('telefono').value}</p>
+                <p><strong>Marca del Vehículo:</strong> ${document.getElementById('marca').value}</p>
+                <p><strong>Modelo del Vehículo:</strong> ${document.getElementById('modelo').value}</p>
+                <p><strong>Placas:</strong> ${document.getElementById('placas').value}</p>
+                <p><strong>Número de Chasis:</strong> ${document.getElementById('chasis').value}</p>
+                <p><strong>Kilometraje:</strong> ${document.getElementById('kilometraje').value}</p>
+                <p><strong>Nivel de Combustible:</strong> ${document.getElementById('combustible').value}</p>
+                <h3>Inspección del Vehículo</h3>
+                ${generateInspectionSummary()}
+            `;
+        }
+
+        function generateInspectionSummary() {
+            const inspectionItems = [
+                'espejoRetrovisor', 'parabrisas', 'limpiaParabrisas', 'alfombras',
+                'tapiceria', 'controlesElectricos', 'encendedor', 'radioReproductor',
+                'tablero', 'espejosLaterales', 'antena', 'manijas', 'tapaCombustible',
+                'faros', 'lucesDireccionales', 'lucesRetroceso', 'tapaCubos', 'llantas',
+                'parachoques', 'costadoDerecho', 'costadoIzquierdo', 'capo', 'cajuela',
+                'techo', 'tapaAceite', 'varillaAceite', 'motor', 'tapaRadiador',
+                'gatoHidraulico', 'extintor', 'cajaHerramientas', 'cablesAuxiliares', 'otros'
+            ];
+
+            return inspectionItems.map(item => {
+                const checkbox = document.getElementById(item);
+                return `<p>${item.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: ${checkbox ? (checkbox.checked ? 'Sí' : 'No') : 'No disponible'}</p>`;
+            }).join('');
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.text('Acta de Recepción de Vehículos', 10, 10);
+            doc.fromHTML(document.getElementById('summary').innerHTML, 10, 20, {
+                'width': 170
+            });
+            doc.save('acta-recepcion.pdf');
+        }
+    });
+</script>
 </body>
 </html>
