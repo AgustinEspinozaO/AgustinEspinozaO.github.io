@@ -73,6 +73,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            margin-bottom: 10px;
         }
 
         button:hover {
@@ -99,6 +100,16 @@
 
         .result p {
             margin-bottom: 10px;
+        }
+
+        #applyButton {
+            display: none;
+            background-color: #27ae60;
+            margin-top: 20px;
+        }
+
+        #applyButton:hover {
+            background-color: #2ecc71;
         }
 
         @media (max-width: 480px) {
@@ -134,6 +145,7 @@
         <button onclick="calculatePayment()">Calcular</button>
         <p class="disclaimer">*Este valor es referencial y puede variar en la realidad*</p>
         <div class="result" id="result"></div>
+        <button id="applyButton" onclick="window.open('https://api.leadconnectorhq.com/widget/form/eZSh7BtUDtqOuinvlVK4', '_blank')">Ve si aplicas</button>
     </div>
 
     <script>
@@ -159,6 +171,9 @@
                 <p>Pago Total: ${totalPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
             `;
             resultElement.style.display = 'block';
+
+            // Mostrar el botón "Ve si aplicas"
+            document.getElementById('applyButton').style.display = 'block';
         }
     </script>
 </body>
