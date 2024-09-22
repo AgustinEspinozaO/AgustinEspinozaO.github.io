@@ -9,22 +9,23 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            padding: 20px;
         }
 
         .calculator-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 100%;
         }
@@ -32,58 +33,85 @@
         h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            font-size: 24px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a4a4a;
         }
 
         input[type="number"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 6px;
             font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
         }
 
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #f39c12;
+            padding: 12px;
+            background-color: #3498db;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             color: white;
             font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #e67e22;
+            background-color: #2980b9;
+        }
+
+        .disclaimer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
         }
 
         .result {
-            margin-top: 20px;
+            margin-top: 25px;
             text-align: center;
             font-size: 18px;
             color: #333;
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
         }
 
-        @media (max-width: 600px) {
+        .result p {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
             .calculator-container {
-                padding: 15px;
+                padding: 20px;
             }
 
             h2 {
                 font-size: 20px;
+            }
+
+            input[type="number"], button {
+                font-size: 14px;
             }
         }
     </style>
@@ -104,7 +132,7 @@
             <input type="number" id="downPayment" placeholder="Ingresa el pie">
         </div>
         <button onclick="calculatePayment()">Calcular</button>
-        <p>*Este valor es referencial y puede variar en la realidad*</p>
+        <p class="disclaimer">*Este valor es referencial y puede variar en la realidad*</p>
         <div class="result" id="result"></div>
     </div>
 
@@ -116,7 +144,7 @@
             const downPayment = parseFloat(document.getElementById('downPayment').value);
 
             if (isNaN(carPrice) || isNaN(months) || isNaN(downPayment)) {
-                alert("Por favor, completa todos los campos.");
+                alert("Por favor, completa todos los campos con valores válidos.");
                 return;
             }
 
@@ -125,10 +153,12 @@
             const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -months));
             const totalPayment = monthlyPayment * months;
 
-            document.getElementById('result').innerHTML = `
-                <p>Pago Mensual: CLP ${monthlyPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
-                <p>Pago Total: CLP ${totalPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `
+                <p>Pago Mensual: ${monthlyPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
+                <p>Pago Total: ${totalPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
             `;
+            resultElement.style.display = 'block';
         }
     </script>
 </body>
