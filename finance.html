@@ -148,10 +148,9 @@
         <button id="applyButton" onclick="window.open('https://api.leadconnectorhq.com/widget/form/eZSh7BtUDtqOuinvlVK4', '_blank')">Ve si aplicas</button>
     </div>
 
-    <script>
+ <script>
         function calculatePayment() {
             const carPrice = parseFloat(document.getElementById('carPrice').value);
-            const interestRate = 3 / 100; // Tasa fija de 2.5% mensual
             const months = parseInt(document.getElementById('months').value);
             const downPayment = parseFloat(document.getElementById('downPayment').value);
 
@@ -159,6 +158,9 @@
                 alert("Por favor, completa todos los campos con valores válidos.");
                 return;
             }
+
+            // Determinar la tasa de interés basada en el precio del auto
+            const interestRate = carPrice < 8000000 ? 4 / 100 : 3 / 100;
 
             const loanAmount = carPrice - downPayment;
             const monthlyInterestRate = interestRate;
@@ -169,6 +171,7 @@
             resultElement.innerHTML = `
                 <p>Pago Mensual: ${monthlyPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
                 <p>Pago Total: ${totalPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
+                <p>Tasa de Interés: ${(interestRate * 100).toFixed(1)}%</p>
             `;
             resultElement.style.display = 'block';
 
