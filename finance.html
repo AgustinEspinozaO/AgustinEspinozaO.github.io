@@ -59,13 +59,13 @@
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: #fb454c;
         }
 
         button {
             width: 100%;
             padding: 12px;
-            background-color: #3498db;
+            background-color: #fb454c;
             border: none;
             border-radius: 6px;
             color: white;
@@ -77,7 +77,7 @@
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: #e03940;
         }
 
         .disclaimer {
@@ -104,12 +104,12 @@
 
         #applyButton {
             display: none;
-            background-color: #27ae60;
+            background-color: #fb454c;
             margin-top: 20px;
         }
 
         #applyButton:hover {
-            background-color: #2ecc71;
+            background-color: #e03940;
         }
 
         @media (max-width: 480px) {
@@ -148,7 +148,7 @@
         <button id="applyButton" onclick="window.open('https://api.leadconnectorhq.com/widget/form/eZSh7BtUDtqOuinvlVK4', '_blank')">Ve si aplicas</button>
     </div>
 
- <script>
+    <script>
         function calculatePayment() {
             const carPrice = parseFloat(document.getElementById('carPrice').value);
             const months = parseInt(document.getElementById('months').value);
@@ -159,9 +159,7 @@
                 return;
             }
 
-            // Determinar la tasa de interés basada en el precio del auto
             const interestRate = carPrice < 8000000 ? 4 / 100 : 3 / 100;
-
             const loanAmount = carPrice - downPayment;
             const monthlyInterestRate = interestRate;
             const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -months));
@@ -171,11 +169,9 @@
             resultElement.innerHTML = `
                 <p>Pago Mensual: ${monthlyPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
                 <p>Pago Total: ${totalPayment.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</p>
-                <p>Tasa de Interés: ${(interestRate * 100).toFixed(1)}%</p>
             `;
             resultElement.style.display = 'block';
 
-            // Mostrar el botón "Ve si aplicas"
             document.getElementById('applyButton').style.display = 'block';
         }
     </script>
