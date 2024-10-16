@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetProfile Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.31/vue.global.prod.js"></script>
+</head>
+<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-2xl overflow-hidden">
+            <header class="bg-gradient-to-r from-blue-500 to-purple-600 p-6 flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-white">PetProfile Pro</h1>
+                <button @click="toggleEditMode" class="bg-white text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-purple-100 transition duration-300">
+                    {{ isEditMode ? 'Guardar' : 'Editar' }}
+                </button>
+            </header>
+            
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-1/3 mb-6 md:mb-0">
+                        <div class="relative">
+                            <img :src="petInfo.photo" alt="Foto de la mascota" class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            <label v-if="isEditMode" for="photoUpload" class="absolute bottom-2 right-2 bg-white p-2 rounded-full cursor-pointer hover:bg-gray-100">
+                                <i class="fas fa-camera text-purple-600"></i>
+                                <input id="photoUpload" type="file" @change="updatePhoto" class="hidden" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="md:w-2/3 md:pl-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                            <span v-if="!isEditMode">{{ petInfo.name }}</span>
+                            <input v-else v-model="petInfo.name" class="w-full p-2 border rounded" placeholder="Nombre de la mascota">
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div v-for="(label, key) in fieldLabels" :key="key" class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" :for="key">
+                                    {{ label }}
+                                </label>
+                                <span v-if="!isEditMode" class="text-gray-600">{{ petInfo[key] }}</span>
+                                <input v-else v-model="petInfo[key]" :id="key" class="w-full p-2 border rounded" :placeholder="label">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gray-100 p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Información adicional</h3>
+                <div v-if="!isEditMode" class="prose" v-html="petInfo.additionalInfo"></div>
+                <textarea v-else v-model="petInfo.additionalInfo" rows="4" class="w-full p-2 border rounded" placeholder="Añade información adicional sobre tu mascota aquí..."></textarea>
+            </div>
+            
+            <footer class="bg-gray-800 text-white p-4 text-center">
+                <p>&copy; 2024 PetProfile Pro. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive } = Vue;
+
+        createApp({
+            setup() {
+                const isEditMode = ref(false);
+                const petInfo = reactive({
+                    photo: '/api/placeholder/400/300',
+                    name: 'Max',
+                    age: '3 años',
+                    breed: 'Labrador',
+                    species: 'Perro',
+                    owner: 'Juan Pérez',
+                    phone: '+34 123 456 789',
+                    address: 'Calle Principal 123, Ciudad',
+                    email: 'juan@example.com',
+                    veterinarian: 'Dra. Ana García',
+                    chipNumber: '123456789012345',
+                    additionalInfo: '<p>Max es un perro muy juguetón y cariñoso. Le encanta jugar a buscar la pelota y dar largos paseos por el parque.</p>'
+                });
+
+                const fieldLabels = {
+                    age: 'Edad',
+                    breed: 'Raza',
+                    species: 'Especie',
+                    owner: 'Dueño',
+                    phone: 'Teléfono de contacto',
+                    address: 'Dirección',
+                    email: 'Correo electrónico',
+                    veterinarian: 'Veterinario',
+                    chipNumber: 'Número de microchip'
+                };
+
+                const toggleEditMode = () => {
+                    isEditMode.value = !isEditMode.value;
+                    if (!isEditMode.value) {
+                        // Aquí se implementaría la lógica para guardar los cambios en el backend
+                        console.log('Guardando cambios:', petInfo);
+                        // Simulación de guardado
+                        setTimeout(() => {
+                            alert('Cambios guardados con éxito!');
+                        }, 500);
+                    }
+                };
+
+                const updatePhoto = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            petInfo.photo = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                };
+
+                return {
+                    isEditMode,
+                    petInfo,
+                    fieldLabels,
+                    toggleEditMode,
+                    updatePhoto
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
