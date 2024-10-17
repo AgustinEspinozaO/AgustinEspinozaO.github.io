@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Mascota</title>
+    <title>Perfil de Max - Sistema de Alerta de Mascota Perdida</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen">
+<body class="bg-gradient-to-r from-blue-400 to-blue-600 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <div class="bg-white rounded-lg shadow-2xl overflow-hidden">
-            <header class="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
-                <h1 class="text-3xl font-bold text-white text-center">Perfil de Max</h1>
+            <header class="bg-red-600 p-6 relative">
+                <h1 class="text-3xl font-bold text-white text-center">¡ALERTA! Mascota Perdida</h1>
             </header>
             
             <div class="p-6">
@@ -23,57 +23,118 @@
                         <h2 class="text-2xl font-bold text-gray-800 mb-4">Información de la Mascota</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Edad:</p>
-                                <p class="text-gray-600">3 años</p>
+                                <p class="text-gray-700 font-bold">Nombre:</p>
+                                <p class="text-gray-600">Max</p>
                             </div>
                             <div class="mb-4">
                                 <p class="text-gray-700 font-bold">Raza:</p>
                                 <p class="text-gray-600">Labrador</p>
                             </div>
                             <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Especie:</p>
-                                <p class="text-gray-600">Perro</p>
+                                <p class="text-gray-700 font-bold">Edad:</p>
+                                <p class="text-gray-600">3 años</p>
                             </div>
                             <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Dueño:</p>
-                                <p class="text-gray-600">Juan Pérez</p>
+                                <p class="text-gray-700 font-bold">Sexo:</p>
+                                <p class="text-gray-600">Macho</p>
                             </div>
                             <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Teléfono de contacto:</p>
-                                <p class="text-gray-600">+34 123 456 789</p>
+                                <p class="text-gray-700 font-bold">Color:</p>
+                                <p class="text-gray-600">Dorado</p>
                             </div>
                             <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Dirección:</p>
-                                <p class="text-gray-600">Calle Principal 123, Ciudad</p>
-                            </div>
-                            <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Correo electrónico:</p>
-                                <p class="text-gray-600">juan@example.com</p>
-                            </div>
-                            <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Veterinario:</p>
-                                <p class="text-gray-600">Dra. Ana García</p>
-                            </div>
-                            <div class="mb-4">
-                                <p class="text-gray-700 font-bold">Número de microchip:</p>
-                                <p class="text-gray-600">123456789012345</p>
+                                <p class="text-gray-700 font-bold">Características distintivas:</p>
+                                <p class="text-gray-600">Mancha blanca en el pecho</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-gray-100 p-6">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Información adicional</h3>
-                <div class="prose">
-                    <p>Max es un perro muy juguetón y cariñoso. Le encanta jugar a buscar la pelota y dar largos paseos por el parque. Es amigable con otros perros y niños, y disfruta mucho de la compañía de su familia.</p>
+            <div class="bg-yellow-100 p-6">
+                <h3 class="text-xl font-semibold text-red-600 mb-4">¡Ayuda a Max a volver a casa!</h3>
+                <p class="mb-4">Si has encontrado a Max, por favor, contacta inmediatamente con su dueño:</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="mb-4">
+                        <p class="text-gray-700 font-bold">Dueño:</p>
+                        <p class="text-gray-600">Juan Pérez</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-gray-700 font-bold">Teléfono de contacto:</p>
+                        <p class="text-gray-600">+34 123 456 789</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-gray-700 font-bold">Correo electrónico:</p>
+                        <p class="text-gray-600">juan@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Sistema de Alerta Rápida</h3>
+                <p class="mb-4">Usa los botones a continuación para notificar rápidamente al dueño:</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="sendAlert('sms')" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                        <i class="fas fa-sms mr-2"></i>Enviar SMS
+                    </button>
+                    <button onclick="sendAlert('email')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                        <i class="fas fa-envelope mr-2"></i>Enviar Email
+                    </button>
+                    <button onclick="sendAlert('whatsapp')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </button>
                 </div>
             </div>
             
+            <div id="map-container" class="p-6 hidden">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Ubicación Actual</h3>
+                <div id="map" class="w-full h-64 rounded-lg shadow-md"></div>
+            </div>
+            
             <footer class="bg-gray-800 text-white p-4 text-center">
-                <p>&copy; 2024 Perfil de Mascota. Todos los derechos reservados.</p>
+                <p>&copy; 2024 Sistema de Alerta de Mascota Perdida. Todos los derechos reservados.</p>
             </footer>
         </div>
     </div>
+
+    <script>
+        function sendAlert(method) {
+            let message = `¡He encontrado a Max! `;
+            let action = '';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    message += `Estoy en estas coordenadas: ${latitude}, ${longitude}. `;
+                    
+                    switch(method) {
+                        case 'sms':
+                            action = `sms:+34123456789?body=${encodeURIComponent(message)}`;
+                            break;
+                        case 'email':
+                            action = `mailto:juan@example.com?subject=He encontrado a Max&body=${encodeURIComponent(message)}`;
+                            break;
+                        case 'whatsapp':
+                            action = `https://wa.me/34123456789?text=${encodeURIComponent(message)}`;
+                            break;
+                    }
+                    
+                    window.open(action, '_blank');
+                    showMap(latitude, longitude);
+                });
+            } else {
+                alert("La geolocalización no está soportada por este navegador.");
+            }
+        }
+
+        function showMap(latitude, longitude) {
+            const mapContainer = document.getElementById('map-container');
+            mapContainer.classList.remove('hidden');
+            
+            const mapElement = document.getElementById('map');
+            mapElement.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=${longitude-0.01}%2C${latitude-0.01}%2C${longitude+0.01}%2C${latitude+0.01}&amp;layer=mapnik&amp;marker=${latitude}%2C${longitude}" style="border: 1px solid black"></iframe>`;
+        }
+    </script>
 </body>
 </html>
