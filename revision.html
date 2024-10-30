@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Vehículos</title>
+    <link rel="stylesheet" href="styles.css">
+  <style>body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+output {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group label {
+    cursor: pointer;
+    padding: 5px 10px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.radio-group input[type="radio"]:checked + label {
+    background-color: #3498db;
+    color: #fff;
+}
+
+#report {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    form {
+        padding: 15px;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+  </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Evaluación de Vehículos</h1>
+        <form id="vehicleEvaluationForm">
+            <div class="form-group">
+                <label>Revisión técnica al día:</label>
+                <div class="radio-group">
+                    <input type="radio" id="technicalReviewYes" name="technicalReview" value="Sí" required>
+                    <label for="technicalReviewYes">Sí</label>
+                    <input type="radio" id="technicalReviewNo" name="technicalReview" value="No">
+                    <label for="technicalReviewNo">No</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Bien cuidado:</label>
+                <div class="radio-group">
+                    <input type="radio" id="wellMaintainedYes" name="wellMaintained" value="Sí" required>
+                    <label for="wellMaintainedYes">Sí</label>
+                    <input type="radio" id="wellMaintainedNo" name="wellMaintained" value="No">
+                    <label for="wellMaintainedNo">No</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Papeles al día:</label>
+                <div class="radio-group">
+                    <input type="radio" id="papersUpToDateYes" name="papersUpToDate" value="Sí" required>
+                    <label for="papersUpToDateYes">Sí</label>
+                    <input type="radio" id="papersUpToDateNo" name="papersUpToDate" value="No">
+                    <label for="papersUpToDateNo">No</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Daños visibles:</label>
+                <div class="radio-group">
+                    <input type="radio" id="visibleDamageYes" name="visibleDamage" value="Sí" required>
+                    <label for="visibleDamageYes">Sí</label>
+                    <input type="radio" id="visibleDamageNo" name="visibleDamage" value="No">
+                    <label for="visibleDamageNo">No</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Detalles de pintura:</label>
+                <div class="radio-group">
+                    <input type="radio" id="paintDetailsYes" name="paintDetails" value="Sí" required>
+                    <label for="paintDetailsYes">Sí</label>
+                    <input type="radio" id="paintDetailsNo" name="paintDetails" value="No">
+                    <label for="paintDetailsNo">No</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="engineCondition">Estado del motor (1-5):</label>
+                <input type="range" id="engineCondition" name="engineCondition" min="1" max="5" value="3" required>
+                <output for="engineCondition"></output>
+            </div>
+
+            <div class="form-group">
+                <label for="interiorCondition">Estado del interior (1-5):</label>
+                <input type="range" id="interiorCondition" name="interiorCondition" min="1" max="5" value="3" required>
+                <output for="interiorCondition"></output>
+            </div>
+
+            <div class="form-group">
+                <label for="additionalComments">Comentarios adicionales:</label>
+                <textarea id="additionalComments" name="additionalComments" rows="4"></textarea>
+            </div>
+
+            <button type="submit">Generar Informe</button>
+        </form>
+
+        <div id="report" class="hidden">
+            <h2>Resumen de la Evaluación</h2>
+            <div id="reportContent"></div>
+            <button id="downloadPDF">Descargar PDF</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('vehicleEvaluationForm');
+    const report = document.getElementById('report');
+    const reportContent = document.getElementById('reportContent');
+    const downloadPDFButton = document.getElementById('downloadPDF');
+
+    // Actualizar los valores de los sliders
+    const sliders = document.querySelectorAll('input[type="range"]');
+    sliders.forEach(slider => {
+        const output = slider.nextElementSibling;
+        output.textContent = slider.value;
+        slider.addEventListener('input', function() {
+            output.textContent = this.value;
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (form.checkValidity()) {
+            const formData = new FormData(form);
+            let reportHTML = '<ul>';
+
+            for (let [key, value] of formData.entries()) {
+                let label = form.querySelector(`[name="${key}"]`).previousElementSibling.textContent;
+                label = label.replace(':', '');
+
+                if (key === 'engineCondition' || key === 'interiorCondition') {
+                    reportHTML += `<li><strong>${label}</strong>: ${value}/5</li>`;
+                } else {
+                    reportHTML += `<li><strong>${label}</strong>: ${value}</li>`;
+                }
+            }
+
+            reportHTML += '</ul>';
+            reportContent.innerHTML = reportHTML;
+            report.classList.remove('hidden');
+        } else {
+            alert('Por favor, complete todos los campos requeridos.');
+        }
+    });
+
+    downloadPDFButton.addEventListener('click', function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.text('Resumen de la Evaluación del Vehículo', 10, 10);
+        
+        const reportText = reportContent.innerText;
+        const lines = doc.splitTextToSize(reportText, 180);
+        doc.text(lines, 10, 20);
+
+        doc.save('evaluacion_vehiculo.pdf');
+    });
+});
+  </script>
+</body>
+</html>
