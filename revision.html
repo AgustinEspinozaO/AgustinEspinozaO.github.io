@@ -4,258 +4,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación de Vehículos</title>
-    <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2c3e50;
-            --background-color: #ecf0f1;
-            --text-color: #34495e;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--background-color);
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #ffffff;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--secondary-color);
-            margin-bottom: 2rem;
-        }
-
-        form {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: grid;
-            gap: 0.5rem;
-        }
-
-        label {
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        input[type="range"] {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 10px;
-            border-radius: 5px;
-            background: #d3d3d3;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-        }
-
-        output {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            resize: vertical;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .radio-group input[type="radio"] {
-            display: none;
-        }
-
-        .radio-group label {
-            cursor: pointer;
-            padding: 0.5rem 1rem;
-            background-color: #f1f1f1;
-            border-radius: var(--border-radius);
-            transition: all 0.3s ease;
-        }
-
-        .radio-group input[type="radio"]:checked + label {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        #report {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #f9f9f9;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-
-        #report h2 {
-            color: var(--secondary-color);
-            margin-bottom: 1rem;
-        }
-
-        #reportContent ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #reportContent li {
-            margin-bottom: 0.5rem;
-        }
-
-        #downloadPDF {
-            margin-top: 1rem;
-            background-color: #27ae60;
-        }
-
-        #downloadPDF:hover {
-            background-color: #2ecc71;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .custom-range {
+                @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer;
             }
-
-            .radio-group {
-                flex-direction: column;
+            .custom-range::-webkit-slider-thumb {
+                @apply appearance-none w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
+            }
+            .custom-range::-moz-range-thumb {
+                @apply w-6 h-6 bg-blue-500 rounded-full cursor-pointer;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Evaluación de Vehículos</h1>
-        <form id="vehicleEvaluationForm">
-            <div class="form-group">
-                <label>Revisión técnica al día:</label>
-                <div class="radio-group">
-                    <input type="radio" id="technicalReviewYes" name="technicalReview" value="Sí" required>
-                    <label for="technicalReviewYes">Sí</label>
-                    <input type="radio" id="technicalReviewNo" name="technicalReview" value="No">
-                    <label for="technicalReviewNo">No</label>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="container max-w-2xl bg-white rounded-lg shadow-lg p-8">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Evaluación de Vehículos</h1>
+        <form id="vehicleEvaluationForm" class="space-y-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Revisión técnica al día:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="technicalReview" value="Sí" required>
+                            <span class="ml-2">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="technicalReview" value="No">
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bien cuidado:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="wellMaintained" value="Sí" required>
+                            <span class="ml-2">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="wellMaintained" value="No">
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Papeles al día:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="papersUpToDate" value="Sí" required>
+                            <span class="ml-2">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="papersUpToDate" value="No">
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Daños visibles:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="visibleDamage" value="Sí" required>
+                            <span class="ml-2">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="visibleDamage" value="No">
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Detalles de pintura:</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="paintDetails" value="Sí" required>
+                            <span class="ml-2">Sí</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" class="form-radio text-blue-600" name="paintDetails" value="No">
+                            <span class="ml-2">No</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="engineCondition" class="block text-sm font-medium text-gray-700 mb-2">Estado del motor (1-5):</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" id="engineCondition" name="engineCondition" min="1" max="5" value="3" class="custom-range" required>
+                        <output for="engineCondition" class="text-blue-600 font-bold">3</output>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="interiorCondition" class="block text-sm font-medium text-gray-700 mb-2">Estado del interior (1-5):</label>
+                    <div class="flex items-center space-x-4">
+                        <input type="range" id="interiorCondition" name="interiorCondition" min="1" max="5" value="3" class="custom-range" required>
+                        <output for="interiorCondition" class="text-blue-600 font-bold">3</output>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="additionalComments" class="block text-sm font-medium text-gray-700 mb-2">Comentarios adicionales:</label>
+                    <textarea id="additionalComments" name="additionalComments" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"></textarea>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Bien cuidado:</label>
-                <div class="radio-group">
-                    <input type="radio" id="wellMaintainedYes" name="wellMaintained" value="Sí" required>
-                    <label for="wellMaintainedYes">Sí</label>
-                    <input type="radio" id="wellMaintainedNo" name="wellMaintained" value="No">
-                    <label for="wellMaintainedNo">No</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Papeles al día:</label>
-                <div class="radio-group">
-                    <input type="radio" id="papersUpToDateYes" name="papersUpToDate" value="Sí" required>
-                    <label for="papersUpToDateYes">Sí</label>
-                    <input type="radio" id="papersUpToDateNo" name="papersUpToDate" value="No">
-                    <label for="papersUpToDateNo">No</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Daños visibles:</label>
-                <div class="radio-group">
-                    <input type="radio" id="visibleDamageYes" name="visibleDamage" value="Sí" required>
-                    <label for="visibleDamageYes">Sí</label>
-                    <input type="radio" id="visibleDamageNo" name="visibleDamage" value="No">
-                    <label for="visibleDamageNo">No</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Detalles de pintura:</label>
-                <div class="radio-group">
-                    <input type="radio" id="paintDetailsYes" name="paintDetails" value="Sí" required>
-                    <label for="paintDetailsYes">Sí</label>
-                    <input type="radio" id="paintDetailsNo" name="paintDetails" value="No">
-                    <label for="paintDetailsNo">No</label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="engineCondition">Estado del motor (1-5):</label>
-                <input type="range" id="engineCondition" name="engineCondition" min="1" max="5" value="3" required>
-                <output for="engineCondition">3</output>
-            </div>
-
-            <div class="form-group">
-                <label for="interiorCondition">Estado del interior (1-5):</label>
-                <input type="range" id="interiorCondition" name="interiorCondition" min="1" max="5" value="3" required>
-                <output for="interiorCondition">3</output>
-            </div>
-
-            <div class="form-group">
-                <label for="additionalComments">Comentarios adicionales:</label>
-                <textarea id="additionalComments" name="additionalComments" rows="4"></textarea>
-            </div>
-
-            <button type="submit">Generar Informe</button>
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200">
+                Generar Informe
+            </button>
         </form>
 
-        <div id="report" class="hidden">
-            <h2>Resumen de la Evaluación</h2>
-            <div id="reportContent"></div>
-            <button id="downloadPDF">Descargar PDF</button>
+        <div id="report" class="mt-8 bg-gray-50 p-6 rounded-lg shadow hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Resumen de la Evaluación</h2>
+            <div id="reportContent" class="space-y-4"></div>
+            <button id="downloadPDF" class="mt-6 w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200">
+                Descargar PDF
+            </button>
         </div>
     </div>
 
@@ -284,32 +155,34 @@
 
                 if (form.checkValidity()) {
                     const formData = new FormData(form);
-                    let reportHTML = '<ul>';
+                    let reportHTML = '<ul class="list-disc pl-5 space-y-2">';
                     let positivePoints = 0;
                     let totalPoints = 0;
 
                     for (let [key, value] of formData.entries()) {
-                        let label = form.querySelector(`[name="${key}"]`).previousElementSibling.textContent;
-                        label = label.replace(':', '');
+                        let labelElement = form.querySelector(`[name="${key}"]`).closest('div').querySelector('label');
+                        if (labelElement) {
+                            let label = labelElement.textContent.replace(':', '');
 
-                        if (key === 'engineCondition' || key === 'interiorCondition') {
-                            reportHTML += `<li><strong>${label}</strong>: ${value}/5</li>`;
-                            positivePoints += parseInt(value);
-                            totalPoints += 5;
-                        } else if (key !== 'additionalComments') {
-                            reportHTML += `<li><strong>${label}</strong>: ${value}</li>`;
-                            if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
-                                positivePoints++;
-                            } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
-                                positivePoints++;
+                            if (key === 'engineCondition' || key === 'interiorCondition') {
+                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}/5</li>`;
+                                positivePoints += parseInt(value);
+                                totalPoints += 5;
+                            } else if (key !== 'additionalComments') {
+                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
+                                if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
+                                    positivePoints++;
+                                } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
+                                    positivePoints++;
+                                }
+                                totalPoints++;
                             }
-                            totalPoints++;
                         }
                     }
 
                     const additionalComments = formData.get('additionalComments');
                     if (additionalComments) {
-                        reportHTML += `<li><strong>Comentarios adicionales</strong>: ${additionalComments}</li>`;
+                        reportHTML += `<li><span class="font-semibold">Comentarios adicionales</span>: ${additionalComments}</li>`;
                     }
 
                     reportHTML += '</ul>';
@@ -317,18 +190,22 @@
                     // Generar resumen y recomendación
                     const score = (positivePoints / totalPoints) * 100;
                     let recommendation = '';
+                    let recommendationClass = '';
                     if (score >= 80) {
                         recommendation = 'Este vehículo parece estar en excelentes condiciones. Se recomienda su compra.';
+                        recommendationClass = 'text-green-600';
                     } else if (score >= 60) {
                         recommendation = 'Este vehículo está en buenas condiciones, pero considera algunos puntos de mejora. La compra podría ser una buena opción si el precio es adecuado.';
+                        recommendationClass = 'text-yellow-600';
                     } else {
                         recommendation = 'Este vehículo tiene varios problemas. Se recomienda buscar otras opciones o negociar un precio significativamente menor.';
+                        recommendationClass = 'text-red-600';
                     }
 
                     const summary = `
-                        <h3>Resumen de la Evaluación</h3>
-                        <p>Puntuación total: ${score.toFixed(2)}%</p>
-                        <p><strong>Recomendación:</strong> ${recommendation}</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Resumen de la Evaluación</h3>
+                        <p class="text-lg mb-2">Puntuación total: <span class="font-bold text-blue-600">${score.toFixed(2)}%</span></p>
+                        <p class="font-bold ${recommendationClass}">${recommendation}</p>
                     `;
 
                     reportContent.innerHTML = reportHTML + summary;
