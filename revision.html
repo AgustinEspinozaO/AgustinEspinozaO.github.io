@@ -273,6 +273,21 @@
         .report:not(.hidden) {
             animation: fadeIn 0.3s ease-out;
         }
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-group output {
+            min-width: 2.5rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.25rem;
+            text-align: center;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -396,36 +411,143 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('vehicleEvaluationForm');
-            const report = document.getElementById('report');
-            const reportContent = document.getElementById('reportContent');
-            const downloadPDFButton = document.getElementById('downloadPDF');
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('vehicleEvaluationForm');
+                const report = document.getElementById('report');
+                const reportContent = document.getElementById('reportContent');
+                const downloadPDFButton = document.getElementById('downloadPDF');
 
-            // Actualizar los valores de los sliders
-            const sliders = document.querySelectorAll('input[type="range"]');
-            sliders.forEach(slider => {
-                const output = slider.nextElementSibling;
-                if (output) {
-                    output.textContent = slider.value;
-                    slider.addEventListener('input', function() {
-                        output.textContent = this.value;
+                // Mejorar la actualización de los sliders
+                const sliders = document.querySelectorAll('input[type="range"]');
+                sliders.forEach(slider => {
+                    const output = slider.nextElementSibling;
+                    // Establecer valor inicial
+                    if (output) {
+                        output.textContent = `${slider.value}/5`;
+                        
+                        // Actualizar en tiempo real al mover el slider
+                        slider.addEventListener('input', function() {
+                            output.textContent = `${this.value}/5`;
+                        });
+                    }
+                });
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    if (form.checkValidity()) {
+                        const formData = new FormData(form);
+                        let reportHTML = '<ul>';
+                        let positivePoints = 0;
+                        let totalPoints = 0;
+
+                        const labelMap = {
+                            'technicalReview': 'Revisión técnica al día',
+                            'wellMaintained': 'Bien cuidado',
+                            'papersUpToDate': 'Papeles al día',
+                            'visibleDamage': 'Daños visibles',
+                            'paintDetails': 'Detalles de pintura',
+                            'engineCondition': 'Estado del motor',
+                            'interiorCondition': 'Estado del interior',
+                            'brand': 'Marca',
+                            'model': 'Modelo',
+                            'licensePlate': 'Patente'
+                        };
+
+                        // Procesar los datos del formulario
+                        for (let [key, value] of formData.entries()) {
+                            const label = labelMap[key] || key;
+
+                            if (key === 'brand' || key === 'model' || key === 'licensePlate') {
+                                reportHTML += `<li><strong>${label}:</strong> ${value}</li>`;
+                            } else if (key === 'engineCondition' || key === 'interiorCondition') {
+                                reportHTML += `<li><strong>${label}:</strong> ${value}/5</li>`;
+                                positivePoints += parseInt(value);
+                                totalPoints += 5;
+                            } else if (key !== 'additionalComments') {
+                                reportHTML += `<li><strong>${label}:</strong> ${value}</li>`;
+                                if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
+                                    positivePoints++;
+                                } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
+                                    positivePoints++;
+                                }
+                                totalPoints++;
+                            }
+                        }
+
+                        const additionalComments = formData.get('additionalComments');
+                        if (additionalComments) {
+                            reportHTML += `<li><strong>Comentarios adicionales:</strong> ${additionalComments}</li>`;
+                        }
+
+                        reportHTML += '</ul>';
+
+                        const score = (positivePoints / totalPoints) * 100;
+                        let recommendation = '';
+                        let recommendationClass = '';
+                        
+                        if (score >= 80) {
+                            recommendation = 'Este vehículo está en excelentes condiciones. Se recomienda su compra.';
+                            recommendationClass = 'text-success';
+                        } else if (score >= 60) {
+                            recommendation = 'Este vehículo está en buenas condiciones, pero considera algunos puntos de mejora. La compra podría ser una buena opción si el precio es adecuado.';
+                            recommendationClass = 'text-warning';
+                        } else {
+                            recommendation = 'Este vehículo tiene varios problemas. Se recomienda buscar otras opciones o negociar un precio significativamente menor.';
+                            recommendationClass = 'text-danger';
+                        }
+
+                        const summary = `
+                            <div class="report-summary">
+                                <h3>Evaluación Final</h3>
+                                <p class="score">Puntuación total: <strong>${score.toFixed(1)}%</strong></p>
+                                <p class="${recommendationClass}">${recommendation}</p>
+                            </div>
+                        `;
+
+                        reportContent.innerHTML = reportHTML + summary;
+                        report.classList.remove('hidden');
+                    }
+                });
+
+                downloadPDFButton.addEventListener('click', function() {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Configuración inicial del PDF
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(20);
+                    doc.text('Evaluación del Vehículo', 105, 20, { align: 'center' });
+
+                    // Agregar contenido del reporte
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(12);
+
+                    const reportText = reportContent.innerText;
+                    const lines = doc.splitTextToSize(reportText, 180);
+                    doc.text(lines, 15, 40);
+
+                    // Agregar borde decorativo
+                    doc.setDrawColor(79, 70, 229); // Color primario
+                    doc.rect(10, 10, 190, 277);
+
+                    // Agregar pie de página
+                    doc.setFontSize(10);
+                    doc.setTextColor(107, 114, 128);
+                    const fecha = new Date().toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
                     });
-                    slider.addEventListener('change', function() {
-                        output.textContent = this.value;
-                    });
-                }
+                    doc.text(`Informe generado el ${fecha}`, 105, 285, { align: 'center' });
+
+                    // Guardar el PDF
+                    const marca = document.getElementById('brand').value;
+                    const modelo = document.getElementById('model').value;
+                    doc.save(`evaluacion_${marca}_${modelo}.pdf`);
+                });
             });
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                if (form.checkValidity()) {
-                    const formData = new FormData(form);
-                    let reportHTML = '<ul>';
-                    let positivePoints = 0;
-                    let totalPoints = 0;
-
-                    const labelMap = {
-                        'technicalReview': 'Revisión técnica al día',
+        </script>
