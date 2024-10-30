@@ -4,127 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluación de Vehículos</title>
-    <link rel="stylesheet" href="styles.css">
-  <style>body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+        }
 
-h1 {
-    text-align: center;
-    color: #2c3e50;
-}
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
 
-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+        h1 {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 2rem;
+        }
 
-.form-group {
-    margin-bottom: 20px;
-}
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
 
-input[type="range"] {
-    width: 100%;
-}
+        label {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
 
-output {
-    display: inline-block;
-    margin-left: 10px;
-}
+        input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+        }
 
-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-}
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
 
-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-}
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
 
-button:hover {
-    background-color: #2980b9;
-}
+        output {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
 
-.radio-group {
-    display: flex;
-    gap: 20px;
-}
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            resize: vertical;
+        }
 
-.radio-group input[type="radio"] {
-    display: none;
-}
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
 
-.radio-group label {
-    cursor: pointer;
-    padding: 5px 10px;
-    background-color: #f1f1f1;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-}
+        button:hover {
+            background-color: #2980b9;
+        }
 
-.radio-group input[type="radio"]:checked + label {
-    background-color: #3498db;
-    color: #fff;
-}
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+        }
 
-#report {
-    margin-top: 20px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+        .radio-group input[type="radio"] {
+            display: none;
+        }
 
-.hidden {
-    display: none;
-}
+        .radio-group label {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            background-color: #f1f1f1;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+        }
 
-@media (max-width: 600px) {
-    .container {
-        padding: 10px;
-    }
+        .radio-group input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
 
-    form {
-        padding: 15px;
-    }
+        #report {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
 
-    .radio-group {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-  </style>
+        #report h2 {
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        #reportContent ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #reportContent li {
+            margin-bottom: 0.5rem;
+        }
+
+        #downloadPDF {
+            margin-top: 1rem;
+            background-color: #27ae60;
+        }
+
+        #downloadPDF:hover {
+            background-color: #2ecc71;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -183,13 +235,13 @@ button:hover {
             <div class="form-group">
                 <label for="engineCondition">Estado del motor (1-5):</label>
                 <input type="range" id="engineCondition" name="engineCondition" min="1" max="5" value="3" required>
-                <output for="engineCondition"></output>
+                <output for="engineCondition">3</output>
             </div>
 
             <div class="form-group">
                 <label for="interiorCondition">Estado del interior (1-5):</label>
                 <input type="range" id="interiorCondition" name="interiorCondition" min="1" max="5" value="3" required>
-                <output for="interiorCondition"></output>
+                <output for="interiorCondition">3</output>
             </div>
 
             <div class="form-group">
@@ -208,102 +260,101 @@ button:hover {
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="script.js"></script>
-  <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('vehicleEvaluationForm');
-    const report = document.getElementById('report');
-    const reportContent = document.getElementById('reportContent');
-    const downloadPDFButton = document.getElementById('downloadPDF');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('vehicleEvaluationForm');
+            const report = document.getElementById('report');
+            const reportContent = document.getElementById('reportContent');
+            const downloadPDFButton = document.getElementById('downloadPDF');
 
-    // Actualizar los valores de los sliders
-    const sliders = document.querySelectorAll('input[type="range"]');
-    sliders.forEach(slider => {
-        const output = slider.nextElementSibling;
-        if (output) {
-            output.textContent = slider.value;
-            slider.addEventListener('input', function() {
-                output.textContent = this.value;
-            });
-        }
-    });
-
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        if (form.checkValidity()) {
-            const formData = new FormData(form);
-            let reportHTML = '<ul>';
-            let positivePoints = 0;
-            let totalPoints = 0;
-
-            for (let [key, value] of formData.entries()) {
-                let label = form.querySelector(`[name="${key}"]`).previousElementSibling.textContent;
-                label = label.replace(':', '');
-
-                if (key === 'engineCondition' || key === 'interiorCondition') {
-                    reportHTML += `<li><strong>${label}</strong>: ${value}/5</li>`;
-                    positivePoints += parseInt(value);
-                    totalPoints += 5;
-                } else if (key !== 'additionalComments') {
-                    reportHTML += `<li><strong>${label}</strong>: ${value}</li>`;
-                    if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
-                        positivePoints++;
-                    } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
-                        positivePoints++;
-                    }
-                    totalPoints++;
+            // Actualizar los valores de los sliders
+            const sliders = document.querySelectorAll('input[type="range"]');
+            sliders.forEach(slider => {
+                const output = slider.nextElementSibling;
+                if (output) {
+                    output.textContent = slider.value;
+                    slider.addEventListener('input', function() {
+                        output.textContent = this.value;
+                    });
                 }
-            }
+            });
 
-            const additionalComments = formData.get('additionalComments');
-            if (additionalComments) {
-                reportHTML += `<li><strong>Comentarios adicionales</strong>: ${additionalComments}</li>`;
-            }
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            reportHTML += '</ul>';
+                if (form.checkValidity()) {
+                    const formData = new FormData(form);
+                    let reportHTML = '<ul>';
+                    let positivePoints = 0;
+                    let totalPoints = 0;
 
-            // Generar resumen y recomendación
-            const score = (positivePoints / totalPoints) * 100;
-            let recommendation = '';
-            if (score >= 80) {
-                recommendation = 'Este vehículo parece estar en excelentes condiciones. Se recomienda su compra.';
-            } else if (score >= 60) {
-                recommendation = 'Este vehículo está en buenas condiciones, pero considera algunos puntos de mejora. La compra podría ser una buena opción si el precio es adecuado.';
-            } else {
-                recommendation = 'Este vehículo tiene varios problemas. Se recomienda buscar otras opciones o negociar un precio significativamente menor.';
-            }
+                    for (let [key, value] of formData.entries()) {
+                        let label = form.querySelector(`[name="${key}"]`).previousElementSibling.textContent;
+                        label = label.replace(':', '');
 
-            const summary = `
-                <h3>Resumen de la Evaluación</h3>
-                <p>Puntuación total: ${score.toFixed(2)}%</p>
-                <p><strong>Recomendación:</strong> ${recommendation}</p>
-            `;
+                        if (key === 'engineCondition' || key === 'interiorCondition') {
+                            reportHTML += `<li><strong>${label}</strong>: ${value}/5</li>`;
+                            positivePoints += parseInt(value);
+                            totalPoints += 5;
+                        } else if (key !== 'additionalComments') {
+                            reportHTML += `<li><strong>${label}</strong>: ${value}</li>`;
+                            if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
+                                positivePoints++;
+                            } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
+                                positivePoints++;
+                            }
+                            totalPoints++;
+                        }
+                    }
 
-            reportContent.innerHTML = reportHTML + summary;
-            report.classList.remove('hidden');
-        } else {
-            alert('Por favor, complete todos los campos requeridos.');
-        }
-    });
+                    const additionalComments = formData.get('additionalComments');
+                    if (additionalComments) {
+                        reportHTML += `<li><strong>Comentarios adicionales</strong>: ${additionalComments}</li>`;
+                    }
 
-    downloadPDFButton.addEventListener('click', function() {
-        const { jsPDF } = window.jspdf;
-        if (typeof jsPDF === 'undefined') {
-            alert('Error: No se pudo cargar la biblioteca jsPDF. Por favor, verifica tu conexión a internet y vuelve a intentarlo.');
-            return;
-        }
-        const doc = new jsPDF();
+                    reportHTML += '</ul>';
 
-        doc.text('Resumen de la Evaluación del Vehículo', 10, 10);
-        
-        const reportText = reportContent.innerText;
-        const lines = doc.splitTextToSize(reportText, 180);
-        doc.text(lines, 10, 20);
+                    // Generar resumen y recomendación
+                    const score = (positivePoints / totalPoints) * 100;
+                    let recommendation = '';
+                    if (score >= 80) {
+                        recommendation = 'Este vehículo parece estar en excelentes condiciones. Se recomienda su compra.';
+                    } else if (score >= 60) {
+                        recommendation = 'Este vehículo está en buenas condiciones, pero considera algunos puntos de mejora. La compra podría ser una buena opción si el precio es adecuado.';
+                    } else {
+                        recommendation = 'Este vehículo tiene varios problemas. Se recomienda buscar otras opciones o negociar un precio significativamente menor.';
+                    }
 
-        doc.save('evaluacion_vehiculo.pdf');
-    });
-});
-  </script>
+                    const summary = `
+                        <h3>Resumen de la Evaluación</h3>
+                        <p>Puntuación total: ${score.toFixed(2)}%</p>
+                        <p><strong>Recomendación:</strong> ${recommendation}</p>
+                    `;
+
+                    reportContent.innerHTML = reportHTML + summary;
+                    report.classList.remove('hidden');
+                } else {
+                    alert('Por favor, complete todos los campos requeridos.');
+                }
+            });
+
+            downloadPDFButton.addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                if (typeof jsPDF === 'undefined') {
+                    alert('Error: No se pudo cargar la biblioteca jsPDF. Por favor, verifica tu conexión a internet y vuelve a intentarlo.');
+                    return;
+                }
+                const doc = new jsPDF();
+
+                doc.text('Resumen de la Evaluación del Vehículo', 10, 10);
+                
+                const reportText = reportContent.innerText;
+                const lines = doc.splitTextToSize(reportText, 180);
+                doc.text(lines, 10, 20);
+
+                doc.save('evaluacion_vehiculo.pdf');
+            });
+        });
+    </script>
 </body>
 </html>
