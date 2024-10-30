@@ -174,26 +174,38 @@
                     let positivePoints = 0;
                     let totalPoints = 0;
 
-                    for (let [key, value] of formData.entries()) {
-                        let labelElement = form.querySelector(`[name="${key}"]`).closest('div').querySelector('label');
-                        if (labelElement) {
-                            let label = labelElement.textContent.replace(':', '');
+                    // Mapeo de nombres de campos a etiquetas
+                    const labelMap = {
+                        'technicalReview': 'Revisión técnica al día',
+                        'wellMaintained': 'Bien cuidado',
+                        'papersUpToDate': 'Papeles al día',
+                        'visibleDamage': 'Daños visibles',
+                        'paintDetails': 'Detalles de pintura',
+                        'engineCondition': 'Estado del motor',
+                        'interiorCondition': 'Estado del interior',
+                        'brand': 'Marca',
+                        'model': 'Modelo',
+                        'licensePlate': 'Patente'
+                    };
 
-                            if (key === 'brand' || key === 'model' || key === 'licensePlate') {
-                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
-                            } else if (key === 'engineCondition' || key === 'interiorCondition') {
-                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}/5</li>`;
-                                positivePoints += parseInt(value);
-                                totalPoints += 5;
-                            } else if (key !== 'additionalComments') {
-                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
-                                if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
-                                    positivePoints++;
-                                } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
-                                    positivePoints++;
-                                }
-                                totalPoints++;
+                    for (let [key, value] of formData.entries()) {
+                        // Usar el mapa de etiquetas en lugar de buscar en el DOM
+                        const label = labelMap[key] || key;
+
+                        if (key === 'brand' || key === 'model' || key === 'licensePlate') {
+                            reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
+                        } else if (key === 'engineCondition' || key === 'interiorCondition') {
+                            reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}/5</li>`;
+                            positivePoints += parseInt(value);
+                            totalPoints += 5;
+                        } else if (key !== 'additionalComments') {
+                            reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
+                            if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
+                                positivePoints++;
+                            } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
+                                positivePoints++;
                             }
+                            totalPoints++;
                         }
                     }
 
@@ -251,7 +263,9 @@
                 // Contenido del informe
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(12);
-                doc.setTextColor(52, 73, 94); // Color del texto principal
+                doc.setTextColor(52, 73, 94); // 
+
+ Color del texto principal
 
                 const reportText = reportContent.innerText;
                 const lines = doc.splitTextToSize(reportText, 180);
@@ -261,7 +275,7 @@
 
                 // Agregar un borde
                 doc.setDrawColor(52, 152, 219); // Color del borde
-                doc.rect(5, 5,   200, 287); // Borde exterior
+                doc.rect(5, 5, 200, 287); // Borde exterior
 
                 // Agregar un pie de página
                 doc.setFontSize(10);
