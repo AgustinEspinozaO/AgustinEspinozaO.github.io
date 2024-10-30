@@ -210,7 +210,7 @@ button:hover {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('vehicleEvaluationForm');
     const report = document.getElementById('report');
     const reportContent = document.getElementById('reportContent');
@@ -220,10 +220,12 @@ button:hover {
     const sliders = document.querySelectorAll('input[type="range"]');
     sliders.forEach(slider => {
         const output = slider.nextElementSibling;
-        output.textContent = slider.value;
-        slider.addEventListener('input', function() {
-            output.textContent = this.value;
-        });
+        if (output) {
+            output.textContent = slider.value;
+            slider.addEventListener('input', function() {
+                output.textContent = this.value;
+            });
+        }
     });
 
     form.addEventListener('submit', function(e) {
@@ -232,6 +234,8 @@ button:hover {
         if (form.checkValidity()) {
             const formData = new FormData(form);
             let reportHTML = '<ul>';
+            let positivePoints = 0;
+            let totalPoints = 0;
 
             for (let [key, value] of formData.entries()) {
                 let label = form.querySelector(`[name="${key}"]`).previousElementSibling.textContent;
@@ -239,13 +243,44 @@ button:hover {
 
                 if (key === 'engineCondition' || key === 'interiorCondition') {
                     reportHTML += `<li><strong>${label}</strong>: ${value}/5</li>`;
-                } else {
+                    positivePoints += parseInt(value);
+                    totalPoints += 5;
+                } else if (key !== 'additionalComments') {
                     reportHTML += `<li><strong>${label}</strong>: ${value}</li>`;
+                    if (value === 'Sí' && key !== 'visibleDamage' && key !== 'paintDetails') {
+                        positivePoints++;
+                    } else if (value === 'No' && (key === 'visibleDamage' || key === 'paintDetails')) {
+                        positivePoints++;
+                    }
+                    totalPoints++;
                 }
             }
 
+            const additionalComments = formData.get('additionalComments');
+            if (additionalComments) {
+                reportHTML += `<li><strong>Comentarios adicionales</strong>: ${additionalComments}</li>`;
+            }
+
             reportHTML += '</ul>';
-            reportContent.innerHTML = reportHTML;
+
+            // Generar resumen y recomendación
+            const score = (positivePoints / totalPoints) * 100;
+            let recommendation = '';
+            if (score >= 80) {
+                recommendation = 'Este vehículo parece estar en excelentes condiciones. Se recomienda su compra.';
+            } else if (score >= 60) {
+                recommendation = 'Este vehículo está en buenas condiciones, pero considera algunos puntos de mejora. La compra podría ser una buena opción si el precio es adecuado.';
+            } else {
+                recommendation = 'Este vehículo tiene varios problemas. Se recomienda buscar otras opciones o negociar un precio significativamente menor.';
+            }
+
+            const summary = `
+                <h3>Resumen de la Evaluación</h3>
+                <p>Puntuación total: ${score.toFixed(2)}%</p>
+                <p><strong>Recomendación:</strong> ${recommendation}</p>
+            `;
+
+            reportContent.innerHTML = reportHTML + summary;
             report.classList.remove('hidden');
         } else {
             alert('Por favor, complete todos los campos requeridos.');
@@ -254,6 +289,10 @@ button:hover {
 
     downloadPDFButton.addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
+        if (typeof jsPDF === 'undefined') {
+            alert('Error: No se pudo cargar la biblioteca jsPDF. Por favor, verifica tu conexión a internet y vuelve a intentarlo.');
+            return;
+        }
         const doc = new jsPDF();
 
         doc.text('Resumen de la Evaluación del Vehículo', 10, 10);
