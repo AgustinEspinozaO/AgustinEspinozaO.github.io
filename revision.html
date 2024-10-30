@@ -23,6 +23,21 @@
     <div class="container max-w-2xl bg-white rounded-lg shadow-lg p-8">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Evaluación de Vehículos</h1>
         <form id="vehicleEvaluationForm" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="brand" class="block text-sm font-medium text-gray-700 mb-2">Marca:</label>
+                    <input type="text" id="brand" name="brand" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="model" class="block text-sm font-medium text-gray-700 mb-2">Modelo:</label>
+                    <input type="text" id="model" name="model" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label for="licensePlate" class="block text-sm font-medium text-gray-700 mb-2">Patente:</label>
+                    <input type="text" id="licensePlate" name="licensePlate" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                </div>
+            </div>
+
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Revisión técnica al día:</label>
@@ -164,7 +179,9 @@
                         if (labelElement) {
                             let label = labelElement.textContent.replace(':', '');
 
-                            if (key === 'engineCondition' || key === 'interiorCondition') {
+                            if (key === 'brand' || key === 'model' || key === 'licensePlate') {
+                                reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}</li>`;
+                            } else if (key === 'engineCondition' || key === 'interiorCondition') {
                                 reportHTML += `<li><span class="font-semibold">${label}</span>: ${value}/5</li>`;
                                 positivePoints += parseInt(value);
                                 totalPoints += 5;
@@ -223,11 +240,33 @@
                 }
                 const doc = new jsPDF();
 
-                doc.text('Resumen de la Evaluación del Vehículo', 10, 10);
-                
+                // Configuración de estilos
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(18);
+                doc.setTextColor(44, 62, 80); // Color del título
+
+                // Título
+                doc.text('Evaluación del Vehículo', 105, 15, null, null, 'center');
+
+                // Contenido del informe
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(12);
+                doc.setTextColor(52, 73, 94); // Color del texto principal
+
                 const reportText = reportContent.innerText;
                 const lines = doc.splitTextToSize(reportText, 180);
-                doc.text(lines, 10, 20);
+                
+                // Agregar contenido
+                doc.text(lines, 15, 25);
+
+                // Agregar un borde
+                doc.setDrawColor(52, 152, 219); // Color del borde
+                doc.rect(5, 5,   200, 287); // Borde exterior
+
+                // Agregar un pie de página
+                doc.setFontSize(10);
+                doc.setTextColor(149, 165, 166); // Color del pie de página
+                doc.text('Evaluación generada el ' + new Date().toLocaleDateString(), 105, 290, null, null, 'center');
 
                 doc.save('evaluacion_vehiculo.pdf');
             });
