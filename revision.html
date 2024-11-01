@@ -343,6 +343,69 @@
             display: inline-block;
             margin-bottom: 1rem;
         }
+        .image-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .image-action-btn {
+        background-color: var(--primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .image-action-btn svg {
+        width: 1.2em;
+        height: 1.2em;
+    }
+
+    .camera-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+    }
+
+    .camera-modal.active {
+        display: flex;
+    }
+
+    .camera-container {
+        background: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    #videoElement {
+        width: 100%;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .camera-controls {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    #canvas {
+        display: none;
+    }
     </style>
 </head>
 <body>
@@ -351,16 +414,38 @@
         <form id="vehicleEvaluationForm">
             <!-- Campos anteriores mantenidos igual -->
             
-            <div class="form-group">
-                <label class="form-label">Cargar Imágenes del Vehículo:</label>
-                <div class="image-upload-container" id="imagePreviewContainer">
-                    <!-- Previews de imágenes se mostrarán aquí -->
-                </div>
-                <label for="imageUpload" class="image-upload-btn">
-                    Subir Imágenes
+           <div class="form-group">
+            <label class="form-label">Imágenes del Vehículo:</label>
+            <div class="image-actions">
+                <label class="image-action-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Galería
+                    <input type="file" id="imageUpload" name="images" accept="image/*" multiple style="display: none;">
                 </label>
-                <input type="file" id="imageUpload" name="images" accept="image/*" multiple>
+                <button type="button" class="image-action-btn" id="openCamera">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Cámara
+                </button>
             </div>
+            <div class="image-upload-container" id="imagePreviewContainer">
+                <!-- Image previews will be shown here -->
+            </div>
+        </div>
+            <div class="camera-modal" id="cameraModal">
+            <div class="camera-container">
+                <video id="videoElement" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+                <div class="camera-controls">
+                    <button type="button" class="btn btn-primary" id="takePhoto">Tomar Foto</button>
+                    <button type="button" class="btn btn-danger" id="closeCamera">Cerrar</button>
+                </div>
+            </div>
+        </div>
     <div class="container">
         <h1>Evaluación de Vehículos</h1>
         <form id="vehicleEvaluationForm">
@@ -490,6 +575,90 @@
             const imageUpload = document.getElementById('imageUpload');
             const imagePreviewContainer = document.getElementById('imagePreviewContainer');
             let uploadedImages = [];
+            const cameraModal = document.getElementById('cameraModal');
+            const openCameraBtn = document.getElementById('openCamera');
+            const closeCameraBtn = document.getElementById('closeCamera');
+            const takePhotoBtn = document.getElementById('takePhoto');
+            const videoElement = document.getElementById('videoElement');
+            const canvas = document.getElementById('canvas');
+            let stream = null;
+
+                async function startCamera() {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    videoElement.srcObject = stream;
+                } catch (err) {
+                    console.error('Error accessing camera:', err);
+                    alert('Error al acceder a la cámara. Por favor, asegúrate de dar permisos de cámara.');
+                }
+            }
+
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    videoElement.srcObject = null;
+                }
+            }
+
+            openCameraBtn.addEventListener('click', () => {
+                cameraModal.classList.add('active');
+                startCamera();
+            });
+
+            closeCameraBtn.addEventListener('click', () => {
+                cameraModal.classList.remove('active');
+                stopCamera();
+            });
+
+            takePhotoBtn.addEventListener('click', () => {
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(videoElement, 0, 0);
+                
+                // Convert to base64 and add to preview
+                const imageData = canvas.toDataURL('image/jpeg');
+                addImagePreview(imageData);
+                
+                cameraModal.classList.remove('active');
+                stopCamera();
+            });
+
+            function addImagePreview(imageData) {
+                const imageWrapper = document.createElement('div');
+                imageWrapper.classList.add('image-preview');
+                
+                const image = document.createElement('img');
+                image.src = imageData;
+                
+                const removeButton = document.createElement('button');
+                removeButton.innerHTML = '&times;';
+                removeButton.classList.add('image-preview-remove');
+                removeButton.addEventListener('click', () => {
+                    imageWrapper.remove();
+                    uploadedImages = uploadedImages.filter(img => img !== imageData);
+                });
+                
+                imageWrapper.appendChild(image);
+                imageWrapper.appendChild(removeButton);
+                imagePreviewContainer.appendChild(imageWrapper);
+                uploadedImages.push(imageData);
+            }
+
+            // Modified form submission to exclude raw File objects from report
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (form.checkValidity()) {
+                    const formData = new FormData(form);
+                    let reportHTML = '<ul>';
+                    
+                    // Process form data excluding images
+                    for (let [key, value] of formData.entries()) {
+                        if (key !== 'images') {  // Skip the file input
+                            // Rest of the form processing remains the same...
+                        }
+                    }
 
                imageUpload.addEventListener('change', function(e) {
                 const files = Array.from(e.target.files);
