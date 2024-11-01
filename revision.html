@@ -633,8 +633,14 @@
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     
-    // Obtener y procesar el texto del reporte
-    const reportText = reportContent.innerText;
+    // Obtener y procesar el texto del reporte, eliminando referencias a imágenes
+    let reportText = reportContent.innerText;
+    // Eliminar cualquier línea que contenga referencias a imágenes
+    reportText = reportText.split('\n')
+        .filter(line => !line.toLowerCase().includes('imagen'))
+        .filter(line => !line.toLowerCase().includes('imágenes'))
+        .join('\n');
+    
     const lines = doc.splitTextToSize(reportText, 180);
     
     // Añadir el contenido del reporte
