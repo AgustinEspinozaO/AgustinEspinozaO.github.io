@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automotora EMSA - Autos Usados de Calidad</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/inter/3.19.3/inter.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #F63139;
+            --primary-dark: #d82830;
+            --black: #1a1a1a;
+            --white: #ffffff;
+            --gray-100: #f9f9f9;
+            --gray-200: #edf2f7;
+            --gray-300: #e2e8f0;
+            --gray-700: #4a5568;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            line-height: 1.7;
+            color: var(--black);
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Mejorada accesibilidad y contraste */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://automotoraemsa.cl/wp-content/uploads/2024/11/imagen-landing.jpeg.webp');
+            background-size: cover;
+            background-position: center;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            color: var(--white);
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: left;
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Carrusel mejorado */
+        .carousel-section {
+            padding: 5rem 0;
+            background: var(--gray-100);
+            overflow: hidden;
+        }
+
+        .carousel {
+            position: relative;
+            margin: 3rem auto;
+            max-width: 400px;
+        }
+
+        .carousel-container {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .carousel-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .carousel-btn {
+            background: var(--white);
+            border: none;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .car-card {
+            min-width: 100%;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .car-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .car-info {
+            padding: 1.5rem;
+        }
+
+        .car-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--black);
+        }
+
+        .car-specs {
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .car-price {
+            color: var(--primary);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        /* Testimonials mejorados */
+        .testimonials {
+            padding: 5rem 0;
+            background: var(--white);
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .testimonial-card {
+            background: var(--gray-100);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: left;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .testimonial-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Financiamiento mejorado */
+        .financing {
+            padding: 5rem 0;
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .financing-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .financing-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .financing-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .financing-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .financing-list li {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .financing-list li i {
+            color: var(--primary);
+        }
+
+        /* FAQ mejorado */
+        .faq {
+            padding: 5rem 0;
+            background: var(--gray-100);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--black);
+        }
+
+        .faq-item {
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            background: var(--white);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--gray-100);
+        }
+
+        .faq-question h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .faq-answer.active {
+            padding: 1.5rem;
+            opacity: 1;
+        }
+
+        /* CTA mejorado */
+        .cta {
+            padding: 6rem 0;
+            background: var(--primary);
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta .btn {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .cta .btn:hover {
+            background: var(--gray-100);
+        }
+
+        /* Responsive mejorado */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .financing-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .financing-list li {
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Descubre las mejores ofertas exclusivas en autos usados</h1>
+                <p>Encuentra el auto de tus sueños con la mejor calidad y garantía del mercado</p>
+                <button class="btn btn-primary">
+                    <i class="fas fa-car"></i>
+                    Ver catálogo completo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Carousel Section -->
+    <section class="carousel-section">
+        <div class="container">
+            <h2 class="section-title">Ofertas Destacadas</h2>
+            <div class="carousel">
+                <div class="carousel-container">
+                    <div class="car-card">
+                        <img src="/api/placeholder/400/250" alt="Toyota Corolla 2020">
+                        <div class="car-info">
+                            <h3>Toyota Corolla 2020</h3>
+                            <p class="car-specs">
+                                <i class="fas fa-tachometer-alt"></i> 36,000 km
+                                <br>
+                                <i class="fas fa-cog"></i> Automático
+                                <br>
+                                <i class="fas fa-gas-pump"></i> Bencina
+                            </p>
+                            <p class="car-price">$12,990,000</p>
+                            <button class="btn btn-primary">Ver detalles</button>
+                        </div>
+                    </div>
+                    <div class="car-card">
+                        <img src="/api/placeholder/400/250" alt="Mazda 3 2021">
+                        <div class="car-info">
+                            <h3>Mazda 3 2021</h3>
+                            <p class="car-specs">
+                                <i class="fas fa-tachometer-alt"></i> 28,000 km
+                                <br>
+                                <i class="fas fa-cog"></i> Mecánico
+                                <br>
+                                <i class="fas fa-gas-pump"></i> Bencina
+                            </p>
+                            <p class="car-price">$13,490,000</p>
+                            <button class="btn btn-primary">Ver detalles</button>
+                        </div>
+                    </div>
+                    <div class="car-card">
+                        <img src="/api/placeholder/400/250" alt="Hyundai Tucson 2019">
+                        <div class="car-info">
+                            <h3>Hyundai Tucson 2019</h3>
+                            <p class="car-specs">
+                                <i class="fas fa-tachometer-alt"></i> 45,000 km
+                                <br>
+                                <i class="fas fa-cog"></i> Automático
+                                <br>
+                                <i class="fas fa-gas-pump"></i> Diesel
+                            </p>
+                            <p class="car-price">$14,990,000</p>
+                            <button class="btn btn-primary">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-buttons">
+                    <button class="carousel-btn prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="/api/placeholder/60/60" alt="JuanPérez" class="testimonial-avatar">
+                        <div>
+                            <h3 class="testimonial-name">Juan Pérez</h3>
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p>"Excelente servicio y asesoría. Me ayudaron a encontrar exactamente lo que buscaba. El proceso fue muy transparente y profesional."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="/api/placeholder/60/60" alt="María González" class="testimonial-avatar">
+                        <div>
+                            <h3 class="testimonial-name">María González</h3>
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p>"El proceso de compra fue muy transparente y profesional. El equipo de ventas fue muy atento y resolvió todas mis dudas. Totalmente recomendado."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="/api/placeholder/60/60" alt="Carlos Rodríguez" class="testimonial-avatar">
+                        <div>
+                            <h3 class="testimonial-name">Carlos Rodríguez</h3>
+                            <div class="testimonial-stars">
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                                <i class="fas fa-star" style="color: #FFD700;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p>"El financiamiento fue rápido y con excelentes tasas. El auto está en perfectas condiciones y el servicio post-venta es excelente."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Financing Section -->
+    <section class="financing">
+        <div class="container">
+            <div class="financing-content">
+                <div class="financing-text">
+                    <h2>Financiamiento a tu medida</h2>
+                    <p>Hacemos realidad tu sueño de tener un auto con las mejores opciones de financiamiento del mercado.</p>
+                    <ul class="financing-list">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Tasas preferenciales desde 1.2% mensual</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Aprobación express en 24 horas</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Cuotas flexibles hasta 48 meses</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Sin pie en modelos seleccionados</span>
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-calculator"></i>
+                        Simular financiamiento
+                    </button>
+                </div>
+                <img src="/api/placeholder/500/400" alt="Financiamiento" style="border-radius: 12px; width: 100%; height: auto;">
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="container">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>¿Qué documentos necesito para comprar un auto?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Para comprar un auto necesitas:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>Cédula de identidad vigente</li>
+                        <li>Comprobante de domicilio reciente</li>
+                        <li>Últimas 3 liquidaciones de sueldo</li>
+                        <li>Declaración de IVA (si eres independiente)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>¿Cuánto es el pie mínimo?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>El pie mínimo varía según el modelo y año del vehículo, generalmente desde un 20% del valor total. Contamos con opciones especiales sin pie para modelos seleccionados y clientes que cumplan requisitos específicos.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>¿Incluyen garantía los autos usados?</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>Sí, todos nuestros vehículos incluyen:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>3 meses de garantía en piezas mecánicas principales</li>
+                        <li>Revisión técnica al día</li>
+                        <li>Historial de mantenciones verificado</li>
+                        <li>Certificación de kilometraje</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>¿Listo para encontrar tu próximo auto?</h2>
+            <p>Agenda una visita y recibe asesoría personalizada de nuestros expertos</p>
+            <button class="btn btn-primary">
+                <i class="fas fa-calendar-alt"></i>
+                Agendar visita
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Carrusel mejorado
+        const carousel = document.querySelector('.carousel-container');
+        const cards = document.querySelectorAll('.car-card');
+        const prevBtn = document.querySelector('.carousel-btn.prev');
+        const nextBtn = document.querySelector('.carousel-btn.next');
+        let currentIndex = 0;
+        const cardCount = cards.length;
+
+        function updateCarousel() {
+            const cardWidth = cards[0].offsetWidth;
+            carousel.style.transform = `translateX(${-currentIndex * cardWidth}px)`;
+            
+            // Actualizar estado de los botones
+            prevBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+            nextBtn.style.opacity = currentIndex === cardCount - 1 ? '0.5' : '1';
+        }
+
+        function nextSlide() {
+            if (currentIndex < cardCount - 1) {
+                currentIndex++;
+                updateCarousel();
+            }
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
+            }
+        }
+
+        // Event listeners para los botones
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Autoplay con pausa al hover
+        let autoplayInterval;
+
+        function startAutoplay() {
+            autoplayInterval = setInterval(() => {
+                if (currentIndex === cardCount - 1) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex++;
+                }
+                updateCarousel();
+            }, 5000);
+        }
+
+        function stopAutoplay() {
+            clearInterval(autoplayInterval);
+        }
+
+        carousel.addEventListener('mouseenter', stopAutoplay);
+        carousel.addEventListener('mouseleave', startAutoplay);
+
+        // Iniciar autoplay
+        startAutoplay();
+
+        // FAQ mejorado
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const icon = question.querySelector('i');
+                const allAnswers = document.querySelectorAll('.faq-answer');
+                const allIcons = document.querySelectorAll('.faq-question i');
+                
+                // Cerrar todas las respuestas excepto la actual
+                allAnswers.forEach(a => {
+                    if (a !== answer) {
+                        a.style.maxHeight = null;
+                        a.classList.remove('active');
+                    }
+                });
+                
+                // Rotar todos los íconos a su posición original excepto el actual
+                allIcons.forEach(i => {
+                    if (i !== icon) {
+                        i.style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                // Alternar la respuesta actual
+                if (answer.style.maxHeight) {
+                    answer.style.maxHeight = null;
+                    answer.classList.remove('active');
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    answer.classList.add('active');
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        // Animaciones al scroll
+        function revealOnScroll() {
+            const elements = document.querySelectorAll('.car-card, .testimonial-card, .financing-content, .faq-item');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                
+                if (elementTop < window.innerHeight && elementBottom > 0) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Inicializar estilos para animación
+        document.querySelectorAll('.car-card, .testimonial-card, .financing-content, .faq-item').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'all 0.6s ease-out';
+        });
+
+        // Event listeners para animaciones
+        window.addEventListener('scroll', revealOnScroll);
+        window.addEventListener('load', revealOnScroll);
+    </script>
+</body>
+</html>
